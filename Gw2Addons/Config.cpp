@@ -1,8 +1,9 @@
 #include "Config.h"
 
-Config::Config()
+void Config::Init()
 {
-	iniFile = new CSimpleIniA(true);
+	Config* c = GetInstance();
+	c->iniFile = new CSimpleIniA(true);
 	std::string addonFolder = GetAddonFolder();
 	if (SHCreateDirectoryExA(nullptr, addonFolder.c_str(), nullptr) == 0) {
 		Logger::LogString(LogLevel::Debug, MAIN_INFO, "Created config directory : ");
@@ -10,9 +11,9 @@ Config::Config()
 	addonFolder = addonFolder.append(CONFIG_FILENAME);
 	size_t size = addonFolder.size() + 1;
 	char* cptr = new char[size];
-	strcpy_s(cptr,size,addonFolder.c_str());
-	configLocation = cptr;
-	Logger::LogString(LogLevel::Debug, MAIN_INFO, std::string("Config file location : ").append(configLocation));
+	strcpy_s(cptr, size, addonFolder.c_str());
+	c->configLocation = cptr;
+	Logger::LogString(LogLevel::Debug, MAIN_INFO, std::string("Config file location : ").append(c->configLocation));
 }
 
 
@@ -130,11 +131,4 @@ void Config::SaveKeyBinds(const char * section, const char * key, std::set<uint>
 		}
 	}
 	c->iniFile->SetValue(section, key, keyS.c_str());
-}
-
-Config* Config::GetInstance()
-{
-	static Config* instance = new Config();
-
-	return instance;
 }

@@ -4,14 +4,13 @@
 #include "simpleini\SimpleIni.h"
 #include "Utility.h"
 #include "Logger.h"
+#include "Singleton.h"
 
-class Config
+class Config : public Singleton<Config>
 {
-private:
-	Config();
-	Config(Config const&) {};
-	void operator=(Config const&) {};
+friend class Singleton <Config>;
 public:
+	static void Init();
 	static bool Load();
 	static bool Save();
 	static bool LoadBool(const char* section, const char* key, bool defaultBool);
@@ -24,10 +23,8 @@ public:
 	static void SaveLong(const char* section, const char* key, long l);
 	static void SaveText(const char* section, const char* key, const char* text);
 	static void SaveKeyBinds(const char* section, const char* key, std::set<uint> keys);
-
-	static Config* GetInstance();
-
 protected:
+	Config() {};
 	// Config file settings
 	const char* configLocation;
 	CSimpleIniA* iniFile;
