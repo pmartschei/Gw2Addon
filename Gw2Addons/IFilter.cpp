@@ -48,9 +48,7 @@ void IFilter::Render()
 	isOpened = ImGui::CollapsingHeader(UNIQUE(name, id), ImGuiTreeNodeFlags_DefaultOpen);
 
 	if (!isActive) {
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
-		ImGui::PopStyleColor();
+		ImGui::PopStyleColor(3);
 	}
 	if (ImGui::BeginPopupContextItem(UNIQUE("HeaderPopup", id), 1)) {
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
@@ -91,7 +89,6 @@ void IFilter::Render()
 		ImGui::Text(text, filteredItems);
 		ImGui::PopStyleColor();
 	}
-	
 
 	if (isOpened) {
 		ImGui::Indent(ImGui::GetStyle().IndentSpacing);
