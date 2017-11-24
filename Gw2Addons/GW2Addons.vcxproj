@@ -195,6 +195,7 @@
     <ClInclude Include="simpleini\SimpleIni.h" />
     <ClInclude Include="SingleFilter.h" />
     <ClInclude Include="FilterPlugin.h" />
+    <ClInclude Include="Singleton.h" />
     <ClInclude Include="tinyxml\tinyxml2.h" />
     <ClInclude Include="TypeItemFilter.h" />
     <ClInclude Include="SellableItemFilter.h" />
