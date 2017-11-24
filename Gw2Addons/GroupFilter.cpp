@@ -41,11 +41,7 @@ std::set<ItemStackData> GroupFilter::Filter(std::set<ItemStackData> collection)
 		filteredItems = 0;
 		return std::set<ItemStackData>();
 	}
-	if (flags & FilterFlags::Not) {
-		std::set<ItemStackData> invers;
-		std::set_difference(collection.begin(), collection.end(), combinedSet.begin(), combinedSet.end(), std::inserter(invers, invers.end()));
-		combinedSet = invers;
-	}
+	combinedSet = InvertSet(collection, combinedSet);
 	filteredItems = (int)combinedSet.size();
 	return combinedSet;
 }
@@ -171,17 +167,16 @@ void GroupFilter::RenderContent() {
 	char *cpy = new char[32];
 	strcpy_s(cpy,32, name.c_str());
 
-	float tab = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + 120;
 
 	ImGui::Text("Name : ");
-	ImGui::SameLine(tab);
+	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	gotUpdated |= ImGui::InputText(UNIQUE_NO_DELIMITER("##nameinput", id), cpy, 32);
 	ImGui::PopItemWidth();
 
 	name = std::string(cpy);
 	ImGui::Text("Operation : ");
-	ImGui::SameLine(tab);
+	ImGui::SameLine(tabSpace);
 	int index = 0;
 	if (flags & FilterFlags::Or) index = 1;
 	ImGui::PushItemWidth(-1);
@@ -192,29 +187,6 @@ void GroupFilter::RenderContent() {
 		flags = (FilterFlags)(flags | FilterFlags::And);
 	else if (index == 1)
 		flags = (FilterFlags)(flags | FilterFlags::Or);
-	/*bool orOperation = (flags & GroupFlags::Or) == GroupFlags::Or;
-	bool andOperation = (flags & GroupFlags::And) == GroupFlags::And;
-	ImGui::SameLine(tab);
-	ImGui::Text("And ");
-	ImGui::SameLine();
-	if (ImGui::RadioButton(UNIQUE_NO_DELIMITER("##and", id), andOperation) && !andOperation) {
-		gotUpdated = true;
-		flags = (GroupFlags)(flags ^ GroupFlags::And ^ GroupFlags::Or);
-	}
-	ImGui::SameLine();
-	ImGui::Text("Or ");
-	ImGui::SameLine();
-	if (ImGui::RadioButton(UNIQUE_NO_DELIMITER("##or", id), orOperation) && !orOperation) {
-		gotUpdated = true;
-		flags = (GroupFlags)(flags ^ GroupFlags::Or ^ GroupFlags::And);
-	}*/
-	bool invert = (flags & FilterFlags::Not);
-	ImGui::Text("Inverted : ");
-	ImGui::SameLine(tab);
-	if (ImGui::Checkbox(UNIQUE_NO_DELIMITER("##invertFilter", id), &invert)) {
-		gotUpdated = true;
-		flags = (FilterFlags)(flags ^ FilterFlags::Not);
-	}
 
 	RenderChildren();
 }
@@ -241,7 +213,6 @@ std::vector<IFilter*>::iterator GroupFilter::RemoveFilter(IFilter* filter) {
 
 void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 {
-	printer.PushAttribute("flags", flags);
 	std::vector<IFilter*>::iterator iter;
 	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
 		(*iter)->Serialize(printer);
@@ -250,7 +221,6 @@ void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 
 void GroupFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
-	flags = (FilterFlags)element->IntAttribute("flags", FilterFlags::And);
 	tinyxml2::XMLElement* child = element->FirstChildElement();
 	tinyxml2::XMLElement* currentChild;
 	while (child) {

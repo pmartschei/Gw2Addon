@@ -21,13 +21,15 @@ protected:
 	bool gotUpdated = false;
 	bool isActive = true;
 	bool isOpened = true;
+	float tabSpace = 0.0f;
 	FilterFlags flags = FilterFlags::And;
 	int filteredItems = 0;
+	int id;
 	virtual void RenderContent() = 0;
 	virtual void CustomMenu();
-	int id;
 	virtual void SerializeContent(tinyxml2::XMLPrinter& printer);
 	virtual void DeserializeContent(tinyxml2::XMLElement* element);
+	std::set<ItemStackData> InvertSet(std::set<ItemStackData> fullData,std::set<ItemStackData> selectedData);
 public:
 	IFilter();
 	virtual std::set<ItemStackData> Filter(std::set<ItemStackData> collection);

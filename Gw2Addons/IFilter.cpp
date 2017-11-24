@@ -24,6 +24,7 @@ std::set<ItemStackData> IFilter::Filter(std::set<ItemStackData> collection)
 				filteredSet.insert(data);
 			}
 		}
+		filteredSet = InvertSet(collection, filteredSet);
 	}
 	filteredItems = (int)filteredSet.size();
 	return filteredSet;
@@ -36,6 +37,8 @@ bool IFilter::IsFiltered(ItemStackData data)
 
 void IFilter::Render()
 {
+	tabSpace = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + 140.0f;
+
 	if (!isActive) {
 		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(1, 110/255.f, 50/255.f, 1));
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1, 170 / 255.f, 90 / 255.f, 1));
@@ -81,8 +84,6 @@ void IFilter::Render()
 	float textSize = ImGui::CalcTextSize("Items filtered : 125").x;
 	char* text = "Items filtered: %3u";
 	if ((ImGui::GetContentRegionMax().x - ImGui::CalcItemWidth()) > textSize) {
-		/*textSize = ImGui::CalcTextSize(" 125 ").x;
-		text = " %3u ";*/
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - textSize);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
 		ImGui::Text(text, filteredItems);
@@ -93,6 +94,13 @@ void IFilter::Render()
 	if (isOpened) {
 		ImGui::Indent(ImGui::GetStyle().IndentSpacing);
 
+		bool invert = (flags & FilterFlags::Not);
+		ImGui::Text("Inverted : ");
+		ImGui::SameLine(tabSpace);
+		if (ImGui::Checkbox(UNIQUE_NO_DELIMITER("##invertFilter", id), &invert)) {
+			gotUpdated = true;
+			flags = (FilterFlags)(flags ^ FilterFlags::Not);
+		}
 		RenderContent();
 
 		ImGui::Unindent(ImGui::GetStyle().IndentSpacing);
@@ -140,6 +148,7 @@ void IFilter::Serialize(tinyxml2::XMLPrinter & printer)
 		printer.PushAttribute("name", name.c_str());
 	printer.PushAttribute("isActive", isActive);
 	printer.PushAttribute("type", GetSerializeName());
+	printer.PushAttribute("flags", flags);
 	SerializeContent(printer);
 	printer.CloseElement();
 }
@@ -152,6 +161,7 @@ void IFilter::Deserialize(tinyxml2::XMLElement * element)
 {
 	const char* c = element->Attribute("name");
 	isActive = element->BoolAttribute("isActive", true);
+	flags = (FilterFlags)element->IntAttribute("flags", FilterFlags::And);
 	if (c)
 		name = std::string(c);
 	DeserializeContent(element);
@@ -159,6 +169,16 @@ void IFilter::Deserialize(tinyxml2::XMLElement * element)
 
 void IFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
+}
+
+std::set<ItemStackData> IFilter::InvertSet(std::set<ItemStackData> fullData,std::set<ItemStackData> selectedData)
+{
+	std::set<ItemStackData> invers;
+	if (flags & FilterFlags::Not) {
+		std::set_difference(fullData.begin(), fullData.end(), selectedData.begin(), selectedData.end(), std::inserter(invers, invers.end()));
+		return invers;
+	}
+	return invers;
 }
 
 int IFilter::GetFilteredCount() {

@@ -19,7 +19,7 @@ template<class T>
 inline void SingleFilter<T>::RenderContent()
 {
 	ImGui::Text("Value : ");
-	ImGui::SameLine(ImGui::GetWindowContentRegionWidth()-ImGui::GetContentRegionAvailWidth()+120);
+	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	RenderInput(value);
 	ImGui::PopItemWidth();

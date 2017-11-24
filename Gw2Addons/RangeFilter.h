@@ -17,13 +17,12 @@ template<class T>
 inline void RangeFilter<T>::RenderContent()
 {
 	ImGui::Text("1st Boundary : ");
-	float pos = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + 120;
-	ImGui::SameLine(pos);
+	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	RenderInput(minValue,"first");
 	ImGui::PopItemWidth();
 	ImGui::Text("2nd Boundary : ");
-	ImGui::SameLine(pos);
+	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	RenderInput(maxValue,"second");
 	ImGui::PopItemWidth();

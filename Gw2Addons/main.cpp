@@ -17,15 +17,8 @@
 
 /*
 	TODO: 
-	Invert single Filter
 	Tradingpost values
 	Filtered Items wegwerfen
-	fix filter names after hovered item copy keybind	
-
-
-
-
-
 */
 HWND GameWindow = 0;
 WNDPROC BaseWndProc;
