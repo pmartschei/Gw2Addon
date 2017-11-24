@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{7EFE6DCC-544A-4116-9EF2-13C0431356E6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>GW2Mounts</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalIncludeDirectories>imgui;tinyxml</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
+    </PostBuildEvent>
+    <FxCompile>
+      <EntryPointName />
+      <ShaderModel />
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>imgui;tinyxml</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="d3d9.cpp" />
+    <ClCompile Include="FilterPluginUtility.cpp" />
+    <ClCompile Include="IDRangeItemFilter.cpp" />
+    <ClCompile Include="IFilter.cpp" />
+    <ClCompile Include="GroupFilter.cpp" />
+    <ClCompile Include="hacklib\ConsoleEx.cpp" />
+    <ClCompile Include="hacklib\CrashHandler_WIN32.cpp" />
+    <ClCompile Include="hacklib\ExeFile.cpp" />
+    <ClCompile Include="hacklib\ExeFile_WIN32.cpp" />
+    <ClCompile Include="hacklib\Hooker.cpp" />
+    <ClCompile Include="hacklib\Input.cpp" />
+    <ClCompile Include="hacklib\Memory_WIN32.cpp" />
+    <ClCompile Include="hacklib\MessageBox_WIN32.cpp" />
+    <ClCompile Include="hacklib\Patch.cpp" />
+    <ClCompile Include="hacklib\PatternScanner.cpp" />
+    <ClCompile Include="IDItemFilter.cpp" />
+    <ClCompile Include="imgui\imgui.cpp" />
+    <ClCompile Include="imgui\imgui_demo.cpp" />
+    <ClCompile Include="imgui\imgui_draw.cpp" />
+    <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="ItemFilterFactory.cpp" />
+    <ClCompile Include="LevelItemFilter.cpp" />
+    <ClCompile Include="LevelRangeItemFilter.cpp" />
+    <ClCompile Include="Logger.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Plugin.cpp" />
+    <ClCompile Include="PluginBase.cpp" />
+    <ClCompile Include="RarityItemFilter.cpp" />
+    <ClCompile Include="RarityRangeItemFilter.cpp" />
+    <ClCompile Include="RootGroupFilter.cpp" />
+    <ClCompile Include="FilterPlugin.cpp" />
+    <ClCompile Include="SellableItemFilter.cpp" />
+    <ClCompile Include="tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="TypeItemFilter.cpp" />
+    <ClCompile Include="Utility.cpp" />
+    <ClCompile Include="Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BagData.h" />
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="d3d9.h" />
+    <ClInclude Include="FilterFactory.h" />
+    <ClInclude Include="FilterPluginUtility.h" />
+    <ClInclude Include="IDRangeItemFilter.h" />
+    <ClInclude Include="IFilter.h" />
+    <ClInclude Include="ForeignFunction.h" />
+    <ClInclude Include="GroupFilter.h" />
+    <ClInclude Include="FilterFlags.h" />
+    <ClInclude Include="hacklib\ConsoleEx.h" />
+    <ClInclude Include="hacklib\CrashHandler.h" />
+    <ClInclude Include="hacklib\ExeFile.h" />
+    <ClInclude Include="hacklib\ForeignClass.h" />
+    <ClInclude Include="hacklib\Handles.h" />
+    <ClInclude Include="hacklib\Hooker.h" />
+    <ClInclude Include="hacklib\ImplementMember.h" />
+    <ClInclude Include="hacklib\Input.h" />
+    <ClInclude Include="hacklib\Memory.h" />
+    <ClInclude Include="hacklib\MessageBox.h" />
+    <ClInclude Include="hacklib\PageAllocator.h" />
+    <ClInclude Include="hacklib\Patch.h" />
+    <ClInclude Include="hacklib\PatternScanner.h" />
+    <ClInclude Include="hacklib\Rng.h" />
+    <ClInclude Include="hacklib\Timer.h" />
+    <ClInclude Include="IDItemFilter.h" />
+    <ClInclude Include="imgui\imconfig.h" />
+    <ClInclude Include="imgui\imgui.h" />
+    <ClInclude Include="imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="imgui\imgui_internal.h" />
+    <ClInclude Include="imgui\stb_rect_pack.h" />
+    <ClInclude Include="imgui\stb_textedit.h" />
+    <ClInclude Include="imgui\stb_truetype.h" />
+    <ClInclude Include="InventoryData.h" />
+    <ClInclude Include="ItemData.h" />
+    <ClInclude Include="ItemFilterFactory.h" />
+    <ClInclude Include="ItemStackData.h" />
+    <ClInclude Include="ItemRarity.h" />
+    <ClInclude Include="ItemType.h" />
+    <ClInclude Include="LevelItemFilter.h" />
+    <ClInclude Include="LevelRangeItemFilter.h" />
+    <ClInclude Include="Logger.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="Plugin.h" />
+    <ClInclude Include="PluginBase.h" />
+    <ClInclude Include="RangeFilter.h" />
+    <ClInclude Include="RarityItemFilter.h" />
+    <ClInclude Include="RarityRangeItemFilter.h" />
+    <ClInclude Include="RootGroupFilter.h" />
+    <ClInclude Include="simpleini\SimpleIni.h" />
+    <ClInclude Include="SingleFilter.h" />
+    <ClInclude Include="FilterPlugin.h" />
+    <ClInclude Include="tinyxml\tinyxml2.h" />
+    <ClInclude Include="TypeItemFilter.h" />
+    <ClInclude Include="SellableItemFilter.h" />
+    <ClInclude Include="Utility.h" />
+    <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="main.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
