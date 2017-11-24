@@ -200,3 +200,13 @@ void PluginBase::RenderKeyBinds()
 	}
 }
 
+void PluginBase::SetState(PluginState newState)
+{
+	successfulInitialize = newState;
+}
+
+PluginState PluginBase::GetState()
+{
+	return successfulInitialize;
+}
+

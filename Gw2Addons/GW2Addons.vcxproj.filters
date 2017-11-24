@@ -306,6 +306,9 @@
     <ClInclude Include="FilterFlags.h">
       <Filter>Source Files\Filter</Filter>
     </ClInclude>
+    <ClInclude Include="PluginState.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="main.def">

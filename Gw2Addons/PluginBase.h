@@ -5,6 +5,7 @@
 #include "ItemData.h"
 #include "main.h"
 #include "Logger.h"
+#include "PluginState.h"
 
 class Window; 
 struct EventKey
@@ -24,6 +25,7 @@ struct KeyBindData {
 		return (*this) < a;
 	}
 };
+
 inline bool operator==(const KeyBindData& lhs, const KeyBindData& rhs)
 {
 	return lhs.plugin == rhs.plugin && lhs.name == rhs.name;
@@ -35,7 +37,6 @@ inline bool operator<(const KeyBindData& lhs, const KeyBindData& rhs)
 	if (!d && rhs.plugin == "Main") return false;
 	if (!d) return lhs.plugin < rhs.plugin;
 	return lhs.name < rhs.name;
-	//return lhs.plugin < rhs.plugin;
 }
 class PluginBase {
 private:
@@ -49,6 +50,7 @@ private:
 	std::vector<KeyBindData*> keyBinds;
 
 	KeyBindData* keybindVisual;
+	PluginState successfulInitialize = PluginState::CREATED;
 protected:
 	std::list<Window*> _windows;
 	Window* _focusedWindow = 0;
@@ -76,5 +78,8 @@ public:
 	void UnregisterKeyBind(KeyBindData* keybind);
 
 	void RenderKeyBinds();
+
+	void SetState(PluginState successful);
+	PluginState GetState();
 };
 #endif

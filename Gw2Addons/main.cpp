@@ -33,8 +33,6 @@ PluginBase* pluginBase = new PluginBase();
 
 KeyBindData* openOptions = new KeyBindData();
 Window* optionWindow;
-
-bool notInitialized = true;
  
 #define ARCH_64BIT
 
@@ -419,8 +417,16 @@ HRESULT f_IDirect3DDevice9::Present(CONST RECT *pSourceRect, CONST RECT *pDestRe
 
 	ImGui_ImplDX9_NewFrame();
 
-	if (notInitialized) {
-		GetContext = hl::FindPattern("65 48 8b 04 25 58 00 00 00 ba 08 00 00 00") - 0x6;
+	if (pluginBase->GetState() == PluginState::CREATED) {
+		if (!GetContext) {
+			GetContext = hl::FindPattern("65 48 8b 04 25 58 00 00 00 ba 07 00 00 00");
+			if (!GetContext.data()) {
+				//can not find any context (aob is invalid)
+				pluginBase->SetState(PluginState::FAILURE);
+				return S_OK;
+			}
+			GetContext = (uintptr_t)GetContext.data() - 0x6;
+		}
 		currentPointers.mouseFocusBase = hl::FollowRelativeAddress(hl::FindPattern("33 DB 41 B9 22 00 00 00 48 8D 0D") + 0xB);
 		GetCodedTextFromHashId = hl::FindPattern("53 57 48 83 EC 48 8B D9 E8 ?? ?? ?? ?? 48 8B 48 50 E8 ?? ?? ?? ?? 44 8B 4C 24 68 48 8D 4C 24 30 48 8B F8") - 0xE;
 		DecodeText = hl::FindPattern("49 8B E8 48 8B F2 48 8B F9 48 85 C9 75 19 41 B8 ?? ?? ?? ?? 48") - 0x14;
@@ -442,7 +448,7 @@ HRESULT f_IDirect3DDevice9::Present(CONST RECT *pSourceRect, CONST RECT *pDestRe
 		void* pAlertCtx = (void*)hl::FollowRelativeAddress(hl::FollowRelativeAddress(results[0] + 0xa) + 0x3);
 		m_hkAlertCtx = m_hooker.hookVT(*(uintptr_t*)pAlertCtx, 0, (uintptr_t)hkGameThread);
 		if (m_hkAlertCtx) {
-			notInitialized = false;
+			pluginBase->SetState(PluginState::INITIALIZED);
 			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetContext addr: " + ToHex((uintptr_t)GetContext.data()));
 			Logger::LogString(LogLevel::Info, MAIN_INFO, "MouseHover addr: " + ToHex(currentPointers.mouseFocusBase));
 			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetCodedTextFromHashId addr: " + ToHex((uintptr_t)GetCodedTextFromHashId.data()));
@@ -619,7 +625,6 @@ void SetupGuild() {
 		currentPointers.guildInv = (uintptr_t)guildInv.data();
 	}
 }
-#pragma optimize( "", off )
 void SetupPlayer() {
 	currentPointers.ctx = 0;
 	currentPointers.charctx = 0;
@@ -704,7 +709,6 @@ void SetupPlayer() {
 	if (changed)
 		pluginBase->SetInventory(inventoryData);
 }
-#pragma optimize( "", on )
 void GameHook()
 {
 	pCtx = GetContext();
