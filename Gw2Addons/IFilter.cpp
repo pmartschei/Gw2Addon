@@ -86,7 +86,6 @@ void IFilter::Render()
 	float headerSize = ImGui::CalcTextSize(name.c_str()).x;
 	float x = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth();
 	if ((ImGui::GetContentRegionMax().x - headerSize - 30.0f - x) > textSize) {
-		
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - textSize);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
 		ImGui::Text(text, filteredItems);
