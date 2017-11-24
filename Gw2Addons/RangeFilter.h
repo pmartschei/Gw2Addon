@@ -6,9 +6,10 @@ template<class T>
 class RangeFilter : public IFilter {
 protected:
 	virtual std::string GetName() = 0;
-public:
 	T minValue;
 	T maxValue;
+public:
+	virtual void SetValues(T minValue,T maxValue) { this->minValue = minValue; this->maxValue = maxValue;  name = GetName(); }
 	virtual void RenderInput(T &value,std::string s) = 0;
 	// Geerbt über IFilter
 	virtual void RenderContent() override;

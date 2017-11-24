@@ -164,14 +164,14 @@ void GroupFilter::CheckForDeletion()
 }
 
 void GroupFilter::RenderContent() {
-	char *cpy = new char[32];
-	strcpy_s(cpy,32, name.c_str());
+	char *cpy = new char[64];
+	strcpy_s(cpy,64, name.c_str());
 
 
 	ImGui::Text("Name : ");
 	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
-	gotUpdated |= ImGui::InputText(UNIQUE_NO_DELIMITER("##nameinput", id), cpy, 32);
+	gotUpdated |= ImGui::InputText(UNIQUE_NO_DELIMITER("##nameinput", id), cpy, 64);
 	ImGui::PopItemWidth();
 
 	name = std::string(cpy);

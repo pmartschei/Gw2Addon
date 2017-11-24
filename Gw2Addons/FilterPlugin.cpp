@@ -16,8 +16,7 @@ void FilterPlugin::Init(PluginBase* base) {
 	stdFilter = new RootGroupFilter();
 	GroupFilter* groupFilter = new GroupFilter();
 	RarityRangeItemFilter* rarityFilter = new RarityRangeItemFilter();
-	rarityFilter->minValue = ItemRarity::Basic;
-	rarityFilter->maxValue = ItemRarity::Ascended;
+	rarityFilter->SetValues(ItemRarity::Basic, ItemRarity::Ascended);
 	groupFilter->AddFilter(rarityFilter);
 	groupFilter->AddFilter(new SellableItemFilter());
 	stdFilter->AddFilter(groupFilter);
@@ -240,10 +239,10 @@ void FilterPlugin::AddHoveredItemToFilter()
 		RarityItemFilter* rarityFilter = new RarityItemFilter();
 		TypeItemFilter* typeFilter = new TypeItemFilter();
 		groupFilter->SetName(std::string(data.name));
-		idFilter->value = data.id;
-		levelFilter->value = data.level;
-		rarityFilter->value = data.rarity;
-		typeFilter->value = data.itemtype;
+		idFilter->SetValue(data.id);
+		levelFilter->SetValue(data.level);
+		rarityFilter->SetValue(data.rarity);
+		typeFilter->SetValue(data.itemtype);
 		levelFilter->SetActive(false);
 		rarityFilter->SetActive(false);
 		typeFilter->SetActive(false);

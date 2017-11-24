@@ -83,7 +83,10 @@ void IFilter::Render()
 
 	float textSize = ImGui::CalcTextSize("Items filtered : 125").x;
 	char* text = "Items filtered: %3u";
-	if ((ImGui::GetContentRegionMax().x - ImGui::CalcItemWidth()) > textSize) {
+	float headerSize = ImGui::CalcTextSize(name.c_str()).x;
+	float x = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth();
+	if ((ImGui::GetContentRegionMax().x - headerSize - 30.0f - x) > textSize) {
+		
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - textSize);
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
 		ImGui::Text(text, filteredItems);
@@ -101,6 +104,7 @@ void IFilter::Render()
 			gotUpdated = true;
 			flags = (FilterFlags)(flags ^ FilterFlags::Not);
 		}
+
 		RenderContent();
 
 		ImGui::Unindent(ImGui::GetStyle().IndentSpacing);
@@ -178,7 +182,7 @@ std::set<ItemStackData> IFilter::InvertSet(std::set<ItemStackData> fullData,std:
 		std::set_difference(fullData.begin(), fullData.end(), selectedData.begin(), selectedData.end(), std::inserter(invers, invers.end()));
 		return invers;
 	}
-	return invers;
+	return selectedData;
 }
 
 int IFilter::GetFilteredCount() {

@@ -7,8 +7,9 @@ class SingleFilter : public IFilter {
 protected:
 
 	virtual std::string GetName() = 0;
-public:
 	T value;
+public:
+	virtual void SetValue(T value) { this->value = value; name = GetName(); }
 	// Geerbt über IFilter
 	virtual void RenderInput(T &value) = 0;
 
