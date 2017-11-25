@@ -167,7 +167,6 @@ void GroupFilter::RenderContent() {
 	char *cpy = new char[64];
 	strcpy_s(cpy,64, name.c_str());
 
-
 	ImGui::Text("Name : ");
 	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);

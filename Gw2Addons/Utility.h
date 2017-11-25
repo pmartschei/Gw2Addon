@@ -41,4 +41,6 @@ void trim(std::string &s);
 void RenderReadonly(const char* label, char* value, int size);
 void RenderReadonlyValue(const char* label, uintptr_t value);
 void RenderReadonlyValue(const char* label, std::string value);
+
+bool RenderInputText(const char* label, std::string& value, int size,float posX = 0.0f);
 #endif

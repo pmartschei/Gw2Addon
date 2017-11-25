@@ -74,6 +74,7 @@ private:
 	uint32_t inventoryUpdateIndex = 0;
 	std::vector<KeyBindData*> keyBinds;
 
+	std::string chainLoad;
 	KeyBindData* keybindVisual;
 	PluginBaseState pluginBaseState = PluginBaseState::CREATED;
 

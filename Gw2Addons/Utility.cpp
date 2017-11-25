@@ -156,3 +156,16 @@ void RenderReadonlyValue(const char* label, std::string str) {
 	strcpy_s(inputTxt, size, str.c_str());
 	RenderReadonly(label, inputTxt, size);
 }
+
+bool RenderInputText(const char* label, std::string& value, int size,float posX) {
+	ImGui::Text(label);
+	ImGui::SameLine(posX);
+	char* buf = new char[size];
+	strcpy_s(buf, size, value.c_str());
+	bool changed = false;
+	ImGui::PushItemWidth(-1);
+	changed = ImGui::InputText(std::string("##").append(label).c_str(), buf, size);
+	ImGui::PopItemWidth();
+	value = std::string(buf);
+	return changed;
+}

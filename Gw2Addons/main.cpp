@@ -22,6 +22,8 @@ uint ScreenWidth, ScreenHeight;
 
 Plugin* plugin= (Plugin*)new FilterPlugin();
 
+void UpdatePlugins();
+
 IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 {
 	assert(SDKVersion == D3D_SDK_VERSION);
@@ -31,13 +33,9 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 
 		// Try to chainload first
 		GetCurrentDirectoryA(MAX_PATH, path);
-		strcat_s(path, "\\d3d9_mchain.dll");
-
-		if (!FileExists(path))
-		{
-			GetCurrentDirectoryA(MAX_PATH, path);
-			strcat_s(path, "\\bin64\\d3d9_mchain.dll");
-		}
+		const char* chainPath = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
+		strcat_s(path, "\\bin64\\");
+		strcat_s(path,chainPath);
 
 		if (!FileExists(path))
 		{

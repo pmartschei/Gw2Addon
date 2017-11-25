@@ -117,6 +117,7 @@ void PluginBase::Init() {
 	openOptions->func = std::bind(&Window::ChangeState, optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
 	RegisterKeyBind(openOptions);
+	chainLoad = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
 }
 
 
@@ -342,7 +343,13 @@ void PluginBase::Render()
 			ImGui::Text("APPLICATION IS NOT FUNCTIONING CORRECTLY, UPDATE REQUIRED");
 			ImGui::PopStyleColor();
 		}
-		RenderKeyBinds();
+		if (RenderInputText("chainload dll", chainLoad, 64, 150)) {
+			Config::SaveText(MAIN_INFO, "chainload", chainLoad.c_str());
+			Config::Save();
+		}
+		if (ImGui::CollapsingHeader("Keybinds")) {
+			RenderKeyBinds();
+		}
 		optionWindow->End();
 	}
 }
