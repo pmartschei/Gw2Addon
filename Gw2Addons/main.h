@@ -9,17 +9,8 @@
 #include <list>
 #include <set>
 #include <iterator>
-#include <algorithm>
-#include <tchar.h>
-#include <sstream>
-#include <iostream>
 #include <mutex>
 #include <d3dx9.h>
-#include <functional>
-#include <cctype>
-#include <fstream>
-#include <Shlobj.h>
-#include <ctime>
 #include "def.h"
 
 #ifndef HID_USAGE_PAGE_GENERIC

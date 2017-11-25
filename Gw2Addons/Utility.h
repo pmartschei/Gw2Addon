@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <imgui.h>
+#include <cctype>
 #include "def.h"
 
 std::wstring s2ws(const std::string & str);
