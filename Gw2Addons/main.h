@@ -16,26 +16,11 @@
 #include <mutex>
 #include <d3dx9.h>
 #include <functional>
-#include <codecvt>
 #include <cctype>
 #include <fstream>
 #include <Shlobj.h>
 #include <ctime>
-
-#define COM_RELEASE(x) { if((x)) { (x)->Release(); (x) = nullptr; } }
-
-template <typename T> T CLAMP(const T& value, const T& low, const T& high)
-{
-	return value < low ? low : (value > high ? high : value);
-}
-
-#define POINTER_SIZE (8)
-#define MAIN_INFO ("Main")
-
-typedef unsigned char uchar;
-typedef unsigned int uint;
-typedef std::basic_string<TCHAR> tstring;
-typedef unsigned __int64 mstime;
+#include "def.h"
 
 #ifndef HID_USAGE_PAGE_GENERIC
 #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)

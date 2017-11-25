@@ -4,12 +4,10 @@
 
 class Plugin {
 protected:
-	PluginBase* _base;
 	void LogString(LogLevel level, std::string log);
 public:
 	virtual const char* GetName() = 0;
-	virtual void Init(PluginBase* base) {
-		_base = base; 
+	virtual void Init() {
 		LogString(LogLevel::Info, std::string(GetName()) + " initialization started");
 	};
 	virtual void PreCreateDevice() {};

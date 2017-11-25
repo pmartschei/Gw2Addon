@@ -3,13 +3,14 @@
 uintptr_t* FilterPlugin::vendorSource = new uintptr_t(0);
 uintptr_t* FilterPlugin::lastCallPtr = new uintptr_t(0);
 
-void FilterPlugin::Init(PluginBase* base) {
-	Plugin::Init(base);
+void FilterPlugin::Init() {
+	Plugin::Init();
 	LogString(LogLevel::Debug, "Creating window");
 	window = new Window("Filters", false);
 	window->flags |= ImGuiWindowFlags_MenuBar;
 	LogString(LogLevel::Debug, "Adding window");
-	base->AddWindow(window);
+	PluginBase* pluginBase = PluginBase::GetInstance();
+	pluginBase->AddWindow(window);
 
 	LogString(LogLevel::Debug, "Creating Filters");
 	root = new RootGroupFilter();
@@ -38,8 +39,8 @@ void FilterPlugin::Init(PluginBase* base) {
 	openWindow->keys = Config::LoadKeyBinds(openWindow->plugin, openWindow->name, { VK_MENU,VK_SHIFT,'F' });
 	copyItemKeyBind->func = std::bind(&FilterPlugin::AddHoveredItemToFilter, this);
 	openWindow->func = std::bind(&Window::ChangeState, window);
-	base->RegisterKeyBind(copyItemKeyBind);
-	base->RegisterKeyBind(openWindow);
+	pluginBase->RegisterKeyBind(copyItemKeyBind);
+	pluginBase->RegisterKeyBind(openWindow);
 	LogString(LogLevel::Info, std::string(GetName())+ " initialization finished");
 	ReloadFilterFiles();
 }
@@ -50,7 +51,7 @@ const char * FilterPlugin::GetName()
 void FilterPlugin::PluginMain()
 {
 	uint32_t updateIndex;
-	InventoryData inventory = _base->GetInventory(&updateIndex);
+	InventoryData inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
 	bool defaultFilterUpdated = root->Updated();
 	if (defaultFilterUpdated) {
 		std::string folder = GetAddonFolder();
@@ -230,8 +231,8 @@ void FilterPlugin::ReloadFilterFiles() {
 
 void FilterPlugin::AddHoveredItemToFilter()
 {
-	if (_base->HasHoveredItem()) {
-		ItemData data = _base->GetHoveredItem();
+	if (PluginBase::GetInstance()->HasHoveredItem()) {
+		ItemData data = PluginBase::GetInstance()->GetHoveredItem();
 		if (!data.sellable) return;
 		GroupFilter* groupFilter = new GroupFilter();
 		IDItemFilter* idFilter = new IDItemFilter();

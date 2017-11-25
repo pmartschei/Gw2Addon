@@ -6,8 +6,31 @@
 #include "main.h"
 #include "Logger.h"
 #include "PluginState.h"
+#include "hacklib\PatternScanner.h"
+#include "ForeignFunction.h"
+#include "hacklib\Hooker.h"
 
 class Window; 
+#include "Logger.h"
+
+#define ADDON_EXCEPTION(msg) ExceptHandler(msg, GetExceptionCode(), GetExceptionInformation(), __FILE__, __FUNCTION__, __LINE__)
+
+inline DWORD ExceptHandler(const char *msg, DWORD code, EXCEPTION_POINTERS *ep, const char *file, const char *func, int line) {
+	EXCEPTION_RECORD *er = ep->ExceptionRecord;
+	CONTEXT *ctx = ep->ContextRecord;
+
+#ifdef DEBUG
+	Logger::LogString(LogLevel::Critical, "Exception", "File : " + std::string(file));
+	Logger::LogString(LogLevel::Critical, "Exception", "Func : " + std::string(func));
+	Logger::LogString(LogLevel::Critical, "Exception", "Line : " + std::to_string(line));
+	Logger::LogString(LogLevel::Critical, "Exception", "Message : " + std::string(msg));
+#else
+	Logger::LogString(LogLevel::Critical, "Exception", "Message : " + std::string(msg));
+#endif
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+
 struct EventKey
 {
 	uint vk : 31;
@@ -38,8 +61,10 @@ inline bool operator<(const KeyBindData& lhs, const KeyBindData& rhs)
 	if (!d) return lhs.plugin < rhs.plugin;
 	return lhs.name < rhs.name;
 }
-class PluginBase {
+class PluginBase : public Singleton<PluginBase>{
+friend class Singleton<PluginBase>;
 private:
+	Window* optionWindow;
 	std::set<uint> _frameDownKeys;
 	std::set<uint> _downKeys;
 	std::set<uint> _closeWindowKeys = { VK_ESCAPE };
@@ -50,14 +75,53 @@ private:
 	std::vector<KeyBindData*> keyBinds;
 
 	KeyBindData* keybindVisual;
-	PluginState successfulInitialize = PluginState::CREATED;
+	PluginState pluginBaseState = PluginState::CREATED;
+
+	ForeignFunction<void*> GetContext;
+	ForeignFunction<void*> GetCodedTextFromHashId;
+	ForeignFunction<bool> DecodeText;
+	hl::Hooker m_hooker;
+	const hl::IHook *m_hkAlertCtx = nullptr;
+	std::mutex m_gameDataMutex;
+	void* pCtx;
+	std::map<uintptr_t, std::string> decodeIDs;
+	struct GamePointers {
+		uintptr_t ctx;
+		uintptr_t charctx;
+		uintptr_t player;
+		uintptr_t inventory;
+
+		uintptr_t guildctx;
+		uintptr_t guildInv;
+
+		uintptr_t mouseFocusBase;
+		uintptr_t hoveredElement;
+		uint elementParam;
+		uintptr_t objOnElement;
+		uintptr_t LocationPtr;
+		uintptr_t itemPtr;
+		ItemData hoveredItemData;
+	} currentPointers;
+
 protected:
+	PluginBase() {};
 	std::list<Window*> _windows;
 	Window* _focusedWindow = 0;
 public:
+	void Init();
 	void AddWindow(Window* window);
 	void CloseFocusedWindow();
 	bool HasFocusWindow();
+
+	void SetupContext();
+	void SetupPlayer();
+	void SetupMisc();
+	void SetupGuild();
+	void ReadItemData(ItemStackData& data, hl::ForeignClass pBase);
+	void ReadItemBase(ItemData& data, hl::ForeignClass pBase);
+	void GameHook();
+
+	void CheckInitialize();
 
 	bool IsCloseWindowBindDown();
 	bool KeysDown(std::set<uint> keys);
@@ -77,9 +141,13 @@ public:
 	void RegisterKeyBind(KeyBindData* keybind);
 	void UnregisterKeyBind(KeyBindData* keybind);
 
+	void Render();
+
 	void RenderKeyBinds();
 
-	void SetState(PluginState successful);
-	PluginState GetState();
+	void AddDecodeID(uintptr_t key, std::string value);
+
+	const hl::IHook* GetAlertHook();
+	std::mutex* GetDataMutex();
 };
 #endif

@@ -45,7 +45,7 @@ private:
 	void AddHoveredItemToFilter();
 	void ReloadFilterFiles();
 public:
-	virtual void Init(PluginBase* base) override;
+	virtual void Init() override;
 	virtual void Render() override;
 	virtual void PluginMain() override;
 	bool SaveFilterAs(RootGroupFilter* filter,const char* name);
@@ -55,7 +55,6 @@ public:
 
 	// Geerbt über Plugin
 	virtual const char * GetName() override;
-
 };
 struct firstParam {
 	int _;

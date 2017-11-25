@@ -1,5 +1,8 @@
 #include "PluginBase.h"
 
+void __fastcall hkGameThread(uintptr_t, int, int);
+void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText);
+
 bool PluginBase::IsCloseWindowBindDown() {
 	return std::includes(_frameDownKeys.begin(), _frameDownKeys.end(), _closeWindowKeys.begin(), _closeWindowKeys.end());
 }
@@ -44,7 +47,7 @@ bool PluginBase::PushKeys(std::list<EventKey> eventKeys)
 			keybindVisual = nullptr;
 			return true;
 		}
-		keybindVisual->isSetMode = !keyUp; 
+		keybindVisual->isSetMode = !keyUp;
 		std::set<uint> keys = std::set<uint>(lastKeys.begin(), lastKeys.end());
 		keybindVisual->keys = keys;
 		if (keyUp)
@@ -102,6 +105,21 @@ std::set<uint> PluginBase::GetKeys()
 	return _downKeys;
 }
 
+void PluginBase::Init() {
+	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating option window");
+	optionWindow = new Window("Options");
+	AddWindow(optionWindow);
+	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
+	KeyBindData* openOptions = new KeyBindData();
+	openOptions->plugin = MAIN_INFO;
+	openOptions->name = "OpenOptions";
+	openOptions->keys = Config::LoadKeyBinds(openOptions->plugin, openOptions->name, { VK_MENU,VK_SHIFT,'O' });
+	openOptions->func = std::bind(&Window::ChangeState, optionWindow);
+	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
+	RegisterKeyBind(openOptions);
+}
+
+
 void PluginBase::AddWindow(Window * window)
 {
 	_windows.push_back(window);
@@ -125,6 +143,75 @@ bool PluginBase::HasFocusWindow()
 		}
 	}
 	return false;
+}
+
+void PluginBase::SetupContext()
+{
+	pCtx = GetContext();
+
+	SetupPlayer();
+	SetupGuild();
+	SetupMisc();
+
+	if (currentPointers.itemPtr) {
+		SetHoveredItem(currentPointers.hoveredItemData);
+	}
+	else {
+		SetHoveredItem(ItemData());
+	}
+}
+
+void PluginBase::CheckInitialize()
+{
+	if (pluginBaseState == PluginState::CREATED) {
+		if (!GetContext) {
+			GetContext = hl::FindPattern("65 48 8b 04 25 58 00 00 00 ba 08 00 00 00");
+			if (!GetContext.data()) {
+				//can not find any context (aob is invalid)
+				pluginBaseState = PluginState::FAILURE;
+				Logger::LogString(LogLevel::Error, MAIN_INFO, "Pattern for Context is invalid");
+				return;
+			}
+			GetContext = (uintptr_t)GetContext.data() - 0x6;
+		}
+		if (!currentPointers.mouseFocusBase) {
+			currentPointers.mouseFocusBase = hl::FindPattern("33 DB 41 B9 22 00 00 00 48 8D 0D");
+			if (currentPointers.mouseFocusBase) currentPointers.mouseFocusBase += 0xB;
+			currentPointers.mouseFocusBase = hl::FollowRelativeAddress(currentPointers.mouseFocusBase);
+		}
+		GetCodedTextFromHashId = hl::FindPattern("53 57 48 83 EC 48 8B D9 E8 ?? ?? ?? ?? 48 8B 48 50 E8 ?? ?? ?? ?? 44 8B 4C 24 68 48 8D 4C 24 30 48 8B F8") - 0xE;
+		DecodeText = hl::FindPattern("49 8B E8 48 8B F2 48 8B F9 48 85 C9 75 19 41 B8 ?? ?? ?? ?? 48") - 0x14;
+
+		hl::PatternScanner scanner;
+
+		auto results = scanner.find({
+			"ViewAdvanceDevice"/*,
+							   "ViewAdvanceAgentSelect",
+							   "ViewAdvanceAgentView",
+							   "ViewAdvanceWorldView",
+							   "CompassManager()->IsCompassFixed()",
+							   "ViewAdvanceUi",
+							   "ultimateMasterCharacter",
+							   "m_currCamera",
+							   "guid != MEM_CATEGORY_INVALID && guid < m_headGUID"*/
+		}, "Gw2-64.exe");
+
+		void* pAlertCtx = (void*)hl::FollowRelativeAddress(hl::FollowRelativeAddress(results[0] + 0xa) + 0x3);
+		m_hkAlertCtx = m_hooker.hookVT(*(uintptr_t*)pAlertCtx, 0, (uintptr_t)hkGameThread);
+		if (m_hkAlertCtx) {
+			pluginBaseState = PluginState::INITIALIZED;
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetContext addr: " + ToHex((uintptr_t)GetContext.data()));
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "MouseHover addr: " + ToHex(currentPointers.mouseFocusBase));
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetCodedTextFromHashId addr: " + ToHex((uintptr_t)GetCodedTextFromHashId.data()));
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "DecodeText addr: " + ToHex((uintptr_t)DecodeText.data()));
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "GameThread Hook addr: " + ToHex((uintptr_t)pAlertCtx));
+		}
+		else {
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "GameThread Hook invalid addr: " + ToHex((uintptr_t)pAlertCtx));
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "results[0] : " + ToHex(results[0]));
+		}
+	}
+
 }
 
 bool PluginBase::CheckKeyBinds() {
@@ -179,6 +266,45 @@ void PluginBase::UnregisterKeyBind(KeyBindData* keybind)
 	//TODO	
 }
 
+void PluginBase::Render()
+{
+#ifdef _DEBUG
+	if (ImGui::Begin("IncQol-Debug", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
+
+		RenderReadonlyValue("GlobalCtx", currentPointers.ctx);
+		ImGui::Separator();
+		RenderReadonlyValue("CharCtx", currentPointers.charctx);
+		RenderReadonlyValue("Player", currentPointers.player);
+		RenderReadonlyValue("Inventory", currentPointers.inventory);
+		ImGui::Separator();
+		RenderReadonlyValue("GuildCtx", currentPointers.guildctx);
+		RenderReadonlyValue("GuildInv", currentPointers.guildInv);
+		ImGui::Separator();
+		RenderReadonlyValue("Mouse Ptr", currentPointers.mouseFocusBase);
+		RenderReadonlyValue("Hov. Element", currentPointers.hoveredElement);
+		RenderReadonlyValue("Param", currentPointers.elementParam);
+		RenderReadonlyValue("Obj", currentPointers.objOnElement);
+		RenderReadonlyValue("LocationPtr", currentPointers.LocationPtr);
+		RenderReadonlyValue("ItemPtr", currentPointers.itemPtr);
+		ImGui::Separator();
+		if (currentPointers.itemPtr != 0) {
+			ImGui::Text("Item");
+			RenderReadonlyValue("Name", currentPointers.hoveredItemData.name);
+			RenderReadonlyValue("ID", currentPointers.hoveredItemData.id);
+			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData.itemtype);
+			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData.rarity);
+			RenderReadonlyValue("Level", currentPointers.hoveredItemData.level);
+			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData.sellable);
+		}
+	}
+	ImGui::End();
+#endif
+	if (optionWindow->Begin()) {
+		RenderKeyBinds();
+		optionWindow->End();
+	}
+}
+
 void PluginBase::RenderKeyBinds()
 {
 	const char* lastPlugin = nullptr;
@@ -200,13 +326,230 @@ void PluginBase::RenderKeyBinds()
 	}
 }
 
-void PluginBase::SetState(PluginState newState)
+void PluginBase::AddDecodeID(uintptr_t key, std::string value)
 {
-	successfulInitialize = newState;
+	decodeIDs[key] = value;
 }
 
-PluginState PluginBase::GetState()
+const hl::IHook* PluginBase::GetAlertHook()
 {
-	return successfulInitialize;
+	return m_hkAlertCtx;
 }
 
+std::mutex* PluginBase::GetDataMutex()
+{
+	return &m_gameDataMutex;
+}
+void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
+	data.pItemData = pBase;
+	data.id = pBase.get<int>(0x28);
+	data.level = pBase.get<int>(0x74);
+	data.rarity = (ItemRarity)pBase.get<int>(0x60);
+	data.sellable = !(pBase.get<byte>(0x39) & 0x40);
+	data.pExtendedType = pBase.get<void*>(0x30);
+	if (data.sellable) {
+		data.sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
+	}
+	data.itemtype = (ItemType)pBase.get<int>(0x2C);
+	uint hashId = pBase.get<uint>(0x80);
+	if (hashId == 0) {
+		hl::ForeignClass hash = pBase.get<void*>(0xA8);
+		hashId = hash.get<uint>(0x58);
+	}
+	if (hashId == 0) return;
+	if (decodeIDs.find(hashId) == decodeIDs.end()) {
+		uintptr_t* d = (uintptr_t*)GetCodedTextFromHashId(hashId, 0);
+		DecodeText(d, cbDecodeText, hashId);
+	}
+	data.name = decodeIDs[hashId];
+}
+void PluginBase::ReadItemData(ItemStackData& data, hl::ForeignClass pBase) {
+	if (!pBase) return;
+	hl::ForeignClass itemPtr = pBase.call<void*>(0x20);
+	if (!itemPtr) return;
+	data.pItem = pBase;
+	data.count = pBase.call<int>(0x78);
+	ReadItemBase(data.itemData, itemPtr);
+}
+void PluginBase::SetupMisc() {
+	currentPointers.elementParam = 0;
+	currentPointers.LocationPtr = 0;
+	currentPointers.itemPtr = 0;
+	currentPointers.objOnElement = 0;
+	currentPointers.hoveredElement = 0;
+	currentPointers.hoveredElement = *(uintptr_t*)currentPointers.mouseFocusBase;
+	hl::ForeignClass element = (void*)currentPointers.hoveredElement;
+	if (!element) return;
+	currentPointers.elementParam = element.get<uint>(0x68);
+	hl::ForeignClass objOnElement = element.get<void*>(0x228);
+	currentPointers.objOnElement = (uintptr_t)objOnElement.data();
+	if (!objOnElement) return;
+	hl::ForeignClass inventory = objOnElement.get<void*>(0xB8);
+	if (inventory && (uintptr_t)inventory.data() == currentPointers.inventory) {//its a normal slot in the inventory/shared/bank
+		currentPointers.LocationPtr = (uintptr_t)inventory.data();
+		hl::ForeignClass item = objOnElement.get<void*>(0xC8);
+		if (item) {
+			ItemStackData data;
+			ReadItemData(data, item);
+			currentPointers.itemPtr = (uintptr_t)data.itemData.pItemData.data();
+			currentPointers.hoveredItemData = data.itemData;
+		}
+		return;
+	}
+	hl::ForeignClass itemData = objOnElement.get<void*>(0x70);
+	hl::ForeignClass itemCollection = objOnElement.get<void*>(0x78);//collection of materials
+	if (itemData && itemCollection && ((uintptr_t)itemData.data() == ((uintptr_t)itemCollection.data() + 0x60 + currentPointers.elementParam * 0x20))) {
+		currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
+		itemData = itemData.get<void*>(0x0);
+		if (itemData) {
+			currentPointers.itemPtr = (uintptr_t)itemData.data();
+			ReadItemBase(currentPointers.hoveredItemData, itemData);
+			return;
+		}
+	}
+	itemCollection = objOnElement.get<void*>(0x80);
+	if (itemCollection && ((uintptr_t)itemCollection.data() == currentPointers.guildInv)) {//guild slots
+		currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
+		itemData = objOnElement.get<void*>(0x98);
+		if (itemData) {
+			currentPointers.itemPtr = (uintptr_t)itemData.data();
+			ReadItemBase(currentPointers.hoveredItemData, itemData);
+			return;
+		}
+	}
+}
+void PluginBase::SetupGuild() {
+	currentPointers.ctx = 0;
+	currentPointers.guildctx = 0;
+	currentPointers.guildInv = 0;
+	hl::ForeignClass ctx = pCtx;
+	currentPointers.ctx = (uintptr_t)ctx.data();
+	if (!ctx) return;
+
+	hl::ForeignClass guildctx = ctx.get<void*>(0x148);
+	currentPointers.guildctx = (uintptr_t)guildctx.data();
+	if (!guildctx) return;
+
+	hl::ForeignClass guildInv = guildctx.get<void*>(0x68);
+	if (guildInv) {
+		currentPointers.guildInv = (uintptr_t)guildInv.data();
+	}
+}
+void PluginBase::SetupPlayer() {
+	currentPointers.ctx = 0;
+	currentPointers.charctx = 0;
+	currentPointers.player = 0;
+	currentPointers.inventory = 0;
+	hl::ForeignClass ctx = pCtx;
+	currentPointers.ctx = (uintptr_t)ctx.data();
+	if (!ctx) return;
+
+	hl::ForeignClass charctx = ctx.get<void*>(0x90);
+	currentPointers.charctx = (uintptr_t)charctx.data();
+	if (!charctx) return;
+
+	uint32_t t;
+	hl::ForeignClass player = charctx.get<void*>(0x98);
+	currentPointers.player = (uintptr_t)player.data();
+	if (!player) {
+		if (GetInventory(&t).itemStackDatas.size()>0)
+			SetInventory(InventoryData());
+		return;
+	}
+
+	hl::ForeignClass inventory = player.call<void*>(0x80);
+	currentPointers.inventory = (uintptr_t)inventory.data();
+	if (!inventory) return;
+	InventoryData oldData = GetInventory(&t);
+	bool changed = false;
+	InventoryData inventoryData = InventoryData();
+	inventoryData.size = inventory.call<int>(0x1A0);//get count slots for bagcount
+	inventoryData.bagCount = inventory.call<int>(0x118);
+	inventoryData.slotsPerBag = inventoryData.size / inventoryData.bagCount;
+	std::vector<BagData> oldBagData = oldData.bagDatas;
+	std::vector<BagData> bagData;
+	for (int i = 0; i < inventoryData.bagCount; i++) {
+		hl::ForeignClass itemStackPtr = inventory.call<void*>(0x108, i);
+		BagData data;
+		ReadItemData(data, itemStackPtr);
+		if (data.itemData.pExtendedType) {
+			data.bagSize = data.itemData.pExtendedType.get<int>(0x28);
+			data.noSellOrSort = data.itemData.pExtendedType.get<bool>(0x0);
+		}
+		bagData.push_back(data);
+		if (changed) continue;
+		if (bagData.size() > oldBagData.size()) {
+			changed = true;
+		}
+		if (changed) continue;
+		ItemStackData old = oldBagData[bagData.size() - 1];
+		if (data.pItem != old.pItem || data.slot != old.slot) {
+			changed = true;
+		}
+	}
+	inventoryData.bagDatas = bagData;
+	std::vector<ItemStackData> oldItemData = oldData.itemStackDatas;
+	std::vector<ItemStackData> itemData;
+	int slotCount = inventory.get<int>(0xD4);//unsafe but nothing better
+	for (int i = 0; i < slotCount; i++) {
+		hl::ForeignClass itemStackPtr = inventory.call<void*>(0x168, i);
+		ItemStackData data;
+		ReadItemData(data, itemStackPtr);
+		int bagSlot = i / inventoryData.slotsPerBag;
+		if (bagSlot < bagData.size()) {
+			BagData bag = bagData[bagSlot];
+			if (bag.pItem && data.itemData.sellable)  data.itemData.sellable = !bag.noSellOrSort;
+		}
+		data.slot = i;
+		itemData.push_back(data);
+		if (changed) continue;
+		if (itemData.size() > oldItemData.size()) {
+			changed = true;
+		}
+		if (changed) continue;
+		ItemStackData old = oldItemData[itemData.size() - 1];
+		if (data.pItem != old.pItem || data.slot != old.slot) {
+			changed = true;
+		}
+	}
+	if (itemData.size() != oldItemData.size()) {
+		changed = true;
+	}
+	inventoryData.itemStackDatas = itemData;
+	if (changed)
+		SetInventory(inventoryData);
+}
+void PluginBase::GameHook()
+{
+	SetupContext();
+
+	//PluginBase* base = GetInstance();
+	//plugin->PluginMain();
+}
+
+void __fastcall hkGameThread(uintptr_t pInst, int, int frame_time)
+{
+	PluginBase* base = PluginBase::GetInstance();
+	static auto orgFunc = ((void(__thiscall*)(uintptr_t, int))base->GetAlertHook()->getLocation());
+
+	std::lock_guard<std::mutex> lock(*base->GetDataMutex());
+
+	[&] {
+		__try {
+			base->GameHook();
+		}
+		__except (ADDON_EXCEPTION("[hkGameThread] Exception in game thread")) {
+			;
+		}
+	}();
+
+	orgFunc(pInst, frame_time);
+}
+static void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText)
+{
+	PluginBase* base = PluginBase::GetInstance();
+	if (ctx && decodedText && decodedText[0] != 0) {
+		uintptr_t v = (uintptr_t)ctx;
+		base->AddDecodeID(v,ws2s(std::wstring(decodedText)));
+	}
+}
