@@ -1,8 +1,13 @@
 #ifndef _UTILITY_H
 #define _UTILITY_H
-#include "main.h"
-
-#define CONFIG_FILENAME ("config.ini")
+#include <string>
+#include <codecvt>
+#include <sstream>
+#include <windows.h>
+#include <vector>
+#include <algorithm>
+#include <imgui.h>
+#include "def.h"
 
 std::wstring s2ws(const std::string & str);
 
@@ -31,4 +36,8 @@ void ltrim(std::string &s);
 void rtrim(std::string &s);
 // trim from both ends (in place)
 void trim(std::string &s);
+
+void RenderReadonly(const char* label, char* value, int size);
+void RenderReadonlyValue(const char* label, uintptr_t value);
+void RenderReadonlyValue(const char* label, std::string value);
 #endif

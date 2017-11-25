@@ -1,8 +1,9 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 #include "Utility.h"
-#include "main.h"
 #include <time.h>
+#include <Shlobj.h>
+#include <fstream>
 
 enum LogLevel {
 	Debug = 0,

@@ -132,3 +132,27 @@ void trim(std::string &s) {
 	ltrim(s);
 	rtrim(s);
 }
+
+
+void RenderReadonly(const char* label, char* value, int size) {
+	ImGui::Text(label);
+	ImGui::SameLine(110);
+	ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(0, 0, 0, 0));
+	ImGui::InputText(std::string("##").append(label).c_str(), value, size, ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_AutoSelectAll);
+	ImGui::PopStyleColor();
+}
+void RenderReadonlyValue(const char* label, uintptr_t value) {
+	char* inputTxt;
+	std::string str = ToHex(value);
+	int size = (int)str.size() + 1;
+	inputTxt = new char[size];
+	strcpy_s(inputTxt, size, str.c_str());
+	RenderReadonly(label, inputTxt, size);
+}
+void RenderReadonlyValue(const char* label, std::string str) {
+	char* inputTxt;
+	int size = (int)str.size() + 1;
+	inputTxt = new char[size];
+	strcpy_s(inputTxt, size, str.c_str());
+	RenderReadonly(label, inputTxt, size);
+}
