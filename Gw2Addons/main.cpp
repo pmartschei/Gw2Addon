@@ -10,6 +10,7 @@
 	TODO: 
 	Tradingpost values
 	Filtered Items wegwerfen
+	s_styleData[..] 26 colors for ui etc size 20 
 */
 HWND GameWindow = 0;
 WNDPROC BaseWndProc;
@@ -20,7 +21,6 @@ IDirect3DDevice9* RealDevice = nullptr;
 uint ScreenWidth, ScreenHeight;
 
 Plugin* plugin= (Plugin*)new FilterPlugin();
-
 
 IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 {
@@ -65,6 +65,7 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 
 void InitDLL() {
 	PluginBase::GetInstance()->Init();
+	PluginBase::GetInstance()->SetUpdateFunc(UpdatePlugins);
 	Logger::Init("IncQol.log");
 	Logger::SetMinLevel(LOG_LVL);
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
@@ -314,4 +315,7 @@ ULONG f_IDirect3DDevice9::Release()
 	return f_pD3DDevice->Release();
 }
 
+void UpdatePlugins() {
+	plugin->PluginMain();
+}
 

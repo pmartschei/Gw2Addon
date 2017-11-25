@@ -163,27 +163,55 @@ void PluginBase::SetupContext()
 
 void PluginBase::CheckInitialize()
 {
-	if (pluginBaseState == PluginState::CREATED) {
-		if (!GetContext) {
-			GetContext = hl::FindPattern("65 48 8b 04 25 58 00 00 00 ba 08 00 00 00");
-			if (!GetContext.data()) {
-				//can not find any context (aob is invalid)
-				pluginBaseState = PluginState::FAILURE;
-				Logger::LogString(LogLevel::Error, MAIN_INFO, "Pattern for Context is invalid");
-				return;
-			}
-			GetContext = (uintptr_t)GetContext.data() - 0x6;
+	switch (pluginBaseState) {
+	case PluginBaseState::CREATED: {
+		GetContext = hl::FindPattern("65 48 8b 04 25 58 00 00 00 ba 08 00 00 00");
+		pluginBaseState = PluginBaseState::CONTEXT_FINISHED;
+		if (!GetContext.data()) {
+			//can not find any context (aob is invalid)
+			pluginBaseState = PluginBaseState::FAILURE;
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "Pattern for Context is invalid");
+			return;
 		}
-		if (!currentPointers.mouseFocusBase) {
-			currentPointers.mouseFocusBase = hl::FindPattern("33 DB 41 B9 22 00 00 00 48 8D 0D");
-			if (currentPointers.mouseFocusBase) currentPointers.mouseFocusBase += 0xB;
+		GetContext = (uintptr_t)GetContext.data() - 0x6;
+		Logger::LogString(LogLevel::Info, MAIN_INFO, "GetContext addr: " + ToHex((uintptr_t)GetContext.data()));
+	}
+	case PluginBaseState::CONTEXT_FINISHED: {
+		currentPointers.mouseFocusBase = hl::FindPattern("33 DB 41 B9 22 00 00 00 48 8D 0D");
+		pluginBaseState = PluginBaseState::MOUSE_FOCUS_FINISHED;
+		if (currentPointers.mouseFocusBase) {
+			currentPointers.mouseFocusBase += 0xB;
 			currentPointers.mouseFocusBase = hl::FollowRelativeAddress(currentPointers.mouseFocusBase);
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "MouseHover addr: " + ToHex(currentPointers.mouseFocusBase));
 		}
-		GetCodedTextFromHashId = hl::FindPattern("53 57 48 83 EC 48 8B D9 E8 ?? ?? ?? ?? 48 8B 48 50 E8 ?? ?? ?? ?? 44 8B 4C 24 68 48 8D 4C 24 30 48 8B F8") - 0xE;
-		DecodeText = hl::FindPattern("49 8B E8 48 8B F2 48 8B F9 48 85 C9 75 19 41 B8 ?? ?? ?? ?? 48") - 0x14;
-
+		else {
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "Pattern for Mouse Hover is invalid, no Mouse Hover available");
+		}
+	}
+	case PluginBaseState::MOUSE_FOCUS_FINISHED: {
+		GetCodedTextFromHashId = hl::FindPattern("53 57 48 83 EC 48 8B D9 E8 ?? ?? ?? ?? 48 8B 48 50 E8 ?? ?? ?? ?? 44 8B 4C 24 68 48 8D 4C 24 30 48 8B F8");
+		pluginBaseState = PluginBaseState::CODED_TEXT_FINISHED;
+		if (GetCodedTextFromHashId.data()) {
+			GetCodedTextFromHashId = (uintptr_t)GetCodedTextFromHashId.data() - 0xE;
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetCodedTextFromHashId addr: " + ToHex((uintptr_t)GetCodedTextFromHashId.data()));
+		}
+		else {
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "Pattern for CodedText is invalid, no CodedText available");
+		}
+	}
+	case PluginBaseState::CODED_TEXT_FINISHED: {
+		DecodeText = hl::FindPattern("49 8B E8 48 8B F2 48 8B F9 48 85 C9 75 19 41 B8 ?? ?? ?? ?? 48");
+		pluginBaseState = PluginBaseState::DECODE_TEXT_FINISHED;
+		if (DecodeText.data()) {
+			DecodeText = (uintptr_t)DecodeText.data() - 0x14;
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "DecodeText addr: " + ToHex((uintptr_t)DecodeText.data()));
+		}
+		else {
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "Pattern for DecodeText is invalid, no DecodeText available");
+		}
+	}
+	case PluginBaseState::DECODE_TEXT_FINISHED: {
 		hl::PatternScanner scanner;
-
 		auto results = scanner.find({
 			"ViewAdvanceDevice"/*,
 							   "ViewAdvanceAgentSelect",
@@ -195,21 +223,30 @@ void PluginBase::CheckInitialize()
 							   "m_currCamera",
 							   "guid != MEM_CATEGORY_INVALID && guid < m_headGUID"*/
 		}, "Gw2-64.exe");
+		pluginBaseState = PluginBaseState::SCANNER_FINISHED;
 
-		void* pAlertCtx = (void*)hl::FollowRelativeAddress(hl::FollowRelativeAddress(results[0] + 0xa) + 0x3);
+		if (!results[0]) {
+			pluginBaseState = PluginBaseState::FAILURE;
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "Scan for AlertCtx was invalid");
+			break;
+		}
+		pAlertCtx = (void*)hl::FollowRelativeAddress(hl::FollowRelativeAddress(results[0] + 0xa) + 0x3);
+		if (!pAlertCtx) {
+			pluginBaseState = PluginBaseState::FAILURE;
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "FollowAddress for AlertCtx was invalid");
+			break;
+		}
+		Logger::LogString(LogLevel::Info, MAIN_INFO, "GameThread Hook addr: " + ToHex((uintptr_t)pAlertCtx));
+	}
+	case PluginBaseState::SCANNER_FINISHED: {
 		m_hkAlertCtx = m_hooker.hookVT(*(uintptr_t*)pAlertCtx, 0, (uintptr_t)hkGameThread);
 		if (m_hkAlertCtx) {
-			pluginBaseState = PluginState::INITIALIZED;
-			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetContext addr: " + ToHex((uintptr_t)GetContext.data()));
-			Logger::LogString(LogLevel::Info, MAIN_INFO, "MouseHover addr: " + ToHex(currentPointers.mouseFocusBase));
-			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetCodedTextFromHashId addr: " + ToHex((uintptr_t)GetCodedTextFromHashId.data()));
-			Logger::LogString(LogLevel::Info, MAIN_INFO, "DecodeText addr: " + ToHex((uintptr_t)DecodeText.data()));
-			Logger::LogString(LogLevel::Info, MAIN_INFO, "GameThread Hook addr: " + ToHex((uintptr_t)pAlertCtx));
+			pluginBaseState = PluginBaseState::INITIALIZED;
 		}
-		else {
-			Logger::LogString(LogLevel::Error, MAIN_INFO, "GameThread Hook invalid addr: " + ToHex((uintptr_t)pAlertCtx));
-			Logger::LogString(LogLevel::Error, MAIN_INFO, "results[0] : " + ToHex(results[0]));
-		}
+		break;
+	}
+	default:
+		break;
 	}
 
 }
@@ -300,6 +337,11 @@ void PluginBase::Render()
 	ImGui::End();
 #endif
 	if (optionWindow->Begin()) {
+		if (pluginBaseState == PluginBaseState::FAILURE) {
+			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+			ImGui::Text("APPLICATION IS NOT FUNCTIONING CORRECTLY, UPDATE REQUIRED");
+			ImGui::PopStyleColor();
+		}
 		RenderKeyBinds();
 		optionWindow->End();
 	}
@@ -331,6 +373,11 @@ void PluginBase::AddDecodeID(uintptr_t key, std::string value)
 	decodeIDs[key] = value;
 }
 
+void PluginBase::SetUpdateFunc(std::function<void()> func)
+{
+	updateFunc = func;
+}
+
 const hl::IHook* PluginBase::GetAlertHook()
 {
 	return m_hkAlertCtx;
@@ -347,10 +394,12 @@ void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
 	data.rarity = (ItemRarity)pBase.get<int>(0x60);
 	data.sellable = !(pBase.get<byte>(0x39) & 0x40);
 	data.pExtendedType = pBase.get<void*>(0x30);
+	data.name = std::string("Item ").append(std::to_string(data.id));
 	if (data.sellable) {
 		data.sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	data.itemtype = (ItemType)pBase.get<int>(0x2C);
+	if (!GetCodedTextFromHashId || DecodeText) return;
 	uint hashId = pBase.get<uint>(0x80);
 	if (hashId == 0) {
 		hl::ForeignClass hash = pBase.get<void*>(0xA8);
@@ -377,6 +426,7 @@ void PluginBase::SetupMisc() {
 	currentPointers.itemPtr = 0;
 	currentPointers.objOnElement = 0;
 	currentPointers.hoveredElement = 0;
+	if (!currentPointers.mouseFocusBase) return;
 	currentPointers.hoveredElement = *(uintptr_t*)currentPointers.mouseFocusBase;
 	hl::ForeignClass element = (void*)currentPointers.hoveredElement;
 	if (!element) return;
@@ -523,8 +573,7 @@ void PluginBase::GameHook()
 {
 	SetupContext();
 
-	//PluginBase* base = GetInstance();
-	//plugin->PluginMain();
+	if (updateFunc) updateFunc();
 }
 
 void __fastcall hkGameThread(uintptr_t pInst, int, int frame_time)

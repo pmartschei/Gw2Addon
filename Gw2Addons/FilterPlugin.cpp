@@ -26,7 +26,6 @@ void FilterPlugin::Init() {
 
 	LogString(LogLevel::Debug, "Hooking Vendor Function start");
 	lastUpdateIndex = 0;
-	proxyVendorLocation = new uintptr_t((uintptr_t)vendorFunc);
 	HookVendorFunc();
 	LogString(LogLevel::Debug, "Hooking Vendor Function end");
 
@@ -66,13 +65,13 @@ void FilterPlugin::PluginMain()
 		collection = stdFilter->Filter(collection);
 		filteredCollection = root->Filter(collection);
 	}
+	if (!vendorSuccessful) return;
 	if (*lastCallPtr == 0) return;
 	uintptr_t func = (uintptr_t)*(lastCallPtr - 1);//-0x8 = 1
 	if (func != *proxyVendorLocation) {
 		lastCallPtr = new uintptr_t(0);
 		return;
 	}
-	func = 1;
 	if (filteredCollection.size() > 0) {
 		hl::ForeignClass vendor = (uintptr_t*)*lastCallPtr;
 		vendor.set<int>(0x50, (*filteredCollection.begin()).slot);
@@ -258,8 +257,17 @@ void FilterPlugin::AddHoveredItemToFilter()
 
 
 void FilterPlugin::HookVendorFunc() {
-	uintptr_t vendorHookBasePtr = hl::FollowRelativeAddress(hl::FindPattern("C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? e8 ?? ?? ?? ?? 0F B6 9C 24 ?? ?? ?? ?? 4C 8D 25 ?? ?? ?? ??")
-		+ 0x28);
+	proxyVendorLocation = new uintptr_t((uintptr_t)vendorFunc);
+	uintptr_t vendorHookBasePtr = hl::FindPattern("C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? e8 ?? ?? ?? ?? 0F B6 9C 24 ?? ?? ?? ?? 4C 8D 25 ?? ?? ?? ??");
+	if (!vendorHookBasePtr) {
+		LogString(LogLevel::Error, "Pattern for VendorFunc is invalid");
+		return;
+	}
+	vendorHookBasePtr = hl::FollowRelativeAddress(vendorHookBasePtr + 0x28);
+	if (!vendorHookBasePtr) {
+		LogString(LogLevel::Error, "Follow for VendorFunc is invalid");
+		return;
+	}
 	LogString(LogLevel::Info, "Hooking Vendor addr: "+ToHex(vendorHookBasePtr));
 	uintptr_t funcLocation = vendorHookBasePtr + 0x30;
 	LogString(LogLevel::Info, "FunctionLocation addr: " + ToHex(funcLocation));
@@ -268,6 +276,7 @@ void FilterPlugin::HookVendorFunc() {
 	memcpy((void*)funcLocation, proxyVendorLocation, 8);
 	LogString(LogLevel::Info, "OldFunction addr: " + ToHex((uintptr_t)*vendorSource));
 	LogString(LogLevel::Info, "NewFunction addr: " + ToHex((uintptr_t)*((uintptr_t*)funcLocation)));
+	vendorSuccessful = true;
 }
 
 void __stdcall vendorFunc(firstParam* a, secondParam* b) {

@@ -5,7 +5,7 @@
 #include "ItemData.h"
 #include "main.h"
 #include "Logger.h"
-#include "PluginState.h"
+#include "PluginBaseState.h"
 #include "hacklib\PatternScanner.h"
 #include "ForeignFunction.h"
 #include "hacklib\Hooker.h"
@@ -75,7 +75,9 @@ private:
 	std::vector<KeyBindData*> keyBinds;
 
 	KeyBindData* keybindVisual;
-	PluginState pluginBaseState = PluginState::CREATED;
+	PluginBaseState pluginBaseState = PluginBaseState::CREATED;
+
+	std::function<void()> updateFunc;
 
 	ForeignFunction<void*> GetContext;
 	ForeignFunction<void*> GetCodedTextFromHashId;
@@ -84,6 +86,7 @@ private:
 	const hl::IHook *m_hkAlertCtx = nullptr;
 	std::mutex m_gameDataMutex;
 	void* pCtx;
+	void* pAlertCtx;
 	std::map<uintptr_t, std::string> decodeIDs;
 	struct GamePointers {
 		uintptr_t ctx;
@@ -146,6 +149,8 @@ public:
 	void RenderKeyBinds();
 
 	void AddDecodeID(uintptr_t key, std::string value);
+
+	void SetUpdateFunc(std::function<void()> func);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();

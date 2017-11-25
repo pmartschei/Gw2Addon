@@ -188,7 +188,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="Plugin.h" />
     <ClInclude Include="PluginBase.h" />
-    <ClInclude Include="PluginState.h" />
+    <ClInclude Include="PluginBaseState.h" />
     <ClInclude Include="RangeFilter.h" />
     <ClInclude Include="RarityItemFilter.h" />
     <ClInclude Include="RarityRangeItemFilter.h" />

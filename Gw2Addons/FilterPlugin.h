@@ -24,6 +24,7 @@ private:
 	uint32_t lastUpdateIndex;
 	void HookVendorFunc();
 	uintptr_t* proxyVendorLocation;
+	bool vendorSuccessful = false;
 	std::set<ItemStackData> filteredCollection;
 	KeyBindData* copyItemKeyBind = new KeyBindData();
 	KeyBindData* openWindow = new KeyBindData();
