@@ -425,7 +425,7 @@ void PluginBase::RenderColors(const char* id,int size, std::function<const char*
 
 void PluginBase::RenderKeyBinds()
 {
-	const char* lastPlugin = nullptr;
+	/*const char* lastPlugin = nullptr;
 	for (auto iterator = keyBinds.begin(), end = keyBinds.end(); iterator != end; ++iterator) {
 		KeyBindData* keyBind = *iterator;
 		if (!lastPlugin || lastPlugin != keyBind->plugin) {
@@ -435,6 +435,15 @@ void PluginBase::RenderKeyBinds()
 			lastPlugin = keyBind->plugin;
 			ImGui::Text(lastPlugin);
 		}
+		ImGui::Text("%s", keyBind->name);
+		ImGui::SameLine(130);
+		if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
+			Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
+			Config::Save();
+		}
+	}*/
+	for (auto iterator = keyBinds.begin(), end = keyBinds.end(); iterator != end; ++iterator) {
+		KeyBindData* keyBind = *iterator;
 		ImGui::Text("%s", keyBind->name);
 		ImGui::SameLine(130);
 		if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
@@ -475,7 +484,7 @@ void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
 		data.sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	data.itemtype = (ItemType)pBase.get<int>(0x2C);
-	if (!GetCodedTextFromHashId || DecodeText) return;
+	if (!GetCodedTextFromHashId || !DecodeText) return;
 	uint hashId = pBase.get<uint>(0x80);
 	if (hashId == 0) {
 		hl::ForeignClass hash = pBase.get<void*>(0xA8);

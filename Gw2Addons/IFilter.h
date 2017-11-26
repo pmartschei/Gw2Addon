@@ -23,7 +23,7 @@ protected:
 	bool isActive = true;
 	bool isOpened = true;
 	float tabSpace = 0.0f;
-	FilterFlags flags = FilterFlags::And;
+	FilterFlags flags = FilterFlags::Null;
 	int filteredItems = 0;
 	int id;
 	virtual void RenderContent() = 0;

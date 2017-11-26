@@ -33,7 +33,7 @@ void FilterPlugin::Init() {
 	copyItemKeyBind->plugin = GetName();
 	openWindow->plugin = GetName();
 	copyItemKeyBind->name = "CopyHoveredItem";
-	openWindow->name = "OpenWindow";
+	openWindow->name = "OpenFilter";
 	copyItemKeyBind->keys = Config::LoadKeyBinds(copyItemKeyBind->plugin, copyItemKeyBind->name, { VK_MENU,VK_SHIFT,'A' });
 	openWindow->keys = Config::LoadKeyBinds(openWindow->plugin, openWindow->name, { VK_MENU,VK_SHIFT,'F' });
 	copyItemKeyBind->func = std::bind(&FilterPlugin::AddHoveredItemToFilter, this);
@@ -344,7 +344,7 @@ bool FilterPlugin::SaveFilterAs(RootGroupFilter* rootFilter, const char * name)
 		doc.Print(&printer);
 		LogString(LogLevel::Debug, "Closing File");
 		fclose(file);
-		LogString(LogLevel::Info, "File created : " + std::string(name));
+		//LogString(LogLevel::Info, "File created : " + std::string(name));
 		return true;
 	}
 	LogString(LogLevel::Error, "Could not create File : " + std::string(name));
