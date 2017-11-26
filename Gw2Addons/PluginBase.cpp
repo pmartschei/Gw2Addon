@@ -67,17 +67,17 @@ bool PluginBase::KeybindText(std::string suffix,KeyBindData* data) {
 		}
 	}
 	float buttonWidth = 50.f;
-	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth()- buttonWidth -ImGui::GetStyle().ColumnsMinSpacing);
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() - buttonWidth - ImGui::GetStyle().ItemInnerSpacing.x);
 	int popcount = 0;
 	if (data->isSetMode) {
 		popcount = 2;
-		ImGui::PushStyleColor(ImGuiCol_FrameBg, ImVec4(201 / 255.f, 215 / 255.f, 255 / 255.f, 200 / 255.0f));
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 0, 0, 1));
+		ImGui::PushStyleColor(ImGuiCol_FrameBg, Addon::Colors[AddonColor_FrameBgHighlighted]);
+		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_TextHighlighted]);
 	}
 	ImGui::InputText(suffix.c_str(),&text[0],text.size(),ImGuiInputTextFlags_ReadOnly);
 	ImGui::PopStyleColor(popcount);
 	ImGui::PopItemWidth();
-	ImGui::SameLine();
+	ImGui::SameLine(0, ImGui::GetStyle().ItemInnerSpacing.x);
 	if (!data->isSetMode && ImGui::Button(("Set" + suffix).c_str(),ImVec2(buttonWidth,0)))
 	{
 		data->isSetMode = true;
@@ -108,6 +108,7 @@ std::set<uint> PluginBase::GetKeys()
 void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating option window");
 	optionWindow = new Window("Options");
+	optionWindow->SetMinSize(ImVec2(300, 150));
 	AddWindow(optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
 	KeyBindData* openOptions = new KeyBindData();
@@ -340,11 +341,11 @@ void PluginBase::Render()
 #endif
 	if (optionWindow->Begin()) {
 		if (pluginBaseState == PluginBaseState::FAILURE) {
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_NegativeText]);
 			ImGui::Text("APPLICATION IS NOT FUNCTIONING CORRECTLY, UPDATE REQUIRED");
 			ImGui::PopStyleColor();
 		}
-		if (RenderInputText("chainload dll", chainLoad, 64, 150)) {
+		if (RenderInputText("chainload dll", chainLoad, 64, 130)) {
 			Config::SaveText(MAIN_INFO, "chainload", chainLoad.c_str());
 			Config::Save();
 		}
@@ -352,10 +353,22 @@ void PluginBase::Render()
 			RenderKeyBinds();
 		}
 		if (ImGui::CollapsingHeader("Addon Colors")) {
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			ImGui::BeginChild("##addonChild", 
+				ImVec2(0,CLAMP(AddonColor_COUNT * ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemInnerSpacing.y,0.0f,300.0f)
+				), false,ImGuiWindowFlags_AlwaysVerticalScrollbar);
 			RenderAddonColors();
+			ImGui::EndChild();
+			ImGui::PopStyleVar(1);
 		}
 		if (ImGui::CollapsingHeader("ImGui Colors")) {
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			ImGui::BeginChild("##imguiChild",
+				ImVec2(0, CLAMP(ImGuiCol_COUNT * ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemInnerSpacing.y, 0.0f, 300.0f)
+				), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
 			RenderColors();
+			ImGui::EndChild();
+			ImGui::PopStyleVar(1);
 		}
 		optionWindow->End();
 	}
@@ -391,6 +404,11 @@ void PluginBase::RenderAddonColors() {
 		ImGuiStyle& style = ImGui::GetStyle();
 		const char* name = Addon::GetStyleColorName((AddonColor)i);
 		ImGui::PushID(i);
+		ImGui::BeginChild("##clip", ImVec2(135, ImGui::GetItemsLineHeightWithSpacing()-ImGui::GetStyle().ItemSpacing.y),false,ImGuiWindowFlags_NoInputs);
+		ImGui::TextUnformatted(name);
+		ImGui::EndChild();
+		ImGui::SameLine(140.0f);
+		ImGui::PushItemWidth(-1);
 		if (ImGui::ColorEdit4("##addoncolor", (float*)&Addon::Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
 			Config::SaveText("Colors", name, std::to_string((int)(Addon::Colors[i].x * 255))
 				.append("," + std::to_string((int)(Addon::Colors[i].y * 255)))
@@ -398,18 +416,22 @@ void PluginBase::RenderAddonColors() {
 				.append("," + std::to_string((int)(Addon::Colors[i].w * 255))).c_str());
 			Config::Save();
 		}
-		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-		ImGui::TextUnformatted(name);
+		ImGui::PopItemWidth();
 		ImGui::PopID();
 	}
 }
 
-void PluginBase::RenderColors() {
+void PluginBase::RenderColors(int size, std::function<const char*(int)> nameFunc,ImVec4& colors) {
 	for (int i = 0; i < ImGuiCol_COUNT; i++)
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		const char* name = ImGui::GetStyleColorName(i);
 		ImGui::PushID(i);
+		ImGui::BeginChild("##clip", ImVec2(135, ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemSpacing.y), false, ImGuiWindowFlags_NoInputs);
+		ImGui::TextUnformatted(name);
+		ImGui::EndChild();
+		ImGui::SameLine(140.0f);
+		ImGui::PushItemWidth(-1);
 		if (ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
 			Config::SaveText("Colors", name, std::to_string((int)(style.Colors[i].x*255))
 				.append("," + std::to_string((int)(style.Colors[i].y*255)))
@@ -417,8 +439,7 @@ void PluginBase::RenderColors() {
 				.append("," + std::to_string((int)(style.Colors[i].w*255))).c_str());
 			Config::Save();
 		}
-		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-		ImGui::TextUnformatted(name);
+		ImGui::PopItemWidth();
 		ImGui::PopID();
 	}
 }
@@ -436,7 +457,7 @@ void PluginBase::RenderKeyBinds()
 			ImGui::Text(lastPlugin);
 		}
 		ImGui::Text("%s", keyBind->name);
-		ImGui::SameLine(150);
+		ImGui::SameLine(130);
 		if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
 			Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
 			Config::Save();

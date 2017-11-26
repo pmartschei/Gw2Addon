@@ -10,6 +10,7 @@ class Window {
 protected:
 	bool _opened = false;
 	bool _focused = false;
+	ImVec2 minSize = ImVec2(0,0);
 	char* _name;
 public:
 	Window(char* name,bool defaultOpened = true);
@@ -17,6 +18,7 @@ public:
 	void SetOpen(bool open);
 	bool IsOpen();
 	void ChangeState();
+	void SetMinSize(ImVec2 size);
 
 	bool Begin();
 	void End();

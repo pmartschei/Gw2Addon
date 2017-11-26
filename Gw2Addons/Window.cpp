@@ -29,10 +29,16 @@ void Window::ChangeState() {
 	SetOpen(!IsOpen());
 }
 
+void Window::SetMinSize(ImVec2 size)
+{
+	minSize = size;
+}
+
 bool Window::Begin()
 {
 	bool entered = false;
 	bool hitExit = _opened;
+	ImGui::SetNextWindowSizeConstraints(minSize, ImVec2(10000, 10000));
 	if (_opened && ImGui::Begin(_name,&hitExit,ImVec2(400,300),-1.0f,flags))
 	{		
 		entered = true;

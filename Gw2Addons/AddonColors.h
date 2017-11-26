@@ -9,10 +9,12 @@ enum AddonColor
 	AddonColor_DisabledHeader,
 	AddonColor_DisabledHeaderActive,
 	AddonColor_DisabledHeaderHovered,
+	AddonColor_FrameBgHighlighted,
+	AddonColor_TextHighlighted,
 	AddonColor_COUNT
 };
 namespace Addon{
-	static ImVec4 Colors[AddonColor_COUNT];
+	extern ImVec4 Colors[AddonColor_COUNT];
 	const char* GetStyleColorName(AddonColor idx);
 	void ClassicColors();
 }

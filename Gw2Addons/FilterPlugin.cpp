@@ -103,7 +103,7 @@ void FilterPlugin::RenderMenu() {
 					trim(fileNameString);
 					if (fileNameString.size() == 0) {
 						extraMessage = "Please enter a filename!";
-						extraMessageColor = ImVec4(1, 0, 0, 1);
+						extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 					}
 					else {
 						std::string folder = GetFilterFolder();
@@ -111,11 +111,11 @@ void FilterPlugin::RenderMenu() {
 						folder.append(fileNameString);
 						if (SaveFilterAs(root,folder.append(".filter").c_str())) {
 							extraMessage = "Filter successfully saved!";
-							extraMessageColor = ImVec4(0, 1, 0, 1);
+							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
 						else {
 							extraMessage = "Filter could not be saved!";
-							extraMessageColor = ImVec4(1, 0, 0, 1);
+							extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 						}
 					}
 				}
@@ -145,16 +145,16 @@ void FilterPlugin::RenderMenu() {
 					extraMessageLoad = true;
 					if (loadIndex == -1) {
 						extraMessage = "No filter selected!";
-						extraMessageColor = ImVec4(1, 0, 0, 1);
+						extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 					}
 					else {
 						if (LoadFilterFrom(root,GetFilterFolder().append(filesToLoad[loadIndex]).c_str(), appendLoad)) {
 							extraMessage = "Filter successfully loaded!";
-							extraMessageColor = ImVec4(0, 1, 0, 1);
+							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
 						else {
 							extraMessage = "Filter could not be loaded!";
-							extraMessageColor = ImVec4(1, 0, 0, 1);
+							extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 						}
 					}
 				}
@@ -164,7 +164,7 @@ void FilterPlugin::RenderMenu() {
 					ReloadFilterFiles();
 					extraMessageLoad = true;
 					extraMessage = "Filter reloaded";
-					extraMessageColor = ImVec4(0, 1, 0, 1);
+					extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 				}
 				if (extraMessageLoad) {
 					ImGui::PushStyleColor(ImGuiCol_Text, extraMessageColor);
@@ -184,7 +184,6 @@ void FilterPlugin::RenderMenu() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Root filter")) {
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
 			root->CustomMenu();
 			if (ImGui::Selectable("Expand all")) {
 				root->SetOpen(true);
@@ -192,7 +191,6 @@ void FilterPlugin::RenderMenu() {
 			if (ImGui::Selectable("Collapse all")) {
 				root->SetOpen(false);
 			}
-			ImGui::PopStyleColor();
 			ImGui::EndMenu();
 		}
 
@@ -202,7 +200,7 @@ void FilterPlugin::RenderMenu() {
 		float a = ImGui::GetContentRegionAvailWidth();
 		if (a > textSize) {
 			ImGui::SameLine(0, a - textSize + ImGui::GetStyle().ColumnsMinSpacing * 2);
-			ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
+			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
 			ImGui::Text(text, root->GetFilteredCount());
 			ImGui::PopStyleColor();
 		}

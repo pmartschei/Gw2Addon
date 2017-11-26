@@ -35,7 +35,7 @@ private:
 	bool extraMessageLoad = false;
 	bool firstOpenedImportFilter = true;
 	std::string extraMessage = "";
-	ImVec4 extraMessageColor = ImVec4(0, 1, 0, 1);
+	ImVec4 extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 
 	int loadIndex = -1;
 	const char** filesToLoad;

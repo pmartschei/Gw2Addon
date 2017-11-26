@@ -2,7 +2,6 @@
 
 int IFilter::ID = 0;
 
-
 void IFilter::CustomMenu()
 {
 }
@@ -40,9 +39,9 @@ void IFilter::Render()
 	tabSpace = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + 140.0f;
 
 	if (!isActive) {
-		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(1, 110/255.f, 50/255.f, 1));
-		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1, 170 / 255.f, 90 / 255.f, 1));
-		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(1, 140 / 255.f, 70 / 255.f, 1));
+		ImGui::PushStyleColor(ImGuiCol_Header, Addon::Colors[AddonColor_DisabledHeader]);
+		ImGui::PushStyleColor(ImGuiCol_HeaderActive, Addon::Colors[AddonColor_DisabledHeaderActive]);
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, Addon::Colors[AddonColor_DisabledHeaderHovered]);
 	}
 	ImGui::SetNextTreeNodeOpen(isOpened);
 	isOpened = ImGui::CollapsingHeader(UNIQUE(name, id), ImGuiTreeNodeFlags_DefaultOpen);
@@ -51,7 +50,6 @@ void IFilter::Render()
 		ImGui::PopStyleColor(3);
 	}
 	if (ImGui::BeginPopupContextItem(UNIQUE("HeaderPopup", id), 1)) {
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
 		CustomMenu();
 		if (isActive) {
 			if (ImGui::Selectable("Deactivate")) {
@@ -70,8 +68,7 @@ void IFilter::Render()
 			SetOpen(false);
 		}
 		ImGui::Separator();
-		ImGui::PopStyleColor();
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1, 0, 0, 1));
+		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_NegativeText]);
 		if (ImGui::Selectable("Delete Filter")) {
 			markedForDelete = true;
 		}
@@ -85,7 +82,7 @@ void IFilter::Render()
 	float x = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth();
 	if ((ImGui::GetContentRegionMax().x - headerSize - 30.0f - x) > textSize) {
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - textSize);
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0, 1, 0, 1));
+		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
 		ImGui::Text(text, filteredItems);
 		ImGui::PopStyleColor();
 	}
