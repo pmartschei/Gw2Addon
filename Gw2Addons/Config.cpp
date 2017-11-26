@@ -101,7 +101,7 @@ void Config::SaveDouble(const char* section, const char* key, double d)
 {
 	Config* c = GetInstance();
 	if (!c->iniFile) return;
-	c->iniFile->SetBoolValue(section, key, d);
+	c->iniFile->SetDoubleValue(section, key, d);
 }
 
 void Config::SaveLong(const char* section, const char* key, long l)

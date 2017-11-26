@@ -133,6 +133,9 @@
     <ClCompile Include="Logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AddonColors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d9.h">
@@ -313,6 +316,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="PluginBaseState.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddonColors.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

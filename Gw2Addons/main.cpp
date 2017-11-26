@@ -62,11 +62,7 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 //}
 
 void InitDLL() {
-	PluginBase::GetInstance()->Init();
-	PluginBase::GetInstance()->SetUpdateFunc(UpdatePlugins);
-	Logger::Init("IncQol.log");
-	Logger::SetMinLevel(LOG_LVL);
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
+	Addon::ClassicColors();
 	Config::Init();
 	if (Config::Load()) {
 		Logger::LogString(LogLevel::Info, MAIN_INFO, "Config successfully loaded");
@@ -74,6 +70,11 @@ void InitDLL() {
 	else {
 		Logger::LogString(LogLevel::Info, MAIN_INFO, "Config not found, default loaded");
 	}
+	PluginBase::GetInstance()->Init();
+	PluginBase::GetInstance()->SetUpdateFunc(UpdatePlugins);
+	Logger::Init("IncQol.log");
+	Logger::SetMinLevel(LOG_LVL);
+	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
 	
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon initialization finished");
 }

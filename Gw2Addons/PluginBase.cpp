@@ -118,6 +118,7 @@ void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
 	RegisterKeyBind(openOptions);
 	chainLoad = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
+	LoadColors();
 }
 
 
@@ -350,7 +351,75 @@ void PluginBase::Render()
 		if (ImGui::CollapsingHeader("Keybinds")) {
 			RenderKeyBinds();
 		}
+		if (ImGui::CollapsingHeader("Addon Colors")) {
+			RenderAddonColors();
+		}
+		if (ImGui::CollapsingHeader("ImGui Colors")) {
+			RenderColors();
+		}
 		optionWindow->End();
+	}
+}
+
+void PluginBase::LoadColors() {
+	for (int i = 0; i < ImGuiCol_COUNT; i++) {
+		ImGuiStyle& style = ImGui::GetStyle();
+		const char* name = ImGui::GetStyleColorName(i);
+		const char* value = Config::LoadText("Colors", name, '\0');
+		if (value == '\0') continue;
+		std::vector<float> result;
+		std::stringstream ss(value);
+		while (ss.good())
+		{
+			std::string substr;
+			std::getline(ss, substr, ',');
+			if (substr.size() > 0) {
+				int val = std::stoi(substr);
+				CLAMP(val, 0, 255);
+				result.push_back(val / 255.0f);
+			}
+		}
+		if (result.size() == 4) {
+			style.Colors[i] = ImVec4(result[0], result[1], result[2], result[3]);
+		}
+	}
+}
+
+void PluginBase::RenderAddonColors() {
+	for (int i = 0; i < AddonColor_COUNT; i++)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		const char* name = Addon::GetStyleColorName((AddonColor)i);
+		ImGui::PushID(i);
+		if (ImGui::ColorEdit4("##addoncolor", (float*)&Addon::Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+			Config::SaveText("Colors", name, std::to_string((int)(Addon::Colors[i].x * 255))
+				.append("," + std::to_string((int)(Addon::Colors[i].y * 255)))
+				.append("," + std::to_string((int)(Addon::Colors[i].z * 255)))
+				.append("," + std::to_string((int)(Addon::Colors[i].w * 255))).c_str());
+			Config::Save();
+		}
+		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
+		ImGui::TextUnformatted(name);
+		ImGui::PopID();
+	}
+}
+
+void PluginBase::RenderColors() {
+	for (int i = 0; i < ImGuiCol_COUNT; i++)
+	{
+		ImGuiStyle& style = ImGui::GetStyle();
+		const char* name = ImGui::GetStyleColorName(i);
+		ImGui::PushID(i);
+		if (ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+			Config::SaveText("Colors", name, std::to_string((int)(style.Colors[i].x*255))
+				.append("," + std::to_string((int)(style.Colors[i].y*255)))
+				.append("," + std::to_string((int)(style.Colors[i].z*255)))
+				.append("," + std::to_string((int)(style.Colors[i].w*255))).c_str());
+			Config::Save();
+		}
+		ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
+		ImGui::TextUnformatted(name);
+		ImGui::PopID();
 	}
 }
 

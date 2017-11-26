@@ -9,6 +9,7 @@
 #include "hacklib\PatternScanner.h"
 #include "ForeignFunction.h"
 #include "hacklib\Hooker.h"
+#include "AddonColors.h"
 
 class Window; 
 #include "Logger.h"
@@ -148,6 +149,9 @@ public:
 	void Render();
 
 	void RenderKeyBinds();
+	void RenderAddonColors();
+	void RenderColors();
+	void LoadColors();
 
 	void AddDecodeID(uintptr_t key, std::string value);
 

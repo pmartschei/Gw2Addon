@@ -103,6 +103,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AddonColors.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="d3d9.cpp" />
     <ClCompile Include="FilterPluginUtility.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddonColors.h" />
     <ClInclude Include="BagData.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="d3d9.h" />
