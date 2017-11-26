@@ -15,7 +15,7 @@ enum AddonColor
 };
 namespace Addon{
 	extern ImVec4 Colors[AddonColor_COUNT];
-	const char* GetStyleColorName(AddonColor idx);
+	const char* GetStyleColorName(int idx);
 	void ClassicColors();
 }
 #endif

@@ -1,6 +1,6 @@
 #include "AddonColors.h"
 ImVec4 Addon::Colors[AddonColor_COUNT];
-const char * Addon::GetStyleColorName(AddonColor idx)
+const char * Addon::GetStyleColorName(int idx)
 {
 	switch (idx)
 	{

@@ -149,9 +149,8 @@ public:
 	void Render();
 
 	void RenderKeyBinds();
-	void RenderAddonColors();
-	void RenderColors();
-	void LoadColors();
+	void RenderColors(const char* id,int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
+	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
 
 	void AddDecodeID(uintptr_t key, std::string value);
 

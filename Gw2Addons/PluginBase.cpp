@@ -108,7 +108,7 @@ std::set<uint> PluginBase::GetKeys()
 void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating option window");
 	optionWindow = new Window("Options");
-	optionWindow->SetMinSize(ImVec2(300, 150));
+	optionWindow->SetMinSize(ImVec2(300, 300));
 	AddWindow(optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
 	KeyBindData* openOptions = new KeyBindData();
@@ -119,7 +119,8 @@ void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
 	RegisterKeyBind(openOptions);
 	chainLoad = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
-	LoadColors();
+	LoadColors(AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
+	LoadColors(ImGuiCol_COUNT, ImGui::GetStyleColorName, ImGui::GetStyle().Colors);
 }
 
 
@@ -353,31 +354,18 @@ void PluginBase::Render()
 			RenderKeyBinds();
 		}
 		if (ImGui::CollapsingHeader("Addon Colors")) {
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::BeginChild("##addonChild", 
-				ImVec2(0,CLAMP(AddonColor_COUNT * ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemInnerSpacing.y,0.0f,300.0f)
-				), false,ImGuiWindowFlags_AlwaysVerticalScrollbar);
-			RenderAddonColors();
-			ImGui::EndChild();
-			ImGui::PopStyleVar(1);
+			RenderColors("addon",AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
 		}
 		if (ImGui::CollapsingHeader("ImGui Colors")) {
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-			ImGui::BeginChild("##imguiChild",
-				ImVec2(0, CLAMP(ImGuiCol_COUNT * ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemInnerSpacing.y, 0.0f, 300.0f)
-				), false, ImGuiWindowFlags_AlwaysVerticalScrollbar);
-			RenderColors();
-			ImGui::EndChild();
-			ImGui::PopStyleVar(1);
+			RenderColors("imgui",ImGuiCol_COUNT,ImGui::GetStyleColorName,ImGui::GetStyle().Colors);
 		}
 		optionWindow->End();
 	}
 }
 
-void PluginBase::LoadColors() {
-	for (int i = 0; i < ImGuiCol_COUNT; i++) {
-		ImGuiStyle& style = ImGui::GetStyle();
-		const char* name = ImGui::GetStyleColorName(i);
+void PluginBase::LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors) {
+	for (int i = 0; i < size; i++) {
+		const char* name = nameFunc(i);
 		const char* value = Config::LoadText("Colors", name, '\0');
 		if (value == '\0') continue;
 		std::vector<float> result;
@@ -393,55 +381,46 @@ void PluginBase::LoadColors() {
 			}
 		}
 		if (result.size() == 4) {
-			style.Colors[i] = ImVec4(result[0], result[1], result[2], result[3]);
+			colors[i] = ImVec4(result[0], result[1], result[2], result[3]);
 		}
 	}
 }
 
-void PluginBase::RenderAddonColors() {
-	for (int i = 0; i < AddonColor_COUNT; i++)
-	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		const char* name = Addon::GetStyleColorName((AddonColor)i);
-		ImGui::PushID(i);
-		ImGui::BeginChild("##clip", ImVec2(135, ImGui::GetItemsLineHeightWithSpacing()-ImGui::GetStyle().ItemSpacing.y),false,ImGuiWindowFlags_NoInputs);
-		ImGui::TextUnformatted(name);
-		ImGui::EndChild();
-		ImGui::SameLine(140.0f);
-		ImGui::PushItemWidth(-1);
-		if (ImGui::ColorEdit4("##addoncolor", (float*)&Addon::Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-			Config::SaveText("Colors", name, std::to_string((int)(Addon::Colors[i].x * 255))
-				.append("," + std::to_string((int)(Addon::Colors[i].y * 255)))
-				.append("," + std::to_string((int)(Addon::Colors[i].z * 255)))
-				.append("," + std::to_string((int)(Addon::Colors[i].w * 255))).c_str());
-			Config::Save();
-		}
-		ImGui::PopItemWidth();
-		ImGui::PopID();
-	}
-}
+void PluginBase::RenderColors(const char* id,int size, std::function<const char*(int)> nameFunc,ImVec4* colors) {
 
-void PluginBase::RenderColors(int size, std::function<const char*(int)> nameFunc,ImVec4& colors) {
-	for (int i = 0; i < ImGuiCol_COUNT; i++)
+	ImVec2 padding = ImGui::GetStyle().WindowPadding;
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+	ImGui::BeginChild(std::string("##Child").append(id).c_str(),
+		ImVec2(0, CLAMP(size * ImGui::GetItemsLineHeightWithSpacing(), 0.0f, 300.0f)
+		), false);
+	for (int i = 0; i < size; i++)
 	{
-		ImGuiStyle& style = ImGui::GetStyle();
-		const char* name = ImGui::GetStyleColorName(i);
+		const char* name = nameFunc(i);
 		ImGui::PushID(i);
-		ImGui::BeginChild("##clip", ImVec2(135, ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemSpacing.y), false, ImGuiWindowFlags_NoInputs);
+		ImGui::BeginChild(std::string("##clip").append(id).c_str(), ImVec2(115, ImGui::GetItemsLineHeightWithSpacing() - ImGui::GetStyle().ItemSpacing.y), false, ImGuiWindowFlags_NoInputs);
 		ImGui::TextUnformatted(name);
 		ImGui::EndChild();
-		ImGui::SameLine(140.0f);
+		if (ImGui::IsItemHovered()) {
+			ImGui::BeginTooltip();
+			ImGui::TextUnformatted(name);
+			ImGui::EndTooltip();
+		}
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, padding);
+		ImGui::SameLine(130-padding.x);
 		ImGui::PushItemWidth(-1);
-		if (ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
-			Config::SaveText("Colors", name, std::to_string((int)(style.Colors[i].x*255))
-				.append("," + std::to_string((int)(style.Colors[i].y*255)))
-				.append("," + std::to_string((int)(style.Colors[i].z*255)))
-				.append("," + std::to_string((int)(style.Colors[i].w*255))).c_str());
+		if (ImGui::ColorEdit4(std::string("##colors").append(id).c_str(), (float*)&colors[i], ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview)) {
+			Config::SaveText("Colors", name, std::to_string((int)(colors[i].x*255))
+				.append("," + std::to_string((int)(colors[i].y*255)))
+				.append("," + std::to_string((int)(colors[i].z*255)))
+				.append("," + std::to_string((int)(colors[i].w*255))).c_str());
 			Config::Save();
 		}
+		ImGui::PopStyleVar(1);
 		ImGui::PopItemWidth();
 		ImGui::PopID();
 	}
+	ImGui::EndChild();
+	ImGui::PopStyleVar(1);
 }
 
 void PluginBase::RenderKeyBinds()
