@@ -11,7 +11,8 @@
 #include "hacklib\Hooker.h"
 #include "AddonColors.h"
 #include "Logger.h"
-#include <http.h>
+#include "HttpDownloader.h"
+#include "ThreadTaskQueue.h"
 
 class Window; 
 class Plugin;
@@ -86,8 +87,7 @@ private:
 	std::string chainLoad;
 	KeyBindData* keybindVisual;
 	PluginBaseState pluginBaseState = PluginBaseState::CREATED;
-
-	std::function<void()> updateFunc;
+	ThreadTaskQueue* ttq;
 
 	ForeignFunction<void*> GetContext;
 	ForeignFunction<void*> GetCodedTextFromHashId;
@@ -163,7 +163,7 @@ public:
 
 	void AddDecodeID(uintptr_t key, std::string value);
 
-	void SetUpdateFunc(std::function<void()> func);
+	void ProcessTask(Task* task);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();

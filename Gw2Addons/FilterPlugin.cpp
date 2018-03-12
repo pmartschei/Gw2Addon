@@ -1,4 +1,5 @@
 #include "FilterPlugin.h"
+#include "RequestTradingpostTask.h"
 
 uintptr_t* FilterPlugin::vendorSource = new uintptr_t(0);
 uintptr_t* FilterPlugin::lastCallPtr = new uintptr_t(0);
@@ -68,6 +69,10 @@ void FilterPlugin::PluginMain()
 		collection = stdFilter->Filter(collection);
 		filteredCollection = root->Filter(collection);
 		lastItemsFilteredCount = root->GetFilteredCount();
+		for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
+			ItemData data = it->itemData;
+			PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(&data));
+		}
 	}
 	if (!vendorSuccessful) return;
 	if (*lastCallPtr == 0) return;

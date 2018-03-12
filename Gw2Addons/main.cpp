@@ -62,6 +62,8 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 //}
 
 void InitDLL() {
+	Logger::Init("IncQol.log");
+	Logger::SetMinLevel(LOG_LVL);
 	Addon::ClassicColors();
 	Config::Init();
 	if (Config::Load()) {
@@ -72,8 +74,6 @@ void InitDLL() {
 	}
 	pluginBase = PluginBase::GetInstance();
 	pluginBase->Init();
-	Logger::Init("IncQol.log");
-	Logger::SetMinLevel(LOG_LVL);
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
 	
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon initialization finished");
@@ -130,7 +130,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			eventKeys.push_back({ VK_MENU, alt });
 			eventKeys.push_back({ (uint)wParam, eventDown });
 			break;
-
 		case WM_LBUTTONDOWN:
 			eventDown = true;
 		case WM_LBUTTONUP:
@@ -166,6 +165,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	const auto& io = ImGui::GetIO();
 	if (io.WantCaptureMouse) {
 		switch (msg) {
+		case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONDOWN:
 		case WM_MOUSEMOVE:
 		case WM_MOUSEWHEEL:

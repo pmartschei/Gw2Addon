@@ -251,9 +251,13 @@ void PluginBase::CheckInitialize()
 	case PluginBaseState::SCANNER_FINISHED: {
 		m_hkAlertCtx = m_hooker.hookVT(*(uintptr_t*)pAlertCtx, 0, (uintptr_t)hkGameThread);
 		if (m_hkAlertCtx) {
-			pluginBaseState = PluginBaseState::INITIALIZED;
+			pluginBaseState = PluginBaseState::THREAD_INITIALIZED;
 		}
 		break;
+	}
+	case PluginBaseState::THREAD_INITIALIZED: {
+		ttq = new ThreadTaskQueue();
+		pluginBaseState = PluginBaseState::INITIALIZED;
 	}
 	default:
 		break;
@@ -474,9 +478,9 @@ void PluginBase::AddDecodeID(uintptr_t key, std::string value)
 	decodeIDs[key] = value;
 }
 
-void PluginBase::SetUpdateFunc(std::function<void()> func)
+void PluginBase::ProcessTask(Task * task)
 {
-	updateFunc = func;
+	ttq->addTask(task);
 }
 
 const hl::IHook* PluginBase::GetAlertHook()

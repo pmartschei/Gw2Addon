@@ -59,16 +59,17 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_DEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>imgui;tinyxml</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
-      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
@@ -86,9 +87,9 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>imgui;tinyxml</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -96,7 +97,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
-      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
@@ -107,6 +109,7 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="d3d9.cpp" />
     <ClCompile Include="FilterPluginUtility.cpp" />
+    <ClCompile Include="HttpDownloader.cpp" />
     <ClCompile Include="IDRangeItemFilter.cpp" />
     <ClCompile Include="IFilter.cpp" />
     <ClCompile Include="GroupFilter.cpp" />
@@ -134,9 +137,13 @@
     <ClCompile Include="PluginBase.cpp" />
     <ClCompile Include="RarityItemFilter.cpp" />
     <ClCompile Include="RarityRangeItemFilter.cpp" />
+    <ClCompile Include="RequestTradingpostTask.cpp" />
     <ClCompile Include="RootGroupFilter.cpp" />
     <ClCompile Include="FilterPlugin.cpp" />
     <ClCompile Include="SellableItemFilter.cpp" />
+    <ClCompile Include="SimpleLogTask.cpp" />
+    <ClCompile Include="TaskQueue.cpp" />
+    <ClCompile Include="ThreadTaskQueue.cpp" />
     <ClCompile Include="tinyxml\tinyxml2.cpp" />
     <ClCompile Include="TypeItemFilter.cpp" />
     <ClCompile Include="Utility.cpp" />
@@ -150,6 +157,7 @@
     <ClInclude Include="def.h" />
     <ClInclude Include="FilterFactory.h" />
     <ClInclude Include="FilterPluginUtility.h" />
+    <ClInclude Include="HttpDownloader.h" />
     <ClInclude Include="IDRangeItemFilter.h" />
     <ClInclude Include="IFilter.h" />
     <ClInclude Include="ForeignFunction.h" />
@@ -194,11 +202,16 @@
     <ClInclude Include="RangeFilter.h" />
     <ClInclude Include="RarityItemFilter.h" />
     <ClInclude Include="RarityRangeItemFilter.h" />
+    <ClInclude Include="RequestTradingpostTask.h" />
     <ClInclude Include="RootGroupFilter.h" />
     <ClInclude Include="simpleini\SimpleIni.h" />
+    <ClInclude Include="SimpleLogTask.h" />
     <ClInclude Include="SingleFilter.h" />
     <ClInclude Include="FilterPlugin.h" />
     <ClInclude Include="Singleton.h" />
+    <ClInclude Include="Task.h" />
+    <ClInclude Include="TaskQueue.h" />
+    <ClInclude Include="ThreadTaskQueue.h" />
     <ClInclude Include="tinyxml\tinyxml2.h" />
     <ClInclude Include="TypeItemFilter.h" />
     <ClInclude Include="SellableItemFilter.h" />

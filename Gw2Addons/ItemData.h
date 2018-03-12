@@ -15,6 +15,9 @@ public:
 	ItemRarity rarity;
 	ItemType itemtype;
 	std::string name;
+	float buyTradingPost;
+	float sellTradingPost;
+	uint32_t vendorValue;
 };
 inline bool operator==(const ItemData& lhs, const ItemData& rhs)
 {

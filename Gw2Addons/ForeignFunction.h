@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FOREIGN_FUNCTION_H
+#define FOREIGN_FUNCTION_H
 
 #define CALL_FN(conv) ((T(conv*)(Ts...))m_ptr)(args...)
 enum CallingConvention {
@@ -57,3 +58,4 @@ private:
 	void *m_ptr;
 
 };
+#endif
