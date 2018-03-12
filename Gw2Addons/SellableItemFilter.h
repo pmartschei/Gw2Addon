@@ -1,7 +1,6 @@
 #ifndef SELLALE_ITEM_FILTER_H
 #define SELLALE_ITEM_FILTER_H
 #include "SingleFilter.h"
-#include "ItemStackData.h"
 
 class SellableItemFilter : public SingleFilter<bool> {
 protected:

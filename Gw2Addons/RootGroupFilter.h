@@ -1,12 +1,6 @@
 #ifndef ROOT_GROUP_FILTER_H
 #define ROOT_GROUP_FILTER_H
 #include "GroupFilter.h"
-#include <stdio.h>
-#include <Shlobj.h>
-#include <direct.h>
-#include "Window.h"
-#include "ItemFilterFactory.h"
-#include "FilterPluginUtility.h"
 
 class RootGroupFilter : public GroupFilter
 {

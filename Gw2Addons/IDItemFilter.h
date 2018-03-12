@@ -1,7 +1,6 @@
 #ifndef ID_ITEM_FILTER_H
 #define ID_ITEM_FILTER_H
 #include "SingleFilter.h"
-#include "ItemStackData.h"
 
 class IDItemFilter : public SingleFilter<int> {
 protected:

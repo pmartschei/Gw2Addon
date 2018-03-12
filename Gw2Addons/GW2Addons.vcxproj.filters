@@ -157,6 +157,9 @@
     <ClCompile Include="RequestTradingpostTask.cpp">
       <Filter>Source Files\FilterPlugin</Filter>
     </ClCompile>
+    <ClCompile Include="TradingPostValueFilter.cpp">
+      <Filter>Source Files\Filter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3d9.h">
@@ -359,6 +362,12 @@
     </ClInclude>
     <ClInclude Include="RequestTradingpostTask.h">
       <Filter>Source Files\FilterPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="TradingPostValueFilter.h">
+      <Filter>Source Files\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="TradingPostModus.h">
+      <Filter>Source Files\Filter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

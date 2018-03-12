@@ -1,7 +1,6 @@
 #ifndef LEVEL_ITEM_FILTER_H
 #define LEVEL_ITEM_FILTER_H
 #include "SingleFilter.h"
-#include "ItemStackData.h"
 
 class LevelItemFilter : public SingleFilter<int> {
 protected:

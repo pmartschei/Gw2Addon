@@ -1,8 +1,6 @@
 #ifndef Rarity_RANGE_ITEM_FILTER_H
 #define Rarity_RANGE_ITEM_FILTER_H
 #include "RangeFilter.h"
-#include "ItemStackData.h"
-#include "ItemRarity.h"
 
 class RarityRangeItemFilter : public RangeFilter<ItemRarity> {
 protected:

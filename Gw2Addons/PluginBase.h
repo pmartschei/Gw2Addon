@@ -1,6 +1,5 @@
 #ifndef PLUGIN_BASE_H
 #define PLUGIN_BASE_H
-#include "Window.h"
 #include "InventoryData.h"
 #include "ItemData.h"
 #include "main.h"
@@ -13,6 +12,7 @@
 #include "Logger.h"
 #include "HttpDownloader.h"
 #include "ThreadTaskQueue.h"
+#include "Singleton.h"
 
 class Window; 
 class Plugin;
@@ -116,6 +116,9 @@ private:
 		ItemData hoveredItemData;
 	} currentPointers;
 
+	std::string configItemsUrl;
+	std::string configPricesUrl;
+
 protected:
 	PluginBase() {};
 	std::list<Window*> _windows;
@@ -127,6 +130,7 @@ public:
 	void CloseFocusedWindow();
 	bool HasFocusWindow();
 
+	void ReloadConfig();
 	void SetupContext();
 	void SetupPlayer();
 	void SetupMisc();
@@ -167,5 +171,8 @@ public:
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();
+
+	std::string GetItemInfoUrl();
+	std::string GetPricesUrl();
 };
 #endif

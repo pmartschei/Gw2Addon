@@ -1,6 +1,5 @@
 #ifndef LOGGER_H
 #define LOGGER_H
-#include "Utility.h"
 #include <time.h>
 #include <Shlobj.h>
 #include <fstream>

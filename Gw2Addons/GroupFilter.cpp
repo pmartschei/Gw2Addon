@@ -1,4 +1,14 @@
 #include "GroupFilter.h"
+#include "IDItemFilter.h"
+#include "IDRangeItemFilter.h"
+#include "LevelItemFilter.h"
+#include "LevelRangeItemFilter.h"
+#include "RarityItemFilter.h"
+#include "RarityRangeItemFilter.h"
+#include "TypeItemFilter.h"
+#include "ItemFilterFactory.h"
+#include "TradingPostValueFilter.h"
+#include <algorithm>
 
 GroupFilter::GroupFilter() {
 	flags = FilterFlags::And;
@@ -108,6 +118,9 @@ void GroupFilter::CustomMenu()
 			}
 			if (ImGui::MenuItem("Type Filter")) {
 				AddFilter(new TypeItemFilter());
+			}
+			if (ImGui::MenuItem("Trading Post Filter")) {
+				AddFilter(new TradingPostValueFilter());
 			}
 			ImGui::EndMenu();
 		}

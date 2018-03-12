@@ -3,16 +3,7 @@
 #include "Plugin.h"
 #include "Window.h"
 #include "RootGroupFilter.h"
-#include "IDItemFilter.h"
-#include "LevelItemFilter.h"
-#include "RarityItemFilter.h"
-#include "TypeItemFilter.h"
-#include "hacklib\PatternScanner.h"
-#include "main.h"
-#include "SellableItemFilter.h"
-#include "ItemType.h"
 #include "Config.h"
-#include "FilterPluginUtility.h"
 
 class Window;
 class FilterPlugin : public Plugin

@@ -145,6 +145,7 @@
     <ClCompile Include="TaskQueue.cpp" />
     <ClCompile Include="ThreadTaskQueue.cpp" />
     <ClCompile Include="tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="TradingPostValueFilter.cpp" />
     <ClCompile Include="TypeItemFilter.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -213,6 +214,8 @@
     <ClInclude Include="TaskQueue.h" />
     <ClInclude Include="ThreadTaskQueue.h" />
     <ClInclude Include="tinyxml\tinyxml2.h" />
+    <ClInclude Include="TradingPostModus.h" />
+    <ClInclude Include="TradingPostValueFilter.h" />
     <ClInclude Include="TypeItemFilter.h" />
     <ClInclude Include="SellableItemFilter.h" />
     <ClInclude Include="Utility.h" />

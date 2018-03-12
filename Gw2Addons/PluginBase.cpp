@@ -1,5 +1,9 @@
 #include "PluginBase.h"
 #include "Plugin.h"
+#include "RequestTradingpostTask.h"
+#include "Window.h"
+#include "Config.h"
+#include "Utility.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
 void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText);
@@ -153,6 +157,12 @@ bool PluginBase::HasFocusWindow()
 		}
 	}
 	return false;
+}
+
+void PluginBase::ReloadConfig()
+{
+	configItemsUrl = Config::LoadText(MAIN_INFO, "UrlItemInfo", "");
+	configPricesUrl = Config::LoadText(MAIN_INFO, "UrlPricesInfo", "");
 }
 
 void PluginBase::SetupContext()
@@ -492,6 +502,14 @@ std::mutex* PluginBase::GetDataMutex()
 {
 	return &m_gameDataMutex;
 }
+std::string PluginBase::GetItemInfoUrl()
+{
+	return configItemsUrl;
+}
+std::string PluginBase::GetPricesUrl()
+{
+	return configPricesUrl;
+}
 void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
 	data.pItemData = pBase;
 	data.id = pBase.get<int>(0x28);
@@ -504,6 +522,7 @@ void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
 		data.sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	data.itemtype = (ItemType)pBase.get<int>(0x2C);
+	PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(&data));
 	if (!GetCodedTextFromHashId || !DecodeText) return;
 	uint hashId = pBase.get<uint>(0x80);
 	/*if (hashId == 0) {

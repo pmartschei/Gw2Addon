@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Config.h"
 
 Window::Window(char * name,bool defaultOpened) : _name(name)
 {

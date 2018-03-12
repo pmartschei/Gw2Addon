@@ -2,7 +2,6 @@
 #define _WINDOW_H
 #include <set>
 #include <imgui.h>
-#include "Config.h"
 
 class PluginBase;
 

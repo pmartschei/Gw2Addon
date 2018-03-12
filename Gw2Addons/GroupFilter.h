@@ -3,14 +3,6 @@
 
 #include "IFilter.h"
 #include <vector>
-#include "IDItemFilter.h"
-#include "IDRangeItemFilter.h"
-#include "LevelItemFilter.h"
-#include "LevelRangeItemFilter.h"
-#include "RarityItemFilter.h"
-#include "RarityRangeItemFilter.h"
-#include "TypeItemFilter.h"
-#include "ItemFilterFactory.h"
 
 class GroupFilter : public IFilter {
 protected:

@@ -1,4 +1,6 @@
 #include "IFilter.h"
+#include <algorithm>
+#include "AddonColors.h"
 
 int IFilter::ID = 0;
 

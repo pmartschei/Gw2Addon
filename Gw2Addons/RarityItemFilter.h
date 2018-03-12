@@ -1,8 +1,6 @@
 #ifndef Rarity_ITEM_FILTER_H
 #define Rarity_ITEM_FILTER_H
 #include "SingleFilter.h"
-#include "ItemStackData.h"
-#include "ItemRarity.h"
 
 class RarityItemFilter : public SingleFilter<ItemRarity> {
 protected:

@@ -1,7 +1,8 @@
 #ifndef FILTER_PLUGIN_UTILITY_H
 #define FILTER_PLUGIN_UTILITY_H
 #include <string>
-#include "Utility.h"
+#include <algorithm>
+#include "imgui.h"
 
 #define STARTUP_FILTERNAME ("startup.filter")
 

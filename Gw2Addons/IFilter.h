@@ -2,13 +2,11 @@
 #define I_FILTER_H
 
 #include <set>
+#include <string>
 #include "ItemStackData.h"
 #include "imgui.h"
-#include <string>
-#include <algorithm>
 #include "tinyxml\tinyxml2.h"
 #include "FilterFlags.h"
-#include "AddonColors.h"
 
 #define UNIQUE(text,id) ((std::string(text)+"##"+std::to_string(id)).c_str())
 

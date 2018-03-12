@@ -1,13 +1,8 @@
 #ifndef _UTILITY_H
 #define _UTILITY_H
 #include <string>
-#include <codecvt>
-#include <sstream>
-#include <windows.h>
 #include <vector>
-#include <algorithm>
-#include <imgui.h>
-#include <cctype>
+#include <windows.h>
 #include "def.h"
 
 std::wstring s2ws(const std::string & str);

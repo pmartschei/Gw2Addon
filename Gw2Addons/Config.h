@@ -1,10 +1,9 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
-#include "main.h"
+#include <set>
 #include "simpleini\SimpleIni.h"
-#include "Utility.h"
-#include "Logger.h"
 #include "Singleton.h"
+#include "def.h"
 
 class Config : public Singleton<Config>
 {

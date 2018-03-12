@@ -1,4 +1,9 @@
 #include "Utility.h"
+#include <cctype>
+#include <imgui.h>
+#include <algorithm>
+#include <sstream>
+#include <codecvt>
 
 /// <summary>
 /// Converts a std::string into the equivalent std::wstring.

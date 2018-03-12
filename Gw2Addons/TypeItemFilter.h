@@ -1,8 +1,6 @@
 #ifndef TYPE_ITEM_FILTER_H
 #define TYPE_ITEM_FILTER_H
 #include "SingleFilter.h"
-#include "ItemStackData.h"
-#include "ItemType.h"
 
 class TypeItemFilter : public SingleFilter<ItemType> {
 protected:

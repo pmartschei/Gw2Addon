@@ -14,7 +14,7 @@ std::string TypeItemFilter::GetName() {
 void TypeItemFilter::RenderInput(ItemType & value)
 {
 	int v = ItemTypeIndex[value];
-	gotUpdated |= ImGui::Combo(UNIQUE_NO_DELIMITER("##type", id), &v, &ItemTypes[0], (int)ItemTypeIndex.size());
+	gotUpdated |= ImGui::Combo(UNIQUE_NO_DELIMITER("##type", id), &v, , (int)ItemTypeIndex.size());
 	value = (ItemType)ItemTypeEnum[v];
 }
 

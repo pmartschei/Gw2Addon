@@ -1,4 +1,6 @@
 #include "Logger.h"
+#include "Utility.h"
+#include <codecvt>
 
 LogLevel Logger::minLevel = LogLevel::Info;
 std::fstream Logger::file;
