@@ -1,4 +1,5 @@
 #include "PluginBase.h"
+#include "Plugin.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
 void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText);
@@ -118,6 +119,7 @@ void PluginBase::Init() {
 	openOptions->func = std::bind(&Window::ChangeState, optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
 	RegisterKeyBind(openOptions);
+
 	chainLoad = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
 	LoadColors(AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
 	LoadColors(ImGuiCol_COUNT, ImGui::GetStyleColorName, ImGui::GetStyle().Colors);
@@ -127,6 +129,10 @@ void PluginBase::Init() {
 void PluginBase::AddWindow(Window * window)
 {
 	_windows.push_back(window);
+}
+
+void PluginBase::AddPlugin(Plugin* plugin) {
+	loadedPlugins.push_back(plugin);
 }
 
 void PluginBase::CloseFocusedWindow()
@@ -338,8 +344,14 @@ void PluginBase::Render()
 			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData.sellable);
 		}
 	}
+
 	ImGui::End();
 #endif
+	for (std::vector<Plugin*>::iterator it = loadedPlugins.begin(); it != loadedPlugins.end(); ++it) {
+		Plugin* plugin = *it;
+		plugin->Render();
+	}
+
 	if (optionWindow->Begin()) {
 		if (pluginBaseState == PluginBaseState::FAILURE) {
 			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_NegativeText]);
@@ -350,14 +362,18 @@ void PluginBase::Render()
 			Config::SaveText(MAIN_INFO, "chainload", chainLoad.c_str());
 			Config::Save();
 		}
+		for (std::vector<Plugin*>::iterator it = loadedPlugins.begin(); it != loadedPlugins.end(); ++it) {
+			Plugin* plugin = *it;
+			plugin->RenderOptions();
+		}
 		if (ImGui::CollapsingHeader("Keybinds")) {
 			RenderKeyBinds();
 		}
 		if (ImGui::CollapsingHeader("Addon Colors")) {
-			RenderColors("addon",AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
+			RenderColors("addon", AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
 		}
 		if (ImGui::CollapsingHeader("ImGui Colors")) {
-			RenderColors("imgui",ImGuiCol_COUNT,ImGui::GetStyleColorName,ImGui::GetStyle().Colors);
+			RenderColors("imgui", ImGuiCol_COUNT, ImGui::GetStyleColorName, ImGui::GetStyle().Colors);
 		}
 		optionWindow->End();
 	}
@@ -486,10 +502,10 @@ void PluginBase::ReadItemBase(ItemData& data, hl::ForeignClass pBase) {
 	data.itemtype = (ItemType)pBase.get<int>(0x2C);
 	if (!GetCodedTextFromHashId || !DecodeText) return;
 	uint hashId = pBase.get<uint>(0x80);
-	if (hashId == 0) {
+	/*if (hashId == 0) {
 		hl::ForeignClass hash = pBase.get<void*>(0xA8);
 		hashId = hash.get<uint>(0x58);
-	}
+	}*/
 	if (hashId == 0) return;
 	if (decodeIDs.find(hashId) == decodeIDs.end()) {
 		uintptr_t* d = (uintptr_t*)GetCodedTextFromHashId(hashId, 0);
@@ -503,6 +519,8 @@ void PluginBase::ReadItemData(ItemStackData& data, hl::ForeignClass pBase) {
 	if (!itemPtr) return;
 	data.pItem = pBase;
 	data.count = pBase.call<int>(0x78);
+	data.accountBound = (pBase.get<int>(0x50) & 0x40);
+	data.tradingpostSellable = !(pBase.get<int>(0x50) & 0x08);
 	ReadItemBase(data.itemData, itemPtr);
 }
 void PluginBase::SetupMisc() {
@@ -533,15 +551,20 @@ void PluginBase::SetupMisc() {
 	}
 	hl::ForeignClass itemData = objOnElement.get<void*>(0x70);
 	hl::ForeignClass itemCollection = objOnElement.get<void*>(0x78);//collection of materials
-	if (itemData && itemCollection && ((uintptr_t)itemData.data() == ((uintptr_t)itemCollection.data() + 0x60 + currentPointers.elementParam * 0x20))) {
-		currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
-		itemData = itemData.get<void*>(0x0);
-		if (itemData) {
-			currentPointers.itemPtr = (uintptr_t)itemData.data();
-			ReadItemBase(currentPointers.hoveredItemData, itemData);
-			return;
+
+	[&] { __try {
+		if (itemData && itemCollection && (uintptr_t)itemCollection.data() + 0x60 == itemCollection.get<uintptr_t>(0x30)) {
+			currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
+			itemData = itemData.get<void*>(0x0);
+			if (itemData) {
+				currentPointers.itemPtr = (uintptr_t)itemData.data();
+				ReadItemBase(currentPointers.hoveredItemData, itemData);
+				return;
+			}
 		}
 	}
+	__except (IGNORE_EXCEPTION) {
+	}}();
 	itemCollection = objOnElement.get<void*>(0x80);
 	if (itemCollection && ((uintptr_t)itemCollection.data() == currentPointers.guildInv)) {//guild slots
 		currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
@@ -584,7 +607,7 @@ void PluginBase::SetupPlayer() {
 	if (!charctx) return;
 
 	uint32_t t;
-	hl::ForeignClass player = charctx.get<void*>(0x98);
+	hl::ForeignClass player = charctx.get<void*>(0x90);
 	currentPointers.player = (uintptr_t)player.data();
 	if (!player) {
 		if (GetInventory(&t).itemStackDatas.size()>0)
@@ -658,7 +681,10 @@ void PluginBase::GameHook()
 {
 	SetupContext();
 
-	if (updateFunc) updateFunc();
+	for (std::vector<Plugin*>::iterator it = loadedPlugins.begin(); it != loadedPlugins.end(); ++it) {
+		Plugin* plugin = *it;
+		plugin->PluginMain();
+	}
 }
 
 void __fastcall hkGameThread(uintptr_t pInst, int, int frame_time)

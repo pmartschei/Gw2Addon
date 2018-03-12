@@ -16,5 +16,6 @@ public:
 	virtual void PostReset() {};
 	virtual void Render() {};
 	virtual void PluginMain() {};
+	virtual void RenderOptions() {};
 };
 #endif

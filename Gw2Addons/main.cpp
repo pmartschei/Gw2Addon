@@ -22,7 +22,7 @@ uint ScreenWidth, ScreenHeight;
 
 Plugin* plugin= (Plugin*)new FilterPlugin();
 
-void UpdatePlugins();
+PluginBase* pluginBase;
 
 IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 {
@@ -70,8 +70,8 @@ void InitDLL() {
 	else {
 		Logger::LogString(LogLevel::Info, MAIN_INFO, "Config not found, default loaded");
 	}
-	PluginBase::GetInstance()->Init();
-	PluginBase::GetInstance()->SetUpdateFunc(UpdatePlugins);
+	pluginBase = PluginBase::GetInstance();
+	pluginBase->Init();
 	Logger::Init("IncQol.log");
 	Logger::SetMinLevel(LOG_LVL);
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
@@ -155,14 +155,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 
 	ImGui_ImplDX9_WndProcHandler(hWnd, msg, wParam, lParam);
-	PluginBase* pluginBase = PluginBase::GetInstance();
 	if (pluginBase->PushKeys(eventKeys)) return true;
 
 	if (pluginBase->HasFocusWindow() && pluginBase->IsCloseWindowBindDown() ) {
 		pluginBase->CloseFocusedWindow();
 		return true;
 	}
-	pluginBase->CheckKeyBinds();
+	if (pluginBase->CheckKeyBinds()) return true;
 	// Prevent game from receiving input if ImGui requests capture
 	const auto& io = ImGui::GetIO();
 	if (io.WantCaptureMouse) {
@@ -224,6 +223,7 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins");
 	plugin->Init();
+	pluginBase->AddPlugin(plugin);
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins completed");
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins");
 	plugin->PreCreateDevice();
@@ -286,11 +286,8 @@ HRESULT f_IDirect3DDevice9::Present(CONST RECT *pSourceRect, CONST RECT *pDestRe
 
 	ImGui_ImplDX9_NewFrame();
 
-	PluginBase* pluginBase = PluginBase::GetInstance();
 	pluginBase->CheckInitialize();
 	pluginBase->Render();
-
-	plugin->Render();
 
 	ImGui::Render();
 
@@ -312,9 +309,5 @@ ULONG f_IDirect3DDevice9::Release()
 		Shutdown();*/
 
 	return f_pD3DDevice->Release();
-}
-
-void UpdatePlugins() {
-	plugin->PluginMain();
 }
 

@@ -6,6 +6,13 @@ RootGroupFilter::RootGroupFilter() {
 	nameCalculated = true;
 }
 
+RootGroupFilter::RootGroupFilter(const RootGroupFilter& copy) {
+	flags = copy.flags;
+	name = copy.name;
+	nameCalculated = copy.nameCalculated;
+	subFilters = std::vector<IFilter*>(copy.subFilters);
+}
+
 void RootGroupFilter::Render()
 {
 	RenderChildren();

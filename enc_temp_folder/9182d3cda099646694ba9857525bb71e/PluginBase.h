@@ -11,7 +11,6 @@
 #include "hacklib\Hooker.h"
 #include "AddonColors.h"
 #include "Logger.h"
-#include <http.h>
 
 class Window; 
 class Plugin;

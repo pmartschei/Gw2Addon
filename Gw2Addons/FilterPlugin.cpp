@@ -14,6 +14,7 @@ void FilterPlugin::Init() {
 
 	LogString(LogLevel::Debug, "Creating Filters");
 	root = new RootGroupFilter();
+	rootCopy = new RootGroupFilter();
 	stdFilter = new RootGroupFilter();
 	GroupFilter* groupFilter = new GroupFilter();
 	RarityRangeItemFilter* rarityFilter = new RarityRangeItemFilter();
@@ -29,7 +30,7 @@ void FilterPlugin::Init() {
 	HookVendorFunc();
 	LogString(LogLevel::Debug, "Hooking Vendor Function end");
 
-	LoadFilterFrom(root, GetAddonFolder().append(STARTUP_FILTERNAME).c_str());
+	LoadFilterFrom(rootCopy, GetAddonFolder().append(STARTUP_FILTERNAME).c_str());
 	copyItemKeyBind->plugin = GetName();
 	openWindow->plugin = GetName();
 	copyItemKeyBind->name = "CopyHoveredItem";
@@ -51,19 +52,22 @@ void FilterPlugin::PluginMain()
 {
 	uint32_t updateIndex;
 	InventoryData inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
-	bool defaultFilterUpdated = root->Updated();
+	*root = *rootCopy;
+	bool defaultFilterUpdated = rootCopy->Updated();
+	rootCopy->ResetUpdateState();
 	if (defaultFilterUpdated) {
 		std::string folder = GetAddonFolder();
 		SHCreateDirectoryExA(nullptr, folder.c_str(), nullptr);
 		folder.append(STARTUP_FILTERNAME);
 		SaveFilterAs(root,folder.c_str());
+		lastCallPtr = new uintptr_t(0);
 	}
 	if (lastUpdateIndex != updateIndex || defaultFilterUpdated) {
-		root->ResetUpdateState();
 		lastUpdateIndex = updateIndex;
 		std::set<ItemStackData> collection = std::set<ItemStackData>(inventory.itemStackDatas.begin(), inventory.itemStackDatas.end());
 		collection = stdFilter->Filter(collection);
 		filteredCollection = root->Filter(collection);
+		lastItemsFilteredCount = root->GetFilteredCount();
 	}
 	if (!vendorSuccessful) return;
 	if (*lastCallPtr == 0) return;
@@ -72,20 +76,44 @@ void FilterPlugin::PluginMain()
 		lastCallPtr = new uintptr_t(0);
 		return;
 	}
+	for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
+		ItemStackData data = (*filteredCollection.begin());
+		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data.itemData.id) != skipUnsellableIds.end()) {
+			filteredCollection.erase(it++);
+		}
+		else {
+			++it;
+		}
+	}
 	if (filteredCollection.size() > 0) {
 		hl::ForeignClass vendor = (uintptr_t*)*lastCallPtr;
-		vendor.set<int>(0x50, (*filteredCollection.begin()).slot);
+		ItemStackData data = (*filteredCollection.begin());
+		if (lastSlot != data.slot) {
+			lastSlot = data.slot;
+			curRetry = 0;
+		}
+		vendor.set<int>(0x50, data.slot);
 		vendorFunc(new firstParam{ 0x0,0x31,lastCallPtr }, new secondParam{ 0x0,0x2,0x3 });
+		curRetry++;
+		if (curRetry >= maxRetry) {
+			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data.itemData.id)));
+			skipUnsellableIds.push_back(data.itemData.id);
+		}
+	}
+	else {
+		lastSlot = -1;
 	}
 }
+
 void FilterPlugin::Render() {
 	if (window->Begin()) {
 		RenderMenu();
-		root->Render();
-		root->CheckForDeletion();
+		rootCopy->Render();
+		rootCopy->CheckForDeletion();
 		window->End();
 	}
 }
+
 void FilterPlugin::RenderMenu() {
 	if (ImGui::BeginMenuBar()) {
 		if (ImGui::BeginMenu("Menu"))
@@ -109,7 +137,7 @@ void FilterPlugin::RenderMenu() {
 						std::string folder = GetFilterFolder();
 						SHCreateDirectoryExA(nullptr, folder.c_str(), nullptr);
 						folder.append(fileNameString);
-						if (SaveFilterAs(root,folder.append(".filter").c_str())) {
+						if (SaveFilterAs(rootCopy,folder.append(".filter").c_str())) {
 							extraMessage = "Filter successfully saved!";
 							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
@@ -148,7 +176,7 @@ void FilterPlugin::RenderMenu() {
 						extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 					}
 					else {
-						if (LoadFilterFrom(root,GetFilterFolder().append(filesToLoad[loadIndex]).c_str(), appendLoad)) {
+						if (LoadFilterFrom(rootCopy,GetFilterFolder().append(filesToLoad[loadIndex]).c_str(), appendLoad)) {
 							extraMessage = "Filter successfully loaded!";
 							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
@@ -183,13 +211,13 @@ void FilterPlugin::RenderMenu() {
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Root filter")) {
-			root->CustomMenu();
+		if (ImGui::BeginMenu("Edit")) {
+			rootCopy->CustomMenu();
 			if (ImGui::Selectable("Expand all")) {
-				root->SetOpen(true);
+				rootCopy->SetOpen(true);
 			}
 			if (ImGui::Selectable("Collapse all")) {
-				root->SetOpen(false);
+				rootCopy->SetOpen(false);
 			}
 			ImGui::EndMenu();
 		}
@@ -201,7 +229,7 @@ void FilterPlugin::RenderMenu() {
 		if (a > textSize) {
 			ImGui::SameLine(0, a - textSize + ImGui::GetStyle().ColumnsMinSpacing * 2);
 			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
-			ImGui::Text(text, root->GetFilteredCount());
+			ImGui::Text(text, lastItemsFilteredCount);
 			ImGui::PopStyleColor();
 		}
 
@@ -249,7 +277,7 @@ void FilterPlugin::AddHoveredItemToFilter()
 		groupFilter->AddFilter(rarityFilter);
 		groupFilter->AddFilter(typeFilter);
 		groupFilter->SetOpen(false);
-		root->AddFilter(groupFilter);
+		rootCopy->AddFilter(groupFilter);
 	}
 }
 

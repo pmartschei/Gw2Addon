@@ -24,8 +24,10 @@ std::set<ItemStackData> GroupFilter::Filter(std::set<ItemStackData> collection)
 			if (filterActive) {
 				activeCount++;
 			}
+			else {
+				continue;
+			}
 			std::set<ItemStackData> filteredSet = (*iter)->Filter(collection);
-			if (!filterActive) continue;
 			if (flags & FilterFlags::And) {
 				std::set<ItemStackData> intersection;
 				std::set_intersection(combinedSet.begin(), combinedSet.end(), filteredSet.begin(), filteredSet.end(), std::inserter(intersection, intersection.end()));

@@ -8,6 +8,8 @@ class ItemStackData {
 public:
 	uint32_t slot = 0;
 	uint32_t count = 0;
+	bool accountBound;
+	bool tradingpostSellable;
 	hl::ForeignClass pItem = nullptr;
 	ItemData itemData;
 };

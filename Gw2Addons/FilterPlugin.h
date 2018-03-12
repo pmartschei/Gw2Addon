@@ -19,7 +19,9 @@ class FilterPlugin : public Plugin
 {
 private:
 	RootGroupFilter* root;
+	RootGroupFilter* rootCopy;
 	RootGroupFilter* stdFilter;
+
 	Window* window;
 	uint32_t lastUpdateIndex;
 	void HookVendorFunc();
@@ -42,6 +44,11 @@ private:
 	int fileCount = 0;
 	bool appendLoad = false;
 
+	int lastItemsFilteredCount;
+	int curRetry = 0;
+	int maxRetry = 100;
+	int lastSlot = -1;
+	std::vector<int> skipUnsellableIds;
 	void RenderMenu();
 	void AddHoveredItemToFilter();
 	void ReloadFilterFiles();
