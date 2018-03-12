@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <windows.h>
-#include "def.h"
+#include "main.h"
 
 std::wstring s2ws(const std::string & str);
 

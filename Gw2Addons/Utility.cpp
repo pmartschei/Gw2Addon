@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <sstream>
 #include <codecvt>
+#include <mutex>
 
 /// <summary>
 /// Converts a std::string into the equivalent std::wstring.

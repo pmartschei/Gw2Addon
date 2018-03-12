@@ -336,9 +336,6 @@
     <ClInclude Include="Singleton.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="def.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="PluginBaseState.h">
       <Filter>Source Files</Filter>
     </ClInclude>

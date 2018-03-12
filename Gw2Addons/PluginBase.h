@@ -1,16 +1,16 @@
 #ifndef PLUGIN_BASE_H
 #define PLUGIN_BASE_H
+#include <set>
+#include <vector>
+#include <imgui.h>
 #include "InventoryData.h"
 #include "ItemData.h"
 #include "main.h"
-#include "Logger.h"
 #include "PluginBaseState.h"
 #include "hacklib\PatternScanner.h"
-#include "ForeignFunction.h"
 #include "hacklib\Hooker.h"
-#include "AddonColors.h"
+#include "ForeignFunction.h"
 #include "Logger.h"
-#include "HttpDownloader.h"
 #include "ThreadTaskQueue.h"
 #include "Singleton.h"
 
@@ -45,7 +45,6 @@ struct EventKey
 	bool down : 1;
 };
 
-
 struct KeyBindData {
 	bool isSetMode = false;
 	const char* plugin;
@@ -79,9 +78,10 @@ private:
 	std::set<uint> _downKeys;
 	std::set<uint> _closeWindowKeys = { VK_ESCAPE };
 	std::list<EventKey> eventKeys;
+
 	InventoryData inventory;
-	ItemData hoveredItem;
 	uint32_t inventoryUpdateIndex = 0;
+	ItemData hoveredItem;
 	std::vector<KeyBindData*> keyBinds;
 
 	std::string chainLoad;
@@ -119,60 +119,55 @@ private:
 	std::string configItemsUrl;
 	std::string configPricesUrl;
 
-protected:
-	PluginBase() {};
-	std::list<Window*> _windows;
-	Window* _focusedWindow = 0;
-public:
-	void Init();
-	void AddWindow(Window* window);
-	void AddPlugin(Plugin* plugin);
-	void CloseFocusedWindow();
-	bool HasFocusWindow();
-
-	void ReloadConfig();
 	void SetupContext();
 	void SetupPlayer();
 	void SetupMisc();
 	void SetupGuild();
 	void ReadItemData(ItemStackData& data, hl::ForeignClass pBase);
 	void ReadItemBase(ItemData& data, hl::ForeignClass pBase);
+	bool KeysDown(std::set<uint> keys);
+	bool KeybindText(std::string suffix, KeyBindData* data);
+	void SetInventory(InventoryData data);
+	void SetHoveredItem(ItemData data);
+	void RenderKeyBinds();
+	void RenderColors(const char* id, int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
+	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
+protected:
+	PluginBase() {};
+	std::list<Window*> _windows;
+	Window* _focusedWindow = 0;
+public:
+	void Init();
+
+	void AddPlugin(Plugin* plugin);
+	void AddWindow(Window* window);
+	void CloseFocusedWindow();
+	bool HasFocusWindow();
+	bool IsCloseWindowBindDown();
 	void GameHook();
 
 	void CheckInitialize();
 
-	bool IsCloseWindowBindDown();
-	bool KeysDown(std::set<uint> keys);
 	bool PushKeys(std::list<EventKey> eventKeys);
-	std::set<uint> GetKeys();
 	bool CheckKeyBinds();
 
-	bool KeybindText(std::string suffix,KeyBindData* data);
-
+	void Render();
+	//METHODS FOR PLUGINS
 	InventoryData GetInventory(uint32_t* updateIndex);
-	void SetInventory(InventoryData data);
-
-	void SetHoveredItem(ItemData data);
 	ItemData GetHoveredItem();
 	bool HasHoveredItem();
+	void ProcessTask(Task* task);
+
+	void ReloadConfig();
+	std::string GetItemInfoUrl();
+	std::string GetPricesUrl();
+	//END
 
 	void RegisterKeyBind(KeyBindData* keybind);
 	void UnregisterKeyBind(KeyBindData* keybind);
-
-	void Render();
-
-	void RenderKeyBinds();
-	void RenderColors(const char* id,int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
-	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
-
 	void AddDecodeID(uintptr_t key, std::string value);
-
-	void ProcessTask(Task* task);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();
-
-	std::string GetItemInfoUrl();
-	std::string GetPricesUrl();
 };
 #endif

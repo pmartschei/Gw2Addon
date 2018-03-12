@@ -2,7 +2,7 @@
 
 TradingPostValueFilter::TradingPostValueFilter()
 {
-	value = 0.0f;
+	value = 0;
 	name = GetName();
 }
 
@@ -23,7 +23,7 @@ void TradingPostValueFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 
 void TradingPostValueFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
-	value = CLAMP(element->FloatAttribute("value", 0), 20.0f, 1000.0f);
+	value = CLAMP(element->IntAttribute("value", 0), 20, 1000);
 	name = GetName();
 }
 

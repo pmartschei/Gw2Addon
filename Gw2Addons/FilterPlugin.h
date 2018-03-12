@@ -15,7 +15,6 @@ private:
 
 	Window* window;
 	uint32_t lastUpdateIndex;
-	void HookVendorFunc();
 	uintptr_t* proxyVendorLocation;
 	bool vendorSuccessful = false;
 	std::set<ItemStackData> filteredCollection;
@@ -23,13 +22,11 @@ private:
 	KeyBindData* openWindow = new KeyBindData();
 
 	char fileName[64] = "Unnamed Filter";
-
 	bool extraMessageSave = false;
 	bool extraMessageLoad = false;
 	bool firstOpenedImportFilter = true;
 	std::string extraMessage = "";
 	ImVec4 extraMessageColor = Addon::Colors[AddonColor_PositiveText];
-
 	int loadIndex = -1;
 	const char** filesToLoad;
 	int fileCount = 0;
@@ -40,20 +37,22 @@ private:
 	int maxRetry = 100;
 	int lastSlot = -1;
 	std::vector<int> skipUnsellableIds;
+
+	void HookVendorFunc();
 	void RenderMenu();
 	void AddHoveredItemToFilter();
 	void ReloadFilterFiles();
+	bool SaveFilterAs(RootGroupFilter* filter, const char* name);
+	bool LoadFilterFrom(RootGroupFilter* filter, const char *name, bool append = false);
 public:
-	virtual void Init() override;
-	virtual void Render() override;
-	virtual void PluginMain() override;
-	bool SaveFilterAs(RootGroupFilter* filter,const char* name);
-	bool LoadFilterFrom(RootGroupFilter* filter, const char *name,bool append = false);
 	static uintptr_t* vendorSource;
 	static uintptr_t* lastCallPtr;
 
 	// Geerbt über Plugin
 	virtual const char * GetName() override;
+	virtual void Init() override;
+	virtual void Render() override;
+	virtual void PluginMain() override;
 };
 struct firstParam {
 	int _;

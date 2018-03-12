@@ -9,6 +9,7 @@
 #include "ItemFilterFactory.h"
 #include "TradingPostValueFilter.h"
 #include <algorithm>
+#include <iterator>
 
 GroupFilter::GroupFilter() {
 	flags = FilterFlags::And;

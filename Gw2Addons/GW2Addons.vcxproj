@@ -155,7 +155,6 @@
     <ClInclude Include="BagData.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="d3d9.h" />
-    <ClInclude Include="def.h" />
     <ClInclude Include="FilterFactory.h" />
     <ClInclude Include="FilterPluginUtility.h" />
     <ClInclude Include="HttpDownloader.h" />

@@ -1,4 +1,5 @@
 #include "IFilter.h"
+#include <iterator>
 #include <algorithm>
 #include "AddonColors.h"
 

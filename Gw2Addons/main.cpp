@@ -5,7 +5,6 @@
 #include "Utility.h"
 #include "FilterPlugin.h"
 #include "PluginBase.h"
-
 /*
 	TODO: 
 	Tradingpost values
@@ -30,38 +29,30 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 	if (!OriginalD3D9)
 	{
 		char path[MAX_PATH];
-
-		// Try to chainload first
+		// Try to chainload first with config
 		GetCurrentDirectoryA(MAX_PATH, path);
 		const char* chainPath = Config::LoadText(MAIN_INFO, "chainload", "d3d9_incqol_chain.dll");
 		strcat_s(path, "\\bin64\\");
 		strcat_s(path,chainPath);
 
-		if (!FileExists(path))
+		if (!FileExists(path))//check system d3d9 after
 		{
 			GetSystemDirectoryA(path, MAX_PATH);
 			strcat_s(path, "\\d3d9.dll");
 		}
 
-		OriginalD3D9 = LoadLibraryA(path);
+		OriginalD3D9 = LoadLibraryA(path);//load d3d9 from path
 	}
-	orig_Direct3DCreate9 = (D3DC9)GetProcAddress(OriginalD3D9, "Direct3DCreate9");
+	orig_Direct3DCreate9 = (D3DC9)GetProcAddress(OriginalD3D9, "Direct3DCreate9");//orig proc address
 
 	return new f_iD3D9(orig_Direct3DCreate9(SDKVersion));
 }
-//
-//void Shutdown()
-//{
-//	ImGui_ImplDX9_Shutdown();
-//	__try {
-//		m_hooker.unhook(m_hkAlertCtx);
-//	}
-//	__except (ADDON_EXCEPTION("[hkGameThread] Exception in game thread")) {
-//
-//	}
-//}
 
+/*
+Initializes the DLL 
+*/
 void InitDLL() {
+	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
 	Logger::Init("IncQol.log");
 	Logger::SetMinLevel(LOG_LVL);
 	Addon::ClassicColors();
@@ -74,11 +65,11 @@ void InitDLL() {
 	}
 	pluginBase = PluginBase::GetInstance();
 	pluginBase->Init();
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
-	
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon initialization finished");
 }
-
+/*
+DLL Main, thats the start of our code
+*/
 bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 {
 	switch (fdwReason)
@@ -101,7 +92,9 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 	return true;
 }
 
-
+/*
+Mouse/Keyboard Handler 
+*/
 extern LRESULT ImGui_ImplDX9_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -170,7 +163,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		case WM_MOUSEMOVE:
 		case WM_MOUSEWHEEL:
 			return true;
-		case WM_INPUT:
+		case WM_INPUT: //Dont move the camera ingame when holding mouse
 		{
 			UINT dwSize = 40;
 			static BYTE lpb[40];
@@ -182,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 			if (raw->header.dwType == RIM_TYPEMOUSE)
 				return true;
-
+			
 			break;
 		}
 		}
@@ -237,6 +230,7 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 
 	// Init ImGui
 	auto& imio = ImGui::GetIO();
+	//load imgui ini
 	std::string location = GetAddonFolder().append("imgui.ini");
 	size_t size = location.size() + 1;
 	char *cptr = new char[size];
@@ -275,7 +269,6 @@ HRESULT f_IDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationParameters
 
 	return hr;
 }
-
 
 HRESULT f_IDirect3DDevice9::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion)
 {

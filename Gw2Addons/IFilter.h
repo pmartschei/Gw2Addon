@@ -7,6 +7,7 @@
 #include "imgui.h"
 #include "tinyxml\tinyxml2.h"
 #include "FilterFlags.h"
+#include "AddonColors.h"
 
 #define UNIQUE(text,id) ((std::string(text)+"##"+std::to_string(id)).c_str())
 

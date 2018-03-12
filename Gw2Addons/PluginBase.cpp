@@ -1,9 +1,13 @@
 #include "PluginBase.h"
+#include <iterator>
+#include <sstream>
 #include "Plugin.h"
 #include "RequestTradingpostTask.h"
 #include "Window.h"
 #include "Config.h"
 #include "Utility.h"
+#include "AddonColors.h"
+#include "Logger.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
 void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText);
@@ -103,11 +107,6 @@ bool PluginBase::KeybindText(std::string suffix,KeyBindData* data) {
 		return true;
 	}
 	return false;
-}
-
-std::set<uint> PluginBase::GetKeys()
-{
-	return _downKeys;
 }
 
 void PluginBase::Init() {

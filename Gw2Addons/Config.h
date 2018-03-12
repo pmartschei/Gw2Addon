@@ -3,7 +3,7 @@
 #include <set>
 #include "simpleini\SimpleIni.h"
 #include "Singleton.h"
-#include "def.h"
+#include "main.h"
 
 class Config : public Singleton<Config>
 {
