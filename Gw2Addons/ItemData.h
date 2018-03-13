@@ -3,21 +3,30 @@
 #include "hacklib\ForeignClass.h"
 #include "ItemType.h"
 #include "ItemRarity.h"
+#include "main.h"
+#include <map>
 
 class ItemData {
+private:
+	static std::map<uint, ItemData*> datas;
 public:
-	
-	hl::ForeignClass pItemData = nullptr;
-	hl::ForeignClass pExtendedType = nullptr;
-	uint32_t id = 0;
+	ItemData();
+	~ItemData();
+	static void AddData(ItemData* data);
+	static ItemData* GetData(uint id);
+	hl::ForeignClass pItemData;
+	hl::ForeignClass pExtendedType;
+	uint id = 0;
 	bool sellable;
-	uint32_t level;
+	uint level;
 	ItemRarity rarity;
 	ItemType itemtype;
 	std::string name;
+	bool validTradingPostData = false;
+	float lastTradingPostUpdate = 0;
 	float buyTradingPost;
 	float sellTradingPost;
-	uint32_t vendorValue;
+	uint vendorValue;
 };
 inline bool operator==(const ItemData& lhs, const ItemData& rhs)
 {

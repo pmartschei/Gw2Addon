@@ -81,7 +81,7 @@ private:
 
 	InventoryData inventory;
 	uint32_t inventoryUpdateIndex = 0;
-	ItemData hoveredItem;
+	ItemData* hoveredItem;
 	std::vector<KeyBindData*> keyBinds;
 
 	std::string chainLoad;
@@ -113,7 +113,7 @@ private:
 		uintptr_t objOnElement;
 		uintptr_t LocationPtr;
 		uintptr_t itemPtr;
-		ItemData hoveredItemData;
+		ItemData* hoveredItemData;
 	} currentPointers;
 
 	std::string configItemsUrl;
@@ -123,12 +123,12 @@ private:
 	void SetupPlayer();
 	void SetupMisc();
 	void SetupGuild();
-	void ReadItemData(ItemStackData& data, hl::ForeignClass pBase);
-	void ReadItemBase(ItemData& data, hl::ForeignClass pBase);
+	void ReadItemData(ItemStackData* data, hl::ForeignClass pBase);
+	void ReadItemBase(ItemData** data, hl::ForeignClass pBase);
 	bool KeysDown(std::set<uint> keys);
 	bool KeybindText(std::string suffix, KeyBindData* data);
 	void SetInventory(InventoryData data);
-	void SetHoveredItem(ItemData data);
+	void SetHoveredItem(ItemData* data);
 	void RenderKeyBinds();
 	void RenderColors(const char* id, int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
 	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
@@ -153,8 +153,8 @@ public:
 
 	void Render();
 	//METHODS FOR PLUGINS
-	InventoryData GetInventory(uint32_t* updateIndex);
-	ItemData GetHoveredItem();
+	InventoryData GetInventory(uint* updateIndex);
+	ItemData* GetHoveredItem();
 	bool HasHoveredItem();
 	void ProcessTask(Task* task);
 

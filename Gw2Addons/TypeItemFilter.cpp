@@ -20,7 +20,7 @@ void TypeItemFilter::RenderInput(ItemType & value)
 
 bool TypeItemFilter::IsFiltered(ItemStackData data)
 {
-	return data.itemData.itemtype == value;
+	return data.itemData->itemtype == value;
 }
 
 char * TypeItemFilter::GetSerializeName()

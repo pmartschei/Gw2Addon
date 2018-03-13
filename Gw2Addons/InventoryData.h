@@ -5,6 +5,8 @@
 #include "BagData.h"
 class InventoryData {
 public:
+	InventoryData();
+	~InventoryData();
 	int size = 0;
 	int bagCount = 0;
 	int slotsPerBag = 0;

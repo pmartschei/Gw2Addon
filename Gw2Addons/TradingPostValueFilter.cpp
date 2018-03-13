@@ -36,11 +36,11 @@ bool TradingPostValueFilter::IsFiltered(ItemStackData data)
 {
 	if (!data.tradingpostSellable) return true;
 
-	float tpValue = data.itemData.buyTradingPost;
+	float tpValue = data.itemData->buyTradingPost;
 	if (modus == TradingPostModus::Sell) {
-		tpValue = data.itemData.sellTradingPost;
+		tpValue = data.itemData->sellTradingPost;
 	}
-	if (data.itemData.vendorValue * (1+value / 100.0f) < tpValue) {
+	if (data.itemData->vendorValue * (1+value / 100.0f) < tpValue) {
 		return true;
 	}
 

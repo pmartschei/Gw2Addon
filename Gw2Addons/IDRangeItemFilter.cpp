@@ -27,10 +27,10 @@ void IDRangeItemFilter::RenderInput(int & value, std::string s)
 bool IDRangeItemFilter::IsFiltered(ItemStackData data)
 {
 	if (minValue < maxValue) {
-		return data.itemData.id >= (uint32_t)minValue && data.itemData.id <= (uint32_t)maxValue;
+		return data.itemData->id >= (uint32_t)minValue && data.itemData->id <= (uint32_t)maxValue;
 	}
 	else {
-		return data.itemData.id >= (uint32_t)maxValue && data.itemData.id <= (uint32_t)minValue;
+		return data.itemData->id >= (uint32_t)maxValue && data.itemData->id <= (uint32_t)minValue;
 	}
 }
 

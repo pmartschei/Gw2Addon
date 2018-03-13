@@ -128,7 +128,12 @@
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
     <ClCompile Include="imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="InventoryData.cpp" />
+    <ClCompile Include="ItemData.cpp" />
     <ClCompile Include="ItemFilterFactory.cpp" />
+    <ClCompile Include="ItemStackData.cpp" />
+    <ClCompile Include="JSON\JSON.cpp" />
+    <ClCompile Include="JSON\JSONValue.cpp" />
     <ClCompile Include="LevelItemFilter.cpp" />
     <ClCompile Include="LevelRangeItemFilter.cpp" />
     <ClCompile Include="Logger.cpp" />
@@ -192,6 +197,8 @@
     <ClInclude Include="ItemStackData.h" />
     <ClInclude Include="ItemRarity.h" />
     <ClInclude Include="ItemType.h" />
+    <ClInclude Include="JSON\JSON.h" />
+    <ClInclude Include="JSON\JSONValue.h" />
     <ClInclude Include="LevelItemFilter.h" />
     <ClInclude Include="LevelRangeItemFilter.h" />
     <ClInclude Include="Logger.h" />

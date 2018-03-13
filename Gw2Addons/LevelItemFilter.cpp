@@ -19,7 +19,7 @@ void LevelItemFilter::RenderInput(int & value)
 
 bool LevelItemFilter::IsFiltered(ItemStackData data)
 {
-	return data.itemData.level == value;
+	return data.itemData->level == value;
 }
 
 char * LevelItemFilter::GetSerializeName()

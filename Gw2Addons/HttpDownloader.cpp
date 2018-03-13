@@ -33,7 +33,7 @@ string HttpDownloader::download(const std::string& url) {
 	CURLcode res = curl_easy_perform(curl);
 	/* Check for errors */
 	if (res != CURLE_OK) {
-		return 0;
+		return "";
 	}
 	return out.str();
 }

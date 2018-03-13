@@ -26,6 +26,9 @@
     <Filter Include="Source Files\FilterPlugin">
       <UniqueIdentifier>{06b605cf-d4f9-4509-b71c-b9b020a425bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="JSON">
+      <UniqueIdentifier>{4618f92e-9f4e-4ea1-b461-6e081e2263f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -82,9 +85,6 @@
     <ClCompile Include="IDItemFilter.cpp">
       <Filter>Source Files\Filter</Filter>
     </ClCompile>
-    <ClCompile Include="FilterPlugin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IFilter.cpp">
       <Filter>Source Files\Filter</Filter>
     </ClCompile>
@@ -130,9 +130,6 @@
     <ClCompile Include="ItemFilterFactory.cpp">
       <Filter>Source Files\Filter</Filter>
     </ClCompile>
-    <ClCompile Include="FilterPluginUtility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Plugin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,6 +156,27 @@
     </ClCompile>
     <ClCompile Include="TradingPostValueFilter.cpp">
       <Filter>Source Files\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="JSON\JSON.cpp">
+      <Filter>JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="JSON\JSONValue.cpp">
+      <Filter>JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterPluginUtility.cpp">
+      <Filter>Source Files\FilterPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterPlugin.cpp">
+      <Filter>Source Files\FilterPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InventoryData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ItemStackData.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -255,9 +273,6 @@
     <ClInclude Include="SingleFilter.h">
       <Filter>Source Files\Filter</Filter>
     </ClInclude>
-    <ClInclude Include="FilterPlugin.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="IFilter.h">
       <Filter>Source Files\Filter</Filter>
     </ClInclude>
@@ -315,9 +330,6 @@
     <ClInclude Include="ItemFilterFactory.h">
       <Filter>Source Files\Filter</Filter>
     </ClInclude>
-    <ClInclude Include="FilterPluginUtility.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="BagData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -365,6 +377,18 @@
     </ClInclude>
     <ClInclude Include="TradingPostModus.h">
       <Filter>Source Files\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\JSONValue.h">
+      <Filter>JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="JSON\JSON.h">
+      <Filter>JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterPluginUtility.h">
+      <Filter>Source Files\FilterPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterPlugin.h">
+      <Filter>Source Files\FilterPlugin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

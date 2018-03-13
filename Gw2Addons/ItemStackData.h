@@ -6,12 +6,14 @@
 
 class ItemStackData {
 public:
+	ItemStackData();
+	~ItemStackData();
 	uint32_t slot = 0;
 	uint32_t count = 0;
 	bool accountBound;
 	bool tradingpostSellable;
-	hl::ForeignClass pItem = nullptr;
-	ItemData itemData;
+	hl::ForeignClass pItem;
+	ItemData* itemData;
 };
 inline bool operator==(const ItemStackData& lhs, const ItemStackData& rhs)
 {

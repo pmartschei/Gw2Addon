@@ -52,6 +52,8 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 Initializes the DLL 
 */
 void InitDLL() {
+	float f = GetTickCount();
+	Logger::LogString(LogLevel::Info, MAIN_INFO, std::to_string(f));
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
 	Logger::Init("IncQol.log");
 	Logger::SetMinLevel(LOG_LVL);

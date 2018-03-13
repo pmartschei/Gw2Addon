@@ -9,12 +9,13 @@ class Window;
 class FilterPlugin : public Plugin
 {
 private:
+
 	RootGroupFilter* root;
 	RootGroupFilter* rootCopy;
 	RootGroupFilter* stdFilter;
 
 	Window* window;
-	uint32_t lastUpdateIndex;
+	uint lastUpdateIndex;
 	uintptr_t* proxyVendorLocation;
 	bool vendorSuccessful = false;
 	std::set<ItemStackData> filteredCollection;
