@@ -88,7 +88,7 @@ void FilterPlugin::PluginMain()
 	}
 	for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
 		ItemStackData data = (*filteredCollection.begin());
-		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data.itemData->id) != skipUnsellableIds.end()) {
+		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data.itemData.id) != skipUnsellableIds.end()) {
 			filteredCollection.erase(it++);
 		}
 		else {
@@ -106,8 +106,8 @@ void FilterPlugin::PluginMain()
 		vendorFunc(new firstParam{ 0x0,0x31,lastCallPtr }, new secondParam{ 0x0,0x2,0x3 });
 		curRetry++;
 		if (curRetry >= maxRetry) {
-			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data.itemData->id)));
-			skipUnsellableIds.push_back(data.itemData->id);
+			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data.itemData.id)));
+			skipUnsellableIds.push_back(data.itemData.id);
 		}
 	}
 	else {
@@ -267,19 +267,18 @@ void FilterPlugin::ReloadFilterFiles() {
 void FilterPlugin::AddHoveredItemToFilter()
 {
 	if (PluginBase::GetInstance()->HasHoveredItem()) {
-		ItemData* data = PluginBase::GetInstance()->GetHoveredItem();
-		if (!data) return;
-		if (!data->sellable) return;
+		ItemData data = PluginBase::GetInstance()->GetHoveredItem();
+		if (!data.sellable) return;
 		GroupFilter* groupFilter = new GroupFilter();
 		IDItemFilter* idFilter = new IDItemFilter();
 		LevelItemFilter* levelFilter = new LevelItemFilter();
 		RarityItemFilter* rarityFilter = new RarityItemFilter();
 		TypeItemFilter* typeFilter = new TypeItemFilter();
-		groupFilter->SetName(std::string(data->name));
-		idFilter->SetValue(data->id);
-		levelFilter->SetValue(data->level);
-		rarityFilter->SetValue(data->rarity);
-		typeFilter->SetValue(data->itemtype);
+		groupFilter->SetName(std::string(data.name));
+		idFilter->SetValue(data.id);
+		levelFilter->SetValue(data.level);
+		rarityFilter->SetValue(data.rarity);
+		typeFilter->SetValue(data.itemtype);
 		levelFilter->SetActive(false);
 		rarityFilter->SetActive(false);
 		typeFilter->SetActive(false);

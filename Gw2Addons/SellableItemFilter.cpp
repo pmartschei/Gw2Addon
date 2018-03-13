@@ -18,7 +18,7 @@ void SellableItemFilter::RenderInput(bool& value)
 
 bool SellableItemFilter::IsFiltered(ItemStackData data)
 {
-	return data.itemData->sellable == value;
+	return data.itemData.sellable == value;
 }
 
 char * SellableItemFilter::GetSerializeName()

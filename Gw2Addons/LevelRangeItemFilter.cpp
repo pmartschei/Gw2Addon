@@ -26,10 +26,10 @@ void LevelRangeItemFilter::RenderInput(int & value, std::string s)
 bool LevelRangeItemFilter::IsFiltered(ItemStackData data)
 {
 	if (minValue < maxValue) {
-		return data.itemData->level >= (uint32_t)minValue && data.itemData->level <= (uint32_t)maxValue;
+		return data.itemData.level >= (uint32_t)minValue && data.itemData.level <= (uint32_t)maxValue;
 	}
 	else {
-		return data.itemData->level >= (uint32_t)maxValue && data.itemData->level <= (uint32_t)minValue;
+		return data.itemData.level >= (uint32_t)maxValue && data.itemData.level <= (uint32_t)minValue;
 	}
 }
 

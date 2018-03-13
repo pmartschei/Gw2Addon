@@ -13,7 +13,7 @@ public:
 	bool accountBound;
 	bool tradingpostSellable;
 	hl::ForeignClass pItem;
-	ItemData* itemData;
+	ItemData itemData;
 };
 inline bool operator==(const ItemStackData& lhs, const ItemStackData& rhs)
 {

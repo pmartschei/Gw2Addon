@@ -179,7 +179,7 @@ void PluginBase::SetupContext()
 		SetHoveredItem(currentPointers.hoveredItemData);
 	}
 	else {
-		SetHoveredItem(nullptr);
+		SetHoveredItem(ItemData());
 	}
 }
 
@@ -303,20 +303,19 @@ void PluginBase::SetInventory(InventoryData data)
 	inventory = data;
 }
 
-void PluginBase::SetHoveredItem(ItemData* data)
+void PluginBase::SetHoveredItem(ItemData data)
 {
-	delete hoveredItem;
 	hoveredItem = data;
 }
 
-ItemData* PluginBase::GetHoveredItem()
+ItemData PluginBase::GetHoveredItem()
 {
 	return hoveredItem;
 }
 
 bool PluginBase::HasHoveredItem()
 {
-	return (hoveredItem && hoveredItem->id != 0);
+	return (hoveredItem.id != 0);
 }
 
 void PluginBase::RegisterKeyBind(KeyBindData* keybind)
@@ -352,12 +351,12 @@ void PluginBase::Render()
 		ImGui::Separator();
 		if (currentPointers.itemPtr != 0) {
 			ImGui::Text("Item");
-			RenderReadonlyValue("Name", currentPointers.hoveredItemData->name);
-			RenderReadonlyValue("ID", currentPointers.hoveredItemData->id);
-			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData->itemtype);
-			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData->rarity);
-			RenderReadonlyValue("Level", currentPointers.hoveredItemData->level);
-			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData->sellable);
+			RenderReadonlyValue("Name", currentPointers.hoveredItemData.name);
+			RenderReadonlyValue("ID", currentPointers.hoveredItemData.id);
+			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData.itemtype);
+			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData.rarity);
+			RenderReadonlyValue("Level", currentPointers.hoveredItemData.level);
+			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData.sellable);
 		}
 	}
 
@@ -512,15 +511,17 @@ std::string PluginBase::GetPricesUrl()
 {
 	return configPricesUrl;
 }
-void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
+void PluginBase::ReadItemBase(ItemData* data, hl::ForeignClass pBase) {
 	uint id = pBase.get<uint>(0x28);
-	ItemData* savedData = ItemData::GetData(id);
+	ItemData* savedData = data;
+	/*ItemData* savedData = ItemData::GetData(id);
 	if (!savedData) {
 		savedData = new ItemData();
 		savedData->id = id;
 		ItemData::AddData(savedData);
 	}
-	*data = savedData;
+	*data = savedData;*/
+	savedData->id = id;
 	savedData->pItemData = pBase;
 	savedData->level = pBase.get<int>(0x74);
 	savedData->rarity = (ItemRarity)pBase.get<int>(0x60);
@@ -531,7 +532,7 @@ void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
 		savedData->sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	savedData->itemtype = (ItemType)pBase.get<int>(0x2C);
-	//PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(savedData));
+	PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(*savedData));
 	if (!GetCodedTextFromHashId || !DecodeText) return;
 	uint hashId = pBase.get<uint>(0x80);
 	/*if (hashId == 0) {
@@ -576,7 +577,7 @@ void PluginBase::SetupMisc() {
 		if (item) {
 			ItemStackData data;
 			ReadItemData(&data, item);
-			currentPointers.itemPtr = (uintptr_t)data.itemData->pItemData.data();
+			currentPointers.itemPtr = (uintptr_t)data.itemData.pItemData.data();
 			currentPointers.hoveredItemData = data.itemData;
 		}
 		return;
@@ -661,9 +662,9 @@ void PluginBase::SetupPlayer() {
 		hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x108, i);
 		BagData data;
 		ReadItemData(&data, itemStackPtr);
-		if (data.itemData->pExtendedType) {
-			data.bagSize = data.itemData->pExtendedType.get<int>(0x28);
-			data.noSellOrSort = data.itemData->pExtendedType.get<bool>(0x0);
+		if (data.itemData.pExtendedType) {
+			data.bagSize = data.itemData.pExtendedType.get<int>(0x28);
+			data.noSellOrSort = data.itemData.pExtendedType.get<bool>(0x0);
 		}
 		bagData.push_back(data);
 		if (changed) continue;
@@ -687,7 +688,7 @@ void PluginBase::SetupPlayer() {
 		int bagSlot = i / inventoryData.slotsPerBag;
 		if (bagSlot < bagData.size()) {
 			BagData bag = bagData[bagSlot];
-			if (data.itemData && bag.pItem && data.itemData->sellable)  data.itemData->sellable = !bag.noSellOrSort;
+			if (bag.pItem && data.itemData.sellable)  data.itemData.sellable = !bag.noSellOrSort;
 		}
 		data.slot = i;
 		itemData.push_back(data);
@@ -711,7 +712,6 @@ void PluginBase::SetupPlayer() {
 void PluginBase::GameHook()
 {
 	SetupContext();
-
 
 	for (std::vector<Plugin*>::iterator it = loadedPlugins.begin(); it != loadedPlugins.end(); ++it) {
 		Plugin* plugin = *it;

@@ -24,7 +24,7 @@ char * IDItemFilter::GetSerializeName()
 
 bool IDItemFilter::IsFiltered(ItemStackData data)
 {
-	return data.itemData->id == value;
+	return data.itemData.id == value;
 }
 
 IFilter * IDItemFilter::CreateNew()

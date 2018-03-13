@@ -5,12 +5,12 @@
 #include "JSON\JSON.h"
 #include "JSON\JSONValue.h"
 
-RequestTradingpostTask::RequestTradingpostTask(ItemData * data) : data(data)
+RequestTradingpostTask::RequestTradingpostTask(ItemData data) : data(data)
 {
 }
 void RequestTradingpostTask::run()
 {
-	std::string idStr = std::to_string(data->id);
+	std::string idStr = std::to_string(data.id);
 	HttpDownloader downloader;
 	std::string jsonInfo = downloader.download(PluginBase::GetInstance()->GetItemInfoUrl() + idStr);
 	if (jsonInfo.empty()) {
@@ -23,7 +23,7 @@ void RequestTradingpostTask::run()
 	if (root.find(L"vendor_value") == root.end())
 		return;
 
-	data->vendorValue = (uint) root[L"vendor_value"]->AsNumber();
+	data.vendorValue = (uint) root[L"vendor_value"]->AsNumber();
 
 	//can theoretically parse anything on api
 
@@ -45,8 +45,8 @@ void RequestTradingpostTask::run()
 
 	}
 
-	data->buyTradingPost = 123;
-	data->sellTradingPost = 123;
-	data->validTradingPostData = true;
-	data->lastTradingPostUpdate = GetCurrentTime();
+	data.buyTradingPost = 123;
+	data.sellTradingPost = 123;
+	data.validTradingPostData = true;
+	data.lastTradingPostUpdate = GetCurrentTime();
 }
