@@ -14,6 +14,8 @@ public:
 	~ItemData();
 	static void AddData(ItemData* data);
 	static ItemData* GetData(uint id);
+
+	bool IsOldTradingPostData();
 	hl::ForeignClass pItemData;
 	hl::ForeignClass pExtendedType;
 	uint id = 0;
@@ -22,11 +24,23 @@ public:
 	ItemRarity rarity;
 	ItemType itemtype;
 	std::string name;
+
+	hl::ForeignClass pSkin;
+	hl::ForeignClass pPrefix;
+	hl::ForeignClass pSuffix;
+
+	bool updateTaskActive = false;
 	bool validTradingPostData = false;
 	float lastTradingPostUpdate = 0;
 	float buyTradingPost;
 	float sellTradingPost;
 	uint vendorValue;
+	static bool sortName(const ItemData* lhs, const ItemData* rhs) {
+		return lhs->name < rhs->name;
+	}
+	static bool unique(const ItemData* lhs, const ItemData* rhs) {
+		return lhs->pItemData == rhs->pItemData;
+	}
 };
 inline bool operator==(const ItemData& lhs, const ItemData& rhs)
 {

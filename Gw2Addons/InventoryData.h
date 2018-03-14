@@ -10,7 +10,8 @@ public:
 	int size = 0;
 	int bagCount = 0;
 	int slotsPerBag = 0;
-	std::vector<ItemStackData> itemStackDatas;
-	std::vector<BagData> bagDatas;
+	int realSize = 0;
+	ItemStackData** itemStackDatas;
+	BagData** bagDatas;
 };
 #endif

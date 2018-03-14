@@ -16,7 +16,7 @@ public:
 	// Geerbt über SingleFilter
 	virtual char * GetSerializeName() override;
 	virtual std::string GetName() override;
-	virtual bool IsFiltered(ItemStackData data) override;
+	virtual bool IsFiltered(FilterData data) override;
 
 	virtual void RenderInput(int& value) override;
 

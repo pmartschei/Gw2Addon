@@ -24,7 +24,7 @@ public:
 
 	// Geerbt über IFilter
 	virtual void CustomMenu() override;
-	virtual std::set<ItemStackData> Filter(std::set<ItemStackData> d) override;
+	virtual std::set<FilterData> Filter(std::set<FilterData> d) override;
 	virtual bool Updated() override;
 	virtual void ResetUpdateState() override;
 	virtual char* GetSerializeName() override;

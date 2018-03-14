@@ -2,7 +2,7 @@
 
 std::map<uint, ItemData*> ItemData::datas = std::map<uint, ItemData*>();
 
-ItemData::ItemData() : pItemData(nullptr), pExtendedType(nullptr)
+ItemData::ItemData() : pItemData(nullptr), pExtendedType(nullptr), pSkin(nullptr), pSuffix(nullptr), pPrefix(nullptr)
 {
 }
 
@@ -21,4 +21,9 @@ ItemData * ItemData::GetData(uint id)
 		return datas[id];
 	}
 	return nullptr;
+}
+
+bool ItemData::IsOldTradingPostData()
+{
+	return (GetCurrentTime() - lastTradingPostUpdate > 60000);
 }

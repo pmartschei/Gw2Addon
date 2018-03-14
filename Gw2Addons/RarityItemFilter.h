@@ -15,7 +15,7 @@ public:
 
 	// Geerbt über SingleFilter
 	virtual void RenderInput(ItemRarity &value) override;
-	virtual bool IsFiltered(ItemStackData data) override;
+	virtual bool IsFiltered(FilterData data) override;
 
 	// Geerbt über Filter
 	virtual char* GetSerializeName() override;

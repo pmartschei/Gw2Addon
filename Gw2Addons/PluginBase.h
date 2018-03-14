@@ -79,9 +79,10 @@ private:
 	std::set<uint> _closeWindowKeys = { VK_ESCAPE };
 	std::list<EventKey> eventKeys;
 
-	InventoryData inventory;
-	uint32_t inventoryUpdateIndex = 0;
-	ItemData hoveredItem;
+	InventoryData* inventory;
+	uint inventoryUpdateIndex = 0;
+	uint test = 0;
+	ItemData* hoveredItem;
 	std::vector<KeyBindData*> keyBinds;
 
 	std::string chainLoad;
@@ -91,13 +92,14 @@ private:
 
 	ForeignFunction<void*> GetContext;
 	ForeignFunction<void*> GetCodedTextFromHashId;
-	ForeignFunction<void> DecodeText;
+	ForeignFunction<void, CALL_CONV_FASTCALL> DecodeText;
+	ForeignFunction<void*,CALL_CONV_FASTCALL> GetCodedItemName;
 	hl::Hooker m_hooker;
 	const hl::IHook *m_hkAlertCtx = nullptr;
 	std::mutex m_gameDataMutex;
 	void* pCtx;
 	void* pAlertCtx;
-	std::map<uintptr_t, std::string> decodeIDs;
+	//std::map<uintptr_t, std::string> decodeIDs;
 	struct GamePointers {
 		uintptr_t ctx;
 		uintptr_t charctx;
@@ -113,7 +115,7 @@ private:
 		uintptr_t objOnElement;
 		uintptr_t LocationPtr;
 		uintptr_t itemPtr;
-		ItemData hoveredItemData;
+		ItemData* hoveredItemData;
 	} currentPointers;
 
 	std::string configItemsUrl;
@@ -127,8 +129,8 @@ private:
 	void ReadItemBase(ItemData* data, hl::ForeignClass pBase);
 	bool KeysDown(std::set<uint> keys);
 	bool KeybindText(std::string suffix, KeyBindData* data);
-	void SetInventory(InventoryData data);
-	void SetHoveredItem(ItemData data);
+	void SetInventory(InventoryData* data);
+	void SetHoveredItem(ItemData* data);
 	void RenderKeyBinds();
 	void RenderColors(const char* id, int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
 	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
@@ -153,8 +155,8 @@ public:
 
 	void Render();
 	//METHODS FOR PLUGINS
-	InventoryData GetInventory(uint* updateIndex);
-	ItemData GetHoveredItem();
+	InventoryData* GetInventory(uint* updateIndex);
+	ItemData* GetHoveredItem();
 	bool HasHoveredItem();
 	void ProcessTask(Task* task);
 
@@ -165,7 +167,6 @@ public:
 
 	void RegisterKeyBind(KeyBindData* keybind);
 	void UnregisterKeyBind(KeyBindData* keybind);
-	void AddDecodeID(uintptr_t key, std::string value);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();

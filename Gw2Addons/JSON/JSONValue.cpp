@@ -256,7 +256,7 @@ JSONValue *JSONValue::Parse(const wchar_t **data)
 
 			// Get the value
 			JSONValue *value = Parse(data);
-			if (value == NULL)
+ 			if (value == NULL)
 			{
 				FREE_ARRAY(array);
 				return NULL;

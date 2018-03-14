@@ -6,6 +6,12 @@ InventoryData::InventoryData()
 
 InventoryData::~InventoryData()
 {
-	itemStackDatas.clear();
-	bagDatas.clear();
+	for (int i = 0; i < realSize; i++) {
+		delete itemStackDatas[i];
+	}
+	delete[] itemStackDatas;
+	for (int i = 0; i < bagCount; i++) {
+		delete bagDatas[i];
+	}
+	delete[] bagDatas;
 }

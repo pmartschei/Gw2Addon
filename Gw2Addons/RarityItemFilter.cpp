@@ -18,9 +18,9 @@ void RarityItemFilter::RenderInput(ItemRarity & value)
 	value = (ItemRarity)(v);
 }
 
-bool RarityItemFilter::IsFiltered(ItemStackData data)
+bool RarityItemFilter::IsFiltered(FilterData data)
 {
-	return data.itemData.rarity == value;
+	return data->itemData->rarity == value;
 }
 
 char * RarityItemFilter::GetSerializeName()

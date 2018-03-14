@@ -18,7 +18,10 @@ private:
 	uint lastUpdateIndex;
 	uintptr_t* proxyVendorLocation;
 	bool vendorSuccessful = false;
-	std::set<ItemStackData> filteredCollection;
+	std::set<FilterData> filteredCollection;
+	std::list<ItemData*> filteredItemDatas;
+	int filteredItemDatasStartY = 0;
+	std::mutex filterMutex;
 	KeyBindData* copyItemKeyBind = new KeyBindData();
 	KeyBindData* openWindow = new KeyBindData();
 

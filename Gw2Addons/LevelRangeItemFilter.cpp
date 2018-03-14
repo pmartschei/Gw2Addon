@@ -23,13 +23,13 @@ void LevelRangeItemFilter::RenderInput(int & value, std::string s)
 	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##level" + s, id), &value, 1, 1000);
 	value = CLAMP(value, 0, 80);
 }
-bool LevelRangeItemFilter::IsFiltered(ItemStackData data)
+bool LevelRangeItemFilter::IsFiltered(FilterData data)
 {
 	if (minValue < maxValue) {
-		return data.itemData.level >= (uint32_t)minValue && data.itemData.level <= (uint32_t)maxValue;
+		return data->itemData->level >= (uint32_t)minValue && data->itemData->level <= (uint32_t)maxValue;
 	}
 	else {
-		return data.itemData.level >= (uint32_t)maxValue && data.itemData.level <= (uint32_t)minValue;
+		return data->itemData->level >= (uint32_t)maxValue && data->itemData->level <= (uint32_t)minValue;
 	}
 }
 

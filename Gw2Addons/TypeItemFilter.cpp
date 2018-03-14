@@ -18,9 +18,9 @@ void TypeItemFilter::RenderInput(ItemType & value)
 	value = (ItemType)ItemTypeEnum[v];
 }
 
-bool TypeItemFilter::IsFiltered(ItemStackData data)
+bool TypeItemFilter::IsFiltered(FilterData data)
 {
-	return data.itemData.itemtype == value;
+	return data->itemData->itemtype == value;
 }
 
 char * TypeItemFilter::GetSerializeName()

@@ -5,11 +5,12 @@
 class ThreadTaskQueue
 {
 public:
-	ThreadTaskQueue();
+	ThreadTaskQueue(int size = 4);
 	~ThreadTaskQueue();
 	void addTask(Task* task);
 private:
 	TaskQueue queue;
-	std::thread t;
+	std::thread* threads;
+	int threadSize;
 };
 #endif

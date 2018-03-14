@@ -14,7 +14,7 @@ public:
 	// Geerbt über RangeFilter
 	virtual std::string GetName() override;
 	virtual void RenderInput(int & value, std::string s) override;
-	virtual bool IsFiltered(ItemStackData data) override;
+	virtual bool IsFiltered(FilterData data) override;
 
 	// Geerbt über Filter
 	virtual char* GetSerializeName() override;

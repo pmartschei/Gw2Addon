@@ -20,9 +20,9 @@ GroupFilter::GroupFilter() {
 GroupFilter::~GroupFilter() {
 
 }
-std::set<ItemStackData> GroupFilter::Filter(std::set<ItemStackData> collection)
+std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 {
-	std::set<ItemStackData> combinedSet;
+	std::set<FilterData> combinedSet;
 	std::vector<IFilter*>::iterator iter;
 
 	if (flags & FilterFlags::And) {
@@ -38,9 +38,9 @@ std::set<ItemStackData> GroupFilter::Filter(std::set<ItemStackData> collection)
 			else {
 				continue;
 			}
-			std::set<ItemStackData> filteredSet = (*iter)->Filter(collection);
+			std::set<FilterData> filteredSet = (*iter)->Filter(collection);
 			if (flags & FilterFlags::And) {
-				std::set<ItemStackData> intersection;
+				std::set<FilterData> intersection;
 				std::set_intersection(combinedSet.begin(), combinedSet.end(), filteredSet.begin(), filteredSet.end(), std::inserter(intersection, intersection.end()));
 				combinedSet = intersection;
 			}
@@ -52,9 +52,10 @@ std::set<ItemStackData> GroupFilter::Filter(std::set<ItemStackData> collection)
 
 	if (activeCount == 0) {
 		filteredItems = 0;
-		return std::set<ItemStackData>();
+		return std::set<FilterData>();
 	}
 	combinedSet = InvertSet(collection, combinedSet);
+	SaveFilteredItemDatas(combinedSet);
 	filteredItems = (int)combinedSet.size();
 	return combinedSet;
 }

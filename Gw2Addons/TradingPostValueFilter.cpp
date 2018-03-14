@@ -23,7 +23,7 @@ void TradingPostValueFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 
 void TradingPostValueFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
-	value = CLAMP(element->IntAttribute("value", 0), 20, 1000);
+	value = CLAMP(element->IntAttribute("value", 20), 20, 1000);
 	name = GetName();
 }
 
@@ -32,15 +32,18 @@ std::string TradingPostValueFilter::GetName()
 	return "Trading Post Filter";
 }
 
-bool TradingPostValueFilter::IsFiltered(ItemStackData data)
+bool TradingPostValueFilter::IsFiltered(FilterData data)
 {
-	if (!data.tradingpostSellable) return true;
+	if (!data->tradingpostSellable) return false;
 
-	float tpValue = data.itemData.buyTradingPost;
+	float tpValue = data->itemData->buyTradingPost;
 	if (modus == TradingPostModus::Sell) {
-		tpValue = data.itemData.sellTradingPost;
+		tpValue = data->itemData->sellTradingPost;
 	}
-	if (data.itemData.vendorValue * (1+value / 100.0f) < tpValue) {
+
+	if (tpValue == 0.0f) return false;
+
+	if (data->itemData->vendorValue * (1+value / 100.0f) > tpValue) {
 		return true;
 	}
 
@@ -49,7 +52,7 @@ bool TradingPostValueFilter::IsFiltered(ItemStackData data)
 
 void TradingPostValueFilter::RenderInput(int & value)
 {
-	gotUpdated |= ImGui::SliderInt(UNIQUE_NO_DELIMITER("##level", id), &value,20,1000);
+	gotUpdated |= ImGui::SliderInt(UNIQUE_NO_DELIMITER("##level", id), &value,20,1000,"%.0f %%");
 }
 
 void TradingPostValueFilter::RenderContent()
@@ -59,7 +62,7 @@ void TradingPostValueFilter::RenderContent()
 	ImGui::PushItemWidth(-1);
 	int v = modus;
 	gotUpdated |= ImGui::Combo(UNIQUE_NO_DELIMITER("##modus", id), &v, &TradingModus[0], TradingPostModus::ModusCount);
-	value = (TradingPostModus)v;
+	modus = (TradingPostModus)v;
 	ImGui::PopItemWidth();
 
 	ImGui::Text("Value (Percent): ");

@@ -3,11 +3,14 @@
 
 #include <set>
 #include <string>
+#include <list>
 #include "ItemStackData.h"
 #include "imgui.h"
 #include "tinyxml\tinyxml2.h"
 #include "FilterFlags.h"
 #include "AddonColors.h"
+
+typedef ItemStackData* FilterData;
 
 #define UNIQUE(text,id) ((std::string(text)+"##"+std::to_string(id)).c_str())
 
@@ -16,6 +19,7 @@
 class IFilter{
 protected:
 	std::string name = "Unnamed Filter";
+	std::list<ItemData*> filteredItemDatas;
 	bool nameCalculated = true;
 	bool markedForDelete = false;
 	bool gotUpdated = false;
@@ -27,13 +31,14 @@ protected:
 	int id;
 	virtual void RenderContent() = 0;
 	virtual void CustomMenu();
+	virtual void SaveFilteredItemDatas(std::set<FilterData> filteredSet);
 	virtual void SerializeContent(tinyxml2::XMLPrinter& printer);
 	virtual void DeserializeContent(tinyxml2::XMLElement* element);
-	std::set<ItemStackData> InvertSet(std::set<ItemStackData> fullData,std::set<ItemStackData> selectedData);
+	std::set<FilterData> InvertSet(std::set<FilterData> fullData,std::set<FilterData> selectedData);
 public:
 	IFilter();
-	virtual std::set<ItemStackData> Filter(std::set<ItemStackData> collection);
-	virtual bool IsFiltered(ItemStackData data);
+	virtual std::set<FilterData> Filter(std::set<FilterData> collection);
+	virtual bool IsFiltered(FilterData data);
 	virtual void Render();
 	virtual bool Updated();
 	virtual void ResetUpdateState();

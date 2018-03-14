@@ -27,13 +27,13 @@ void RarityRangeItemFilter::RenderInput(ItemRarity & value, std::string s)
 	value = (ItemRarity)(v);
 }
 
-bool RarityRangeItemFilter::IsFiltered(ItemStackData data)
+bool RarityRangeItemFilter::IsFiltered(FilterData data)
 {
 	if (minValue < maxValue) {
-		return data.itemData.rarity >= minValue && data.itemData.rarity <= maxValue;
+		return data->itemData->rarity >= minValue && data->itemData->rarity <= maxValue;
 	}
 	else {
-		return data.itemData.rarity >= maxValue && data.itemData.rarity <= minValue;
+		return data->itemData->rarity >= maxValue && data->itemData->rarity <= minValue;
 	}
 }
 

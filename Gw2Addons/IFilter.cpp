@@ -9,30 +9,41 @@ void IFilter::CustomMenu()
 {
 }
 
+void IFilter::SaveFilteredItemDatas(std::set<FilterData> filteredSet)
+{
+	filteredItemDatas.clear();
+	for (auto it = filteredSet.begin(); it != filteredSet.end(); ++it) {
+		FilterData data = (*it);
+		filteredItemDatas.push_back(data->itemData);
+	}
+}
+
 IFilter::IFilter() : id(ID++) {
 
 }
 
-std::set<ItemStackData> IFilter::Filter(std::set<ItemStackData> collection)
+std::set<FilterData> IFilter::Filter(std::set<FilterData> collection)
 {
-	std::set<ItemStackData>::iterator iter;
+	std::set<FilterData>::iterator iter;
 
-	std::set<ItemStackData> filteredSet;
+	std::set<FilterData> filteredSet;
 
 	if (isActive) {
 		for (iter = collection.begin(); iter != collection.end(); ++iter) {
-			ItemStackData data = *iter;
+			FilterData data = *iter;
+			if (!data->itemData) continue;
 			if (IsFiltered(data)) {
 				filteredSet.insert(data);
 			}
 		}
 		filteredSet = InvertSet(collection, filteredSet);
 	}
+	SaveFilteredItemDatas(filteredSet);
 	filteredItems = (int)filteredSet.size();
 	return filteredSet;
 }
 
-bool IFilter::IsFiltered(ItemStackData data)
+bool IFilter::IsFiltered(FilterData data)
 {
 	return false;
 }
@@ -88,6 +99,18 @@ void IFilter::Render()
 		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
 		ImGui::Text(text, filteredItems);
 		ImGui::PopStyleColor();
+
+		int size = filteredItemDatas.size();
+		if (ImGui::IsItemHovered() && size > 0) {
+			ImGui::BeginTooltip();
+			ItemData** arr = new ItemData*[size];
+			std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
+			for (int i = 0; i < size; i++) {
+				const char* data = arr[i]->name;
+				ImGui::Text(data);
+			}
+			ImGui::EndTooltip();
+		}
 	}
 
 	if (isOpened) {
@@ -171,9 +194,9 @@ void IFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 }
 
-std::set<ItemStackData> IFilter::InvertSet(std::set<ItemStackData> fullData,std::set<ItemStackData> selectedData)
+std::set<ItemStackData*> IFilter::InvertSet(std::set<ItemStackData*> fullData,std::set<ItemStackData*> selectedData)
 {
-	std::set<ItemStackData> invers;
+	std::set<ItemStackData*> invers;
 	if (flags & FilterFlags::Not) {
 		std::set_difference(fullData.begin(), fullData.end(), selectedData.begin(), selectedData.end(), std::inserter(invers, invers.end()));
 		return invers;

@@ -61,7 +61,7 @@ const char * FilterPlugin::GetName()
 void FilterPlugin::PluginMain()
 {
 	uint updateIndex;
-	InventoryData inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
+	InventoryData* inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
 	*root = *rootCopy;
 	bool defaultFilterUpdated = rootCopy->Updated();
 	rootCopy->ResetUpdateState();
@@ -72,12 +72,20 @@ void FilterPlugin::PluginMain()
 		SaveFilterAs(root,folder.c_str());
 		lastCallPtr = new uintptr_t(0);
 	}
-	if (lastUpdateIndex != updateIndex || defaultFilterUpdated) {
+	if (lastUpdateIndex != updateIndex || defaultFilterUpdated && inventory) {
 		lastUpdateIndex = updateIndex;
-		std::set<ItemStackData> collection = std::set<ItemStackData>(inventory.itemStackDatas.begin(), inventory.itemStackDatas.end());
+		std::set<ItemStackData*> collection(inventory->itemStackDatas, inventory->itemStackDatas+inventory->realSize);
 		collection = stdFilter->Filter(collection);
-		filteredCollection = root->Filter(collection);
+		filteredCollection = root->Filter(collection);	
 		lastItemsFilteredCount = root->GetFilteredCount();
+		filteredItemDatas.clear();
+		auto f = [&](){
+			for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ++it) {
+				FilterData data = (*it);
+				filteredItemDatas.push_back(data->itemData);
+			}
+		};
+		AddDispatchWork(f);
 	}
 	if (!vendorSuccessful) return;
 	if (*lastCallPtr == 0) return;
@@ -87,8 +95,8 @@ void FilterPlugin::PluginMain()
 		return;
 	}
 	for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
-		ItemStackData data = (*filteredCollection.begin());
-		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data.itemData.id) != skipUnsellableIds.end()) {
+		FilterData data = (*filteredCollection.begin());
+		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data->itemData->id) != skipUnsellableIds.end()) {
 			filteredCollection.erase(it++);
 		}
 		else {
@@ -97,17 +105,17 @@ void FilterPlugin::PluginMain()
 	}
 	if (filteredCollection.size() > 0) {
 		hl::ForeignClass vendor = (uintptr_t*)*lastCallPtr;
-		ItemStackData data = (*filteredCollection.begin());
-		if (lastSlot != data.slot) {
-			lastSlot = data.slot;
+		FilterData data = (*filteredCollection.begin());
+		if (lastSlot != data->slot) {
+			lastSlot = data->slot;
 			curRetry = 0;
 		}
-		vendor.set<int>(0x50, data.slot);
+		vendor.set<int>(0x50, data->slot);
 		vendorFunc(new firstParam{ 0x0,0x31,lastCallPtr }, new secondParam{ 0x0,0x2,0x3 });
 		curRetry++;
 		if (curRetry >= maxRetry) {
-			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data.itemData.id)));
-			skipUnsellableIds.push_back(data.itemData.id);
+			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data->itemData->id)));
+			skipUnsellableIds.push_back(data->itemData->id);
 		}
 	}
 	else {
@@ -241,6 +249,30 @@ void FilterPlugin::RenderMenu() {
 			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
 			ImGui::Text(text, lastItemsFilteredCount);
 			ImGui::PopStyleColor();
+			int size = filteredItemDatas.size();
+			if (ImGui::IsItemHovered() && size > 0) {
+				filteredItemDatas.sort(ItemData::sortName);
+				filteredItemDatas.unique();
+				size = filteredItemDatas.size();
+				ImGui::BeginTooltip();
+				ImGui::Text("Use your mouse wheel to scroll");
+				ImGui::Text("");
+				ImGuiIO io = ImGui::GetIO();
+				filteredItemDatasStartY += io.MouseWheel;
+				if (filteredItemDatasStartY + 20 >= size) filteredItemDatasStartY = size - 20;
+				if (filteredItemDatasStartY < 0) filteredItemDatasStartY = 0;
+				int limit = min(size, 20);
+				ItemData** arr = new ItemData*[size];
+				std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
+				for (int i = filteredItemDatasStartY; i < filteredItemDatasStartY + limit; i++) {
+					const char* data = arr[i]->name;
+					ImGui::Text(data);
+				}
+				ImGui::EndTooltip();
+			}
+			else {
+				filteredItemDatasStartY = 0;
+			}
 		}
 
 		ImGui::EndMenuBar();
@@ -267,18 +299,19 @@ void FilterPlugin::ReloadFilterFiles() {
 void FilterPlugin::AddHoveredItemToFilter()
 {
 	if (PluginBase::GetInstance()->HasHoveredItem()) {
-		ItemData data = PluginBase::GetInstance()->GetHoveredItem();
-		if (!data.sellable) return;
+		ItemData* data = PluginBase::GetInstance()->GetHoveredItem();
+		if (!data) return;
+		if (!data->sellable) return;
 		GroupFilter* groupFilter = new GroupFilter();
 		IDItemFilter* idFilter = new IDItemFilter();
 		LevelItemFilter* levelFilter = new LevelItemFilter();
 		RarityItemFilter* rarityFilter = new RarityItemFilter();
 		TypeItemFilter* typeFilter = new TypeItemFilter();
-		groupFilter->SetName(std::string(data.name));
-		idFilter->SetValue(data.id);
-		levelFilter->SetValue(data.level);
-		rarityFilter->SetValue(data.rarity);
-		typeFilter->SetValue(data.itemtype);
+		groupFilter->SetName(std::string(data->name));
+		idFilter->SetValue(data->id);
+		levelFilter->SetValue(data->level);
+		rarityFilter->SetValue(data->rarity);
+		typeFilter->SetValue(data->itemtype);
 		levelFilter->SetActive(false);
 		rarityFilter->SetActive(false);
 		typeFilter->SetActive(false);

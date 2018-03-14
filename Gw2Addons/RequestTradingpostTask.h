@@ -5,9 +5,9 @@ class ItemData;
 
 class RequestTradingpostTask : public Task {
 public:
-	RequestTradingpostTask(ItemData data);
+	RequestTradingpostTask(ItemData* data);
 private:
-	ItemData data;
+	ItemData* data;
 	// Geerbt über Task
 	virtual void run() override;
 };

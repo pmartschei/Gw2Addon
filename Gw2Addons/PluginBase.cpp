@@ -175,11 +175,11 @@ void PluginBase::SetupContext()
 	SetupGuild();
 	SetupMisc();
 
-	if (currentPointers.itemPtr) {
-		SetHoveredItem(currentPointers.hoveredItemData);
+	if (!currentPointers.itemPtr) {
+		SetHoveredItem(nullptr);
 	}
 	else {
-		SetHoveredItem(ItemData());
+		currentPointers.hoveredItemData = hoveredItem;
 	}
 }
 
@@ -223,6 +223,7 @@ void PluginBase::CheckInitialize()
 	}
 	case PluginBaseState::CODED_TEXT_FINISHED: {
 		DecodeText = hl::FindPattern("49 8B E8 48 8B F2 48 8B F9 48 85 C9 75 19 41 B8 ?? ?? ?? ?? 48");
+		GetCodedItemName = hl::FindPattern("57 41 54 41 55 41 56 41 57 48 83 EC ?? 4D 8B E1 4D 8B E8 4C 8B FA 48 8B F1 48 85 C9 75");
 		pluginBaseState = PluginBaseState::DECODE_TEXT_FINISHED;
 		if (DecodeText.data()) {
 			DecodeText = (uintptr_t)DecodeText.data() - 0x14;
@@ -230,6 +231,13 @@ void PluginBase::CheckInitialize()
 		}
 		else {
 			Logger::LogString(LogLevel::Info, MAIN_INFO, "Pattern for DecodeText is invalid, no DecodeText available");
+		}
+		if (GetCodedItemName.data()) {
+			GetCodedItemName = (uintptr_t)GetCodedItemName.data() - 0xf;
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "GetCodedItemName addr: " + ToHex((uintptr_t)GetCodedItemName.data()));
+		}
+		else {
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "Pattern for GetCodedItemName is invalid, no GetCodedItemName available");
 		}
 	}
 	case PluginBaseState::DECODE_TEXT_FINISHED: {
@@ -268,7 +276,7 @@ void PluginBase::CheckInitialize()
 		break;
 	}
 	case PluginBaseState::THREAD_INITIALIZED: {
-		ttq = new ThreadTaskQueue();
+		ttq = new ThreadTaskQueue(8);
 		pluginBaseState = PluginBaseState::INITIALIZED;
 	}
 	default:
@@ -290,32 +298,33 @@ bool PluginBase::CheckKeyBinds() {
 	return found;
 }
 
-InventoryData PluginBase::GetInventory(uint* updateIndex)
+InventoryData* PluginBase::GetInventory(uint* updateIndex)
 {
 	if (updateIndex != NULL) *updateIndex = inventoryUpdateIndex;
 	return inventory;
 }
 
-void PluginBase::SetInventory(InventoryData data)
+void PluginBase::SetInventory(InventoryData* data)
 {
 	inventoryUpdateIndex++;
 	if (inventoryUpdateIndex == 0) inventoryUpdateIndex++;
+	delete inventory;
 	inventory = data;
 }
 
-void PluginBase::SetHoveredItem(ItemData data)
+void PluginBase::SetHoveredItem(ItemData* data)
 {
 	hoveredItem = data;
 }
 
-ItemData PluginBase::GetHoveredItem()
+ItemData* PluginBase::GetHoveredItem()
 {
 	return hoveredItem;
 }
 
 bool PluginBase::HasHoveredItem()
 {
-	return (hoveredItem.id != 0);
+	return (hoveredItem && hoveredItem->id != 0);
 }
 
 void PluginBase::RegisterKeyBind(KeyBindData* keybind)
@@ -333,11 +342,14 @@ void PluginBase::Render()
 {
 #ifdef _DEBUG
 	if (ImGui::Begin("IncQol-Debug", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
+		RenderReadonlyValue("Cur. Tick",std::to_string(GetCurrentTime()));
+		RenderReadonlyValue("task count", std::to_string(test));
 		RenderReadonlyValue("GlobalCtx", currentPointers.ctx);
 		ImGui::Separator();
 		RenderReadonlyValue("CharCtx", currentPointers.charctx);
 		RenderReadonlyValue("Player", currentPointers.player);
 		RenderReadonlyValue("Inventory", currentPointers.inventory);
+		RenderReadonlyValue("Inv. Update ID", inventoryUpdateIndex);
 		ImGui::Separator();
 		RenderReadonlyValue("GuildCtx", currentPointers.guildctx);
 		RenderReadonlyValue("GuildInv", currentPointers.guildInv);
@@ -349,14 +361,18 @@ void PluginBase::Render()
 		RenderReadonlyValue("LocationPtr", currentPointers.LocationPtr);
 		RenderReadonlyValue("ItemPtr", currentPointers.itemPtr);
 		ImGui::Separator();
-		if (currentPointers.itemPtr != 0) {
+		if (currentPointers.itemPtr != 0 && currentPointers.hoveredItemData) {
 			ImGui::Text("Item");
-			RenderReadonlyValue("Name", currentPointers.hoveredItemData.name);
-			RenderReadonlyValue("ID", currentPointers.hoveredItemData.id);
-			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData.itemtype);
-			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData.rarity);
-			RenderReadonlyValue("Level", currentPointers.hoveredItemData.level);
-			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData.sellable);
+			RenderReadonlyValue("Name", currentPointers.hoveredItemData->name);
+			RenderReadonlyValue("ID", currentPointers.hoveredItemData->id);
+			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData->itemtype);
+			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData->rarity);
+			RenderReadonlyValue("Level", currentPointers.hoveredItemData->level);
+			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData->sellable);
+			RenderReadonlyValue("lastUpd", std::to_string(currentPointers.hoveredItemData->lastTradingPostUpdate));
+			RenderReadonlyValue("Vendor", std::to_string(currentPointers.hoveredItemData->vendorValue));
+			RenderReadonlyValue("Buy", std::to_string(currentPointers.hoveredItemData->buyTradingPost));
+			RenderReadonlyValue("Sell", std::to_string(currentPointers.hoveredItemData->sellTradingPost));
 		}
 	}
 
@@ -364,7 +380,7 @@ void PluginBase::Render()
 #endif
 	for (std::vector<Plugin*>::iterator it = loadedPlugins.begin(); it != loadedPlugins.end(); ++it) {
 		Plugin* plugin = *it;
-		plugin->Render();
+		plugin->PreRender();
 	}
 
 	if (optionWindow->Begin()) {
@@ -483,12 +499,6 @@ void PluginBase::RenderKeyBinds()
 		}
 	}
 }
-
-void PluginBase::AddDecodeID(uintptr_t key, std::string value)
-{
-	decodeIDs[key] = value;
-}
-
 void PluginBase::ProcessTask(Task * task)
 {
 	ttq->addTask(task);
@@ -513,38 +523,43 @@ std::string PluginBase::GetPricesUrl()
 }
 void PluginBase::ReadItemBase(ItemData* data, hl::ForeignClass pBase) {
 	uint id = pBase.get<uint>(0x28);
-	ItemData* savedData = data;
 	/*ItemData* savedData = ItemData::GetData(id);
 	if (!savedData) {
 		savedData = new ItemData();
 		savedData->id = id;
 		ItemData::AddData(savedData);
-	}
-	*data = savedData;*/
+	}*/
+	//*data = savedData;
+	ItemData* savedData = data;
 	savedData->id = id;
 	savedData->pItemData = pBase;
 	savedData->level = pBase.get<int>(0x74);
 	savedData->rarity = (ItemRarity)pBase.get<int>(0x60);
 	savedData->sellable = !(pBase.get<byte>(0x39) & 0x40);
 	savedData->pExtendedType = pBase.get<void*>(0x30);
-	savedData->name = std::string("Item ").append(std::to_string(savedData->id));
+	//savedData->name = std::to_string(id).c_str();
 	if (savedData->sellable) {
 		savedData->sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	savedData->itemtype = (ItemType)pBase.get<int>(0x2C);
-	PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(*savedData));
-	if (!GetCodedTextFromHashId || !DecodeText) return;
+	if (!savedData->updateTaskActive && savedData->IsOldTradingPostData()) {
+		test++;
+		savedData->updateTaskActive = true;
+		PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(savedData));
+	}
+	if (!GetCodedTextFromHashId || !DecodeText || !GetCodedItemName) return;
 	uint hashId = pBase.get<uint>(0x80);
-	/*if (hashId == 0) {
+	if (hashId == 0) {
 		hl::ForeignClass hash = pBase.get<void*>(0xA8);
 		hashId = hash.get<uint>(0x58);
-	}*/
-	if (hashId == 0) return;
-	if (decodeIDs.find(hashId) == decodeIDs.end()) {
+		//uintptr_t* d = (uintptr_t*)GetCodedItemName(pBase.data(), skin,prefixname,suffixname,1,0,0)
+		uintptr_t* d = (uintptr_t*)GetCodedItemName(pBase.data(), (uintptr_t)0, 0/*savedData->prefixName*/, 0/*savedData->suffixName*/, 1, (uintptr_t)0, 0);
+		DecodeText(d, cbDecodeText, savedData->name);
+	//}else if (decodeIDs.find(hashId) == decodeIDs.end()) {
+	}else{
 		uintptr_t* d = (uintptr_t*)GetCodedTextFromHashId(hashId, 0);
-		DecodeText(d, cbDecodeText, hashId);
+		DecodeText(d, cbDecodeText, savedData->name);
 	}
-	savedData->name = decodeIDs[hashId];
 }
 void PluginBase::ReadItemData(ItemStackData* data, hl::ForeignClass pBase) {
 	if (!pBase) return;
@@ -554,6 +569,18 @@ void PluginBase::ReadItemData(ItemStackData* data, hl::ForeignClass pBase) {
 	data->count = pBase.call<int>(0x78);
 	data->accountBound = (pBase.get<int>(0x50) & 0x40);
 	data->tradingpostSellable = !(pBase.get<int>(0x50) & 0x08);
+
+	data->itemData.pSkin = pBase.call<void*>(0x70);
+
+	hl::ForeignClass prepost = pBase.call<void*>(0x210);
+	if (prepost) {
+
+		data->itemData.pPrefix = prepost.call<void*>(0x0);
+		hl::ForeignClass suffix = prepost.call<void*>(0x10, 1);
+		if (suffix) {
+			data->itemData.pSuffix = suffix.get<void*>(0x30);
+		}
+	}
 	ReadItemBase(&data->itemData, itemPtr);
 }
 void PluginBase::SetupMisc() {
@@ -571,14 +598,15 @@ void PluginBase::SetupMisc() {
 	currentPointers.objOnElement = (uintptr_t)objOnElement.data();
 	if (!objOnElement) return;
 	hl::ForeignClass inventory = objOnElement.get<void*>(0xB8);
+	ItemData data;
+	ItemStackData stackData;
 	if (inventory && (uintptr_t)inventory.data() == currentPointers.inventory) {//its a normal slot in the inventory/shared/bank
 		currentPointers.LocationPtr = (uintptr_t)inventory.data();
 		hl::ForeignClass item = objOnElement.get<void*>(0xC8);
 		if (item) {
-			ItemStackData data;
-			ReadItemData(&data, item);
-			currentPointers.itemPtr = (uintptr_t)data.itemData.pItemData.data();
-			currentPointers.hoveredItemData = data.itemData;
+			ReadItemData(&stackData, item);
+			currentPointers.itemPtr = (uintptr_t)stackData.itemData.pItemData.data();
+			SetHoveredItem(stackData.itemData);
 		}
 		return;
 	}
@@ -590,8 +618,9 @@ void PluginBase::SetupMisc() {
 			currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
 			itemData = itemData.get<void*>(0x0);
 			if (itemData) {
-				currentPointers.itemPtr = (uintptr_t)itemData.data();
-				ReadItemBase(&currentPointers.hoveredItemData, itemData);
+				ReadItemBase(&data, itemData);
+				currentPointers.itemPtr = (uintptr_t)data.pItemData.data();
+				SetHoveredItem(data);
 				return;
 			}
 		}
@@ -603,8 +632,9 @@ void PluginBase::SetupMisc() {
 		currentPointers.LocationPtr = (uintptr_t)itemCollection.data();
 		itemData = objOnElement.get<void*>(0x98);
 		if (itemData) {
-			currentPointers.itemPtr = (uintptr_t)itemData.data();
-			ReadItemBase(&currentPointers.hoveredItemData, itemData);
+			ReadItemBase(&data, itemData);
+			currentPointers.itemPtr = (uintptr_t)data.pItemData.data();
+			SetHoveredItem(data);
 			return;
 		}
 	}
@@ -642,70 +672,76 @@ void PluginBase::SetupPlayer() {
 	hl::ForeignClass player = charctx.get<void*>(0x90);
 	currentPointers.player = (uintptr_t)player.data();
 	if (!player) {
-		if (inventory.itemStackDatas.size()>0)
-			SetInventory(InventoryData());
+		if (inventory)
+			SetInventory(nullptr);
 		return;
 	}
 
 	hl::ForeignClass inventoryC = player.call<void*>(0x80);
 	currentPointers.inventory = (uintptr_t)inventoryC.data();
 	if (!inventoryC) return;
-	InventoryData oldData = inventory;
+	InventoryData* oldData = inventory;
 	bool changed = false;
-	InventoryData inventoryData = InventoryData();
-	inventoryData.size = inventoryC.call<int>(0x1A0);//get count slots for bagcount
-	inventoryData.bagCount = inventoryC.call<int>(0x118);
-	inventoryData.slotsPerBag = inventoryData.size / inventoryData.bagCount;
-	std::vector<BagData> oldBagData = oldData.bagDatas;
-	std::vector<BagData> bagData;
-	for (int i = 0; i < inventoryData.bagCount; i++) {
-		hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x108, i);
-		BagData data;
-		ReadItemData(&data, itemStackPtr);
-		if (data.itemData.pExtendedType) {
-			data.bagSize = data.itemData.pExtendedType.get<int>(0x28);
-			data.noSellOrSort = data.itemData.pExtendedType.get<bool>(0x0);
-		}
-		bagData.push_back(data);
-		if (changed) continue;
-		if (bagData.size() > oldBagData.size()) {
-			changed = true;
-		}
-		if (changed) continue;
-		ItemStackData old = oldBagData[bagData.size() - 1];
-		if (data.pItem != old.pItem || data.slot != old.slot) {
-			changed = true;
-		}
-	}
-	inventoryData.bagDatas = bagData;
-	std::vector<ItemStackData> oldItemData = oldData.itemStackDatas;
-	std::vector<ItemStackData> itemData;
-	int slotCount = inventoryC.get<int>(0xD4);//unsafe but nothing better
-	for (int i = 0; i < slotCount; i++) {
-		hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x168, i);
-		ItemStackData data;
-		ReadItemData(&data, itemStackPtr);
-		int bagSlot = i / inventoryData.slotsPerBag;
-		if (bagSlot < bagData.size()) {
-			BagData bag = bagData[bagSlot];
-			if (bag.pItem && data.itemData.sellable)  data.itemData.sellable = !bag.noSellOrSort;
-		}
-		data.slot = i;
-		itemData.push_back(data);
-		if (changed) continue;
-		if (itemData.size() > oldItemData.size()) {
-			changed = true;
-		}
-		if (changed) continue;
-		ItemStackData old = oldItemData[itemData.size() - 1];
-		if (data.pItem != old.pItem || data.slot != old.slot) {
-			changed = true;
-		}
-	}
-	if (itemData.size() != oldItemData.size()) {
+	InventoryData* inventoryData = new InventoryData();
+	inventoryData->size = inventoryC.call<int>(0x1A0);//get count slots for bagcount
+	inventoryData->bagCount = inventoryC.call<int>(0x118);
+	inventoryData->slotsPerBag = inventoryData->size / inventoryData->bagCount;
+	BagData** oldBagData = nullptr;
+	if (oldData)
+		oldBagData = oldData->bagDatas;
+	BagData** bagData = new BagData*[inventoryData->bagCount];
+	if (!oldData || inventoryData->bagCount != oldData->bagCount) {
 		changed = true;
 	}
-	inventoryData.itemStackDatas = itemData;
+	for (int i = 0; i < inventoryData->bagCount; i++) {
+		hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x108, i);
+		BagData* data = new BagData();
+		bagData[i] = data;
+		ReadItemData(data, itemStackPtr);
+		if (data->itemData.pExtendedType) {
+			data->bagSize = data->itemData.pExtendedType.get<int>(0x28);
+			data->noSellOrSort = data->itemData.pExtendedType.get<bool>(0x0);
+		}
+		inventoryData->realSize += data->bagSize;
+		if (changed) continue;
+		ItemStackData* old = oldBagData[i];
+		if (data->pItem != old->pItem || data->slot != old->slot) {
+			changed = true;	
+		}
+	}
+	if (!oldData || inventoryData->realSize != oldData->realSize) {
+		changed = true;
+	}
+	inventoryData->bagDatas = bagData;
+	//int slotCount = inventoryC.get<int>(0xD4);//unsafe but nothing better
+	ItemStackData** oldItemData = nullptr;
+	if (oldData)
+		oldItemData = oldData->itemStackDatas;
+	ItemStackData** itemData = new ItemStackData*[inventoryData->realSize];
+	int bagOffset = 0;
+	int currentBagIndex = 0;
+	for (int i = 0; i < inventoryData->realSize; ++i,++currentBagIndex,++bagOffset) {
+		hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x168, bagOffset);
+		ItemStackData* data = new ItemStackData();
+		itemData[i] = data;
+		data->slot = bagOffset;
+		ReadItemData(data, itemStackPtr);
+		int bagSlot = bagOffset / inventoryData->slotsPerBag;
+		if (bagSlot < inventoryData->bagCount) {
+			BagData* bag = bagData[bagSlot];
+			if (currentBagIndex == bag->bagSize - 1) {
+				bagOffset += (inventoryData->slotsPerBag - bag->bagSize);
+				currentBagIndex = -1;
+			}
+			if (bag->pItem && data->itemData.sellable)  data->itemData.sellable = !bag->noSellOrSort;
+		}
+		if (changed) continue;
+		ItemStackData* old = oldItemData[i];
+		if (data->pItem != old->pItem || data->slot != old->slot) {
+			changed = true;
+		}
+	}
+	inventoryData->itemStackDatas = itemData;
 	if (changed)
 		SetInventory(inventoryData);
 }
@@ -732,16 +768,17 @@ void __fastcall hkGameThread(uintptr_t pInst, int, int frame_time)
 		}
 		__except (ADDON_EXCEPTION("[hkGameThread] Exception in game thread")) {
 			;
-		}
+		}	
 	}();
 
 	orgFunc(pInst, frame_time);
 }
-static void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText)
+static void __fastcall cbDecodeText(std::string* ctx, wchar_t* decodedText)
 {
-	PluginBase* base = PluginBase::GetInstance();
+	//PluginBase* base = PluginBase::GetInstance();
 	if (ctx && decodedText && decodedText[0] != 0) {
-		uintptr_t v = (uintptr_t)ctx;
-		base->AddDecodeID(v,ws2s(std::wstring(decodedText)));
+		//uintptr_t v = (uintptr_t)ctx;
+		//base->AddDecodeID(v,ws2s(std::wstring(decodedText)));
+		*ctx = ws2s(std::wstring(decodedText));
 	}
 }

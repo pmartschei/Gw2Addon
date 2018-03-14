@@ -22,9 +22,9 @@ char * IDItemFilter::GetSerializeName()
 	return "IDItemFilter";
 }
 
-bool IDItemFilter::IsFiltered(ItemStackData data)
+bool IDItemFilter::IsFiltered(FilterData data)
 {
-	return data.itemData.id == value;
+	return data->itemData->id == value;
 }
 
 IFilter * IDItemFilter::CreateNew()

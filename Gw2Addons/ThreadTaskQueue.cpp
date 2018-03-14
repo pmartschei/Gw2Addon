@@ -8,13 +8,20 @@ void run(void* params) {
 		delete t;
 	}
 }
-ThreadTaskQueue::ThreadTaskQueue()
+ThreadTaskQueue::ThreadTaskQueue(int size) : threadSize(size)
 {
-	t = std::thread(run,&queue);
+	threads = new std::thread[size];
+	for (int i = 0; i < threadSize; i++) {
+		threads[i] = std::thread(run, &queue);
+	}
 }
 ThreadTaskQueue::~ThreadTaskQueue()
 {
-	queue.finish();
+	queue.finish(); 
+	for (int i = 0; i < threadSize; i++) {
+		threads[i].join();
+	}
+	delete[] threads;
 }
 void ThreadTaskQueue::addTask(Task * task)
 {
