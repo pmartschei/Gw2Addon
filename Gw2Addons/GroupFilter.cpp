@@ -8,6 +8,8 @@
 #include "TypeItemFilter.h"
 #include "ItemFilterFactory.h"
 #include "TradingPostValueFilter.h"
+#include "TypeItemMultiFilter.h"
+#include "PluginBase.h"
 #include <algorithm>
 #include <iterator>
 
@@ -22,11 +24,12 @@ GroupFilter::~GroupFilter() {
 }
 std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 {
-	std::set<FilterData> combinedSet;
+	std::lock_guard<std::recursive_mutex> lock(mutex);
+	std::set<FilterData> filteredSet;
 	std::vector<IFilter*>::iterator iter;
 
 	if (flags & FilterFlags::And) {
-		combinedSet = collection;
+		filteredSet = collection;
 	}
 	int activeCount = 0;
 	if (IsActive()) {
@@ -38,14 +41,14 @@ std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 			else {
 				continue;
 			}
-			std::set<FilterData> filteredSet = (*iter)->Filter(collection);
+			std::set<FilterData> subFilteredSet = (*iter)->Filter(collection);
 			if (flags & FilterFlags::And) {
 				std::set<FilterData> intersection;
-				std::set_intersection(combinedSet.begin(), combinedSet.end(), filteredSet.begin(), filteredSet.end(), std::inserter(intersection, intersection.end()));
-				combinedSet = intersection;
+				std::set_intersection(filteredSet.begin(), filteredSet.end(), subFilteredSet.begin(), subFilteredSet.end(), std::inserter(intersection, intersection.end()));
+				filteredSet = intersection;
 			}
 			else if (flags & FilterFlags::Or) {
-				combinedSet.insert(filteredSet.begin(), filteredSet.end());
+				filteredSet.insert(subFilteredSet.begin(), subFilteredSet.end());
 			}
 		}
 	}
@@ -54,19 +57,20 @@ std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 		filteredItems = 0;
 		return std::set<FilterData>();
 	}
-	combinedSet = InvertSet(collection, combinedSet);
-	SaveFilteredItemDatas(combinedSet);
-	filteredItems = (int)combinedSet.size();
-	return combinedSet;
+	filteredSet = InvertSet(collection, filteredSet);
+	SaveFilteredItemDatas(filteredSet);
+	filteredItems = (int)filteredSet.size();
+	return filteredSet;
 }
 
 bool GroupFilter::Updated()
 {
 	if (gotUpdated) return true;
 
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter ) {
+	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
 		if ((*iter)->Updated()) return true;
 	}
 	return false;
@@ -75,6 +79,7 @@ bool GroupFilter::Updated()
 void GroupFilter::ResetUpdateState()
 {
 	IFilter::ResetUpdateState();
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
 	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter ) {
@@ -90,6 +95,7 @@ char * GroupFilter::GetSerializeName()
 void GroupFilter::SetOpen(bool open)
 {
 	IFilter::SetOpen(open);
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
 	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
@@ -121,6 +127,9 @@ void GroupFilter::CustomMenu()
 			if (ImGui::MenuItem("Type Filter")) {
 				AddFilter(new TypeItemFilter());
 			}
+			if (ImGui::MenuItem("Type Multi Filter")) {
+				AddFilter(new TypeItemMultiFilter());
+			}
 			if (ImGui::MenuItem("Trading Post Filter")) {
 				AddFilter(new TradingPostValueFilter());
 			}
@@ -146,6 +155,7 @@ void GroupFilter::CustomMenu()
 
 void GroupFilter::RemoveAndDeleteAll() {
 
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
 	for (iter = subFilters.begin(); iter != subFilters.end(); ) {
@@ -159,6 +169,7 @@ void GroupFilter::RemoveAndDeleteAll() {
 
 void GroupFilter::CheckForDeletion()
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
 	for (iter = subFilters.begin(); iter != subFilters.end(); ) {
@@ -208,6 +219,7 @@ void GroupFilter::RenderContent() {
 }
 
 void GroupFilter::RenderChildren() {
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 
 	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
@@ -221,6 +233,7 @@ void GroupFilter::AddFilter(IFilter* filter) {
 }
 
 std::vector<IFilter*>::iterator GroupFilter::RemoveFilter(IFilter* filter) {
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator it = std::find(subFilters.begin(), subFilters.end(), filter);
 	gotUpdated = true;
 	return subFilters.erase(it);
@@ -229,6 +242,7 @@ std::vector<IFilter*>::iterator GroupFilter::RemoveFilter(IFilter* filter) {
 
 void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 {
+	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::vector<IFilter*>::iterator iter;
 	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
 		(*iter)->Serialize(printer);
@@ -237,6 +251,7 @@ void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 
 void GroupFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
+
 	tinyxml2::XMLElement* child = element->FirstChildElement();
 	tinyxml2::XMLElement* currentChild;
 	while (child) {

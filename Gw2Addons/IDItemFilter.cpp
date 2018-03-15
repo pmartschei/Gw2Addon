@@ -8,12 +8,15 @@ IDItemFilter::IDItemFilter() {
 
 std::string IDItemFilter::GetName()
 {
-	return "ID Filter (ID: " + std::to_string(value) + ")";
+	return "ID Filter (" + std::to_string(value) + ")";
 }
 
 void IDItemFilter::RenderInput(int & value)
 {
 	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##itemid", id), &value);
+	if (ImGui::IsItemHovered() && !ImGui::IsAnyItemActive()) {
+		value += ImGui::GetIO().MouseWheel;
+	}
 	value = CLAMP(value, 0, 1000000);
 }
 

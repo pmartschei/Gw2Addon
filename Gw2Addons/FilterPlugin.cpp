@@ -24,7 +24,6 @@ void FilterPlugin::Init() {
 
 	LogString(LogLevel::Debug, "Creating Filters");
 	root = new RootGroupFilter();
-	rootCopy = new RootGroupFilter();
 	stdFilter = new RootGroupFilter();
 	GroupFilter* groupFilter = new GroupFilter();
 	RarityRangeItemFilter* rarityFilter = new RarityRangeItemFilter();
@@ -40,7 +39,7 @@ void FilterPlugin::Init() {
 	HookVendorFunc();
 	LogString(LogLevel::Debug, "Hooking Vendor Function end");
 
-	LoadFilterFrom(rootCopy, GetAddonFolder().append(STARTUP_FILTERNAME).c_str());
+	LoadFilterFrom(root, GetAddonFolder().append(STARTUP_FILTERNAME).c_str());
 	copyItemKeyBind->plugin = GetName();
 	openWindow->plugin = GetName();
 	copyItemKeyBind->name = "CopyHoveredItem";
@@ -60,33 +59,9 @@ const char * FilterPlugin::GetName()
 }
 void FilterPlugin::PluginMain()
 {
-	uint updateIndex;
-	InventoryData* inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
-	*root = *rootCopy;
-	bool defaultFilterUpdated = rootCopy->Updated();
-	rootCopy->ResetUpdateState();
-	if (defaultFilterUpdated) {
-		std::string folder = GetAddonFolder();
-		SHCreateDirectoryExA(nullptr, folder.c_str(), nullptr);
-		folder.append(STARTUP_FILTERNAME);
-		SaveFilterAs(root,folder.c_str());
-		lastCallPtr = new uintptr_t(0);
-	}
-	if (lastUpdateIndex != updateIndex || defaultFilterUpdated && inventory) {
-		lastUpdateIndex = updateIndex;
-		std::set<ItemStackData*> collection(inventory->itemStackDatas, inventory->itemStackDatas+inventory->realSize);
-		collection = stdFilter->Filter(collection);
-		filteredCollection = root->Filter(collection);	
-		lastItemsFilteredCount = root->GetFilteredCount();
-		filteredItemDatas.clear();
-		auto f = [&](){
-			for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ++it) {
-				FilterData data = (*it);
-				filteredItemDatas.push_back(data->itemData);
-			}
-		};
-		AddDispatchWork(f);
-	}
+
+	UpdateFilter();
+
 	if (!vendorSuccessful) return;
 	if (*lastCallPtr == 0) return;
 	uintptr_t func = (uintptr_t)*(lastCallPtr - 1);//-0x8 = 1
@@ -94,18 +69,11 @@ void FilterPlugin::PluginMain()
 		lastCallPtr = new uintptr_t(0);
 		return;
 	}
-	for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
-		FilterData data = (*filteredCollection.begin());
-		if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data->itemData->id) != skipUnsellableIds.end()) {
-			filteredCollection.erase(it++);
-		}
-		else {
-			++it;
-		}
-	}
+	
 	if (filteredCollection.size() > 0) {
 		hl::ForeignClass vendor = (uintptr_t*)*lastCallPtr;
 		FilterData data = (*filteredCollection.begin());
+		if (!data->itemData) return;
 		if (lastSlot != data->slot) {
 			lastSlot = data->slot;
 			curRetry = 0;
@@ -123,11 +91,54 @@ void FilterPlugin::PluginMain()
 	}
 }
 
+void FilterPlugin::RenderOptions()
+{
+	if (ImGui::CollapsingHeader(GetName())) {
+		PluginBase::RenderKeyBind(copyItemKeyBind);
+		PluginBase::RenderKeyBind(openWindow);
+	}
+}
+
+void FilterPlugin::UpdateFilter() {
+	uint updateIndex;
+	InventoryData* inventory = PluginBase::GetInstance()->GetInventory(&updateIndex);
+	bool defaultFilterUpdated = root->Updated();
+	root->ResetUpdateState();
+	if (defaultFilterUpdated) {
+		std::string folder = GetAddonFolder();
+		SHCreateDirectoryExA(nullptr, folder.c_str(), nullptr);
+		folder.append(STARTUP_FILTERNAME);
+		SaveFilterAs(root, folder.c_str());
+		lastCallPtr = new uintptr_t(0);
+	}
+	if (lastUpdateIndex != updateIndex || defaultFilterUpdated && inventory) {
+		lastUpdateIndex = updateIndex;
+		std::set<ItemStackData*> collection(inventory->itemStackDatas, inventory->itemStackDatas + inventory->realSize);
+		collection = stdFilter->Filter(collection);
+		filteredCollection = root->Filter(collection);
+		for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
+			FilterData data = (*filteredCollection.begin());
+			if (std::find(skipUnsellableIds.begin(), skipUnsellableIds.end(), data->itemData->id) != skipUnsellableIds.end()) {
+				filteredCollection.erase(it++);
+			}
+			else {
+				++it;
+			}
+		}
+		lastItemsFilteredCount = filteredCollection.size();
+		filteredItemDatas.clear();
+		for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ++it) {
+			FilterData data = (*it);
+			filteredItemDatas.push_back(data->itemData);
+		}
+	}
+}
+
 void FilterPlugin::Render() {
 	if (window->Begin()) {
 		RenderMenu();
-		rootCopy->Render();
-		rootCopy->CheckForDeletion();
+		root->Render();
+		root->CheckForDeletion();
 		window->End();
 	}
 }
@@ -155,7 +166,7 @@ void FilterPlugin::RenderMenu() {
 						std::string folder = GetFilterFolder();
 						SHCreateDirectoryExA(nullptr, folder.c_str(), nullptr);
 						folder.append(fileNameString);
-						if (SaveFilterAs(rootCopy,folder.append(".filter").c_str())) {
+						if (SaveFilterAs(root,folder.append(".filter").c_str())) {
 							extraMessage = "Filter successfully saved!";
 							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
@@ -194,7 +205,7 @@ void FilterPlugin::RenderMenu() {
 						extraMessageColor = Addon::Colors[AddonColor_NegativeText];
 					}
 					else {
-						if (LoadFilterFrom(rootCopy,GetFilterFolder().append(filesToLoad[loadIndex]).c_str(), appendLoad)) {
+						if (LoadFilterFrom(root,GetFilterFolder().append(filesToLoad[loadIndex]).c_str(), appendLoad)) {
 							extraMessage = "Filter successfully loaded!";
 							extraMessageColor = Addon::Colors[AddonColor_PositiveText];
 						}
@@ -230,12 +241,12 @@ void FilterPlugin::RenderMenu() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Edit")) {
-			rootCopy->CustomMenu();
+			root->CustomMenu();
 			if (ImGui::Selectable("Expand all")) {
-				rootCopy->SetOpen(true);
+				root->SetOpen(true);
 			}
 			if (ImGui::Selectable("Collapse all")) {
-				rootCopy->SetOpen(false);
+				root->SetOpen(false);
 			}
 			ImGui::EndMenu();
 		}
@@ -255,19 +266,50 @@ void FilterPlugin::RenderMenu() {
 				filteredItemDatas.unique();
 				size = filteredItemDatas.size();
 				ImGui::BeginTooltip();
-				ImGui::Text("Use your mouse wheel to scroll");
-				ImGui::Text("");
+				int limit = min(size, 20);
+				if (size > limit) {
+					ImGui::Text("Use your mouse wheel to scroll");
+					ImGui::Text("");
+				}
 				ImGuiIO io = ImGui::GetIO();
-				filteredItemDatasStartY += io.MouseWheel;
+				filteredItemDatasStartY -= io.MouseWheel;
 				if (filteredItemDatasStartY + 20 >= size) filteredItemDatasStartY = size - 20;
 				if (filteredItemDatasStartY < 0) filteredItemDatasStartY = 0;
-				int limit = min(size, 20);
 				ItemData** arr = new ItemData*[size];
 				std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
 				for (int i = filteredItemDatasStartY; i < filteredItemDatasStartY + limit; i++) {
-					const char* data = arr[i]->name;
-					ImGui::Text(data);
+					switch (arr[i]->rarity) {
+					case ItemRarity::Junk:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityJunk]);
+						break;
+					case ItemRarity::Basic:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityBasic]);
+						break;
+					case ItemRarity::Fine:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityFine]);
+						break;
+					case ItemRarity::Masterwork:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityMasterwork]);
+						break;
+					case ItemRarity::Rare:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityRare]);
+						break;
+					case ItemRarity::Exotic:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityExotic]);
+						break;
+					case ItemRarity::Ascended:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityAscended]);
+						break;
+					case ItemRarity::Legendary:
+						ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityLegendary]);
+						break;
+					default:
+						ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+					}
+					ImGui::Text(arr[i]->name.c_str());
+					ImGui::PopStyleColor();
 				}
+				delete[] arr;
 				ImGui::EndTooltip();
 			}
 			else {
@@ -320,7 +362,7 @@ void FilterPlugin::AddHoveredItemToFilter()
 		groupFilter->AddFilter(rarityFilter);
 		groupFilter->AddFilter(typeFilter);
 		groupFilter->SetOpen(false);
-		rootCopy->AddFilter(groupFilter);
+		root->AddFilter(groupFilter);
 	}
 }
 

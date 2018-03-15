@@ -2,7 +2,7 @@
 
 std::map<uint, ItemData*> ItemData::datas = std::map<uint, ItemData*>();
 
-ItemData::ItemData() : pItemData(nullptr), pExtendedType(nullptr), pSkin(nullptr), pSuffix(nullptr), pPrefix(nullptr)
+ItemData::ItemData() : pItemData(nullptr), pExtendedType(nullptr)
 {
 }
 

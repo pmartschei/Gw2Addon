@@ -83,10 +83,10 @@ private:
 	uint inventoryUpdateIndex = 0;
 	uint test = 0;
 	ItemData* hoveredItem;
+	KeyBindData* openOptions;
 	std::vector<KeyBindData*> keyBinds;
 
 	std::string chainLoad;
-	KeyBindData* keybindVisual;
 	PluginBaseState pluginBaseState = PluginBaseState::CREATED;
 	ThreadTaskQueue* ttq;
 
@@ -126,14 +126,14 @@ private:
 	void SetupMisc();
 	void SetupGuild();
 	void ReadItemData(ItemStackData* data, hl::ForeignClass pBase);
-	void ReadItemBase(ItemData* data, hl::ForeignClass pBase);
+	void ReadItemBase(ItemData** data, hl::ForeignClass pBase);
 	bool KeysDown(std::set<uint> keys);
-	bool KeybindText(std::string suffix, KeyBindData* data);
 	void SetInventory(InventoryData* data);
 	void SetHoveredItem(ItemData* data);
-	void RenderKeyBinds();
 	void RenderColors(const char* id, int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
 	void LoadColors(int size, std::function<const char*(int)> nameFunc, ImVec4* colors);
+
+	static KeyBindData* keybindVisual;
 protected:
 	PluginBase() {};
 	std::list<Window*> _windows;
@@ -167,6 +167,9 @@ public:
 
 	void RegisterKeyBind(KeyBindData* keybind);
 	void UnregisterKeyBind(KeyBindData* keybind);
+
+	static bool KeybindText(std::string suffix, KeyBindData* data);
+	static void RenderKeyBind(KeyBindData* keybind);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();

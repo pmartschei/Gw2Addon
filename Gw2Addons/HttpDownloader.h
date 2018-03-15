@@ -9,10 +9,7 @@
 
 class HttpDownloader {
 public:   
-	HttpDownloader();
-	~HttpDownloader();
 	std::string download(const std::string& url);
 private:
-	void* curl;
 };
 #endif

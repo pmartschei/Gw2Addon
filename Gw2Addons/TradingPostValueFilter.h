@@ -6,7 +6,9 @@
 
 class TradingPostValueFilter : public SingleFilter<int> {
 protected:
-	TradingPostModus modus = TradingPostModus::Sell;
+	TradingPostType tradingType = TradingPostType::Sell;
+	bool onlyTradingPostSellable = false;
+	TradingPostModus tradingModus = TradingPostModus::Percent;
 	virtual IFilter * CreateNew() override;
 	virtual void SerializeContent(tinyxml2::XMLPrinter &printer) override;
 	virtual void DeserializeContent(tinyxml2::XMLElement* element) override;

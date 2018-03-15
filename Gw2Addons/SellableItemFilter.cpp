@@ -8,7 +8,7 @@ SellableItemFilter::SellableItemFilter() {
 
 std::string SellableItemFilter::GetName()
 {
-	return "Sellable Filter ( " + std::to_string(value) + ")";
+	return "Sellable Filter (" + std::to_string(value) + ")";
 }
 
 void SellableItemFilter::RenderInput(bool& value)
@@ -18,7 +18,7 @@ void SellableItemFilter::RenderInput(bool& value)
 
 bool SellableItemFilter::IsFiltered(FilterData data)
 {
-	return data->itemData->sellable == value;
+	return data->sellable == value;
 }
 
 char * SellableItemFilter::GetSerializeName()

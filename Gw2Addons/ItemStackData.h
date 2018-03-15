@@ -12,8 +12,13 @@ public:
 	uint32_t count = 0;
 	bool accountBound;
 	bool tradingpostSellable;
+	bool sellable;
+
+	hl::ForeignClass pSkin;
+	hl::ForeignClass pPrefix;
+	hl::ForeignClass pSuffix;
 	hl::ForeignClass pItem;
-	ItemData itemData;
+	ItemData* itemData;
 };
 inline bool operator==(const ItemStackData& lhs, const ItemStackData& rhs)
 {

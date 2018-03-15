@@ -14,13 +14,8 @@ size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
 	*((stringstream*)stream) << data << endl;
 	return size * nmemb;
 }
-HttpDownloader::HttpDownloader() {
-	curl = curl_easy_init();
-}
-HttpDownloader::~HttpDownloader() {
-	curl_easy_cleanup(curl);
-}
 string HttpDownloader::download(const std::string& url) {
+	void* curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 	/* example.com is redirected, so we tell libcurl to follow redirection */
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
@@ -32,6 +27,7 @@ string HttpDownloader::download(const std::string& url) {
 	/* Perform the request, res will get the return code */
 	CURLcode res = curl_easy_perform(curl);
 	/* Check for errors */
+	curl_easy_cleanup(curl);
 	if (res != CURLE_OK) {
 		return "";
 	}

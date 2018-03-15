@@ -27,12 +27,17 @@ void RequestTradingpostTask::run()
 	}
 
 	JSONValue* value = JSON::Parse(jsonInfo.c_str());
+	if (!value) return;
 	JSONObject root = value->AsObject();
-	if (root.find(L"vendor_value") == root.end())
+	if (root.find(L"vendor_value") == root.end()) {
+		delete value;
 		return;
+	}
 
 	data->vendorValue = (uint) root[L"vendor_value"]->AsNumber();
+	data->minTPValue = (int)(data->vendorValue / 0.85f);
 
+	delete value;
 	//can theoretically parse anything on api
 
 	jsonInfo = downloader.download(PluginBase::GetInstance()->GetPricesUrl() + idStr);
@@ -42,15 +47,38 @@ void RequestTradingpostTask::run()
 	}
 	jsonInfo.erase(std::remove(jsonInfo.begin(), jsonInfo.end(), '\n'), jsonInfo.end());
 	value = JSON::Parse(jsonInfo.c_str());
+	if (!value) return;
 	root = value->AsObject();
-	if (root.find(L"buys") == root.end() || root.find(L"sells") == root.end())
+	if (root.find(L"buys") == root.end() || root.find(L"sells") == root.end()) {
+		delete value;
 		return;
+	}
 
-	JSONArray buys = root[L"buys"]->AsArray();
+	JSONArray sells = root[L"sells"]->AsArray();
 
 	uintptr_t quantity = 0;
 	uintptr_t price = 0;
-	int limit = min(buys.size(), 3);
+	int limit = min(sells.size(), 3);
+	for (int i = 0; i < limit; i++) {
+		JSONObject sell = sells[i]->AsObject();
+		if (sell.find(L"unit_price") != sell.end() && sell.find(L"quantity") != sell.end()) {
+			int localQ = (int)sell[L"quantity"]->AsNumber();
+			price += (int)sell[L"unit_price"]->AsNumber() * localQ;
+			quantity += localQ;
+		}
+	}
+	if (quantity>0) {
+		data->sellTradingPost = price / (float)quantity;
+	}
+	else {
+		data->sellTradingPost = 0.0f;
+	}
+
+	JSONArray buys = root[L"buys"]->AsArray();
+
+	quantity = 0;
+	price = 0;
+	limit = min(buys.size(), 3);
 	for (int i = 0; i < limit; i++) {
 		JSONObject buy = buys[i]->AsObject();
 		if (buy.find(L"unit_price") != buy.end() && buy.find(L"quantity") != buy.end()) {
@@ -64,26 +92,9 @@ void RequestTradingpostTask::run()
 		data->buyTradingPost = price / (float)quantity;
 	}
 	else {
-		data->buyTradingPost = 0.0f;
+		data->buyTradingPost = data->sellTradingPost;
 	}
-	JSONArray sells = root[L"sells"]->AsArray();
-
-	quantity = 0;
-	price = 0;
-	limit = min(sells.size(), 3);
-	for (int i = 0; i < limit; i++) {
-		JSONObject sell = sells[i]->AsObject();
-		if (sell.find(L"unit_price") != sell.end() && sell.find(L"quantity") != sell.end()) {
-			int localQ = (int)sell[L"quantity"]->AsNumber();
-			price += (int)sell[L"unit_price"]->AsNumber() * localQ;
-			quantity += localQ;
-		}
-	}
-	if (quantity>0){
-		data->sellTradingPost = price / (float)quantity;
-	}
-	else {
-		data->sellTradingPost = 0.0f;
-	}
+	
 	data->validTradingPostData = true;
+	delete value;
 }

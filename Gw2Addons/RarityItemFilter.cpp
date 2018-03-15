@@ -8,7 +8,7 @@ RarityItemFilter::RarityItemFilter()
 }
 
 std::string RarityItemFilter::GetName() {
-	return "Rarity Filter (Rarity: " + std::string(ItemRarities[value])+")";
+	return "Rarity Filter (" + std::string(ItemRarities[value])+")";
 }
 
 void RarityItemFilter::RenderInput(ItemRarity & value)

@@ -12,7 +12,9 @@
 #include "psapi.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
-void __fastcall cbDecodeText(uintptr_t* ctx, wchar_t* decodedText);
+void __fastcall cbDecodeText(std::string* ctx, wchar_t* decodedText);
+
+KeyBindData* PluginBase::keybindVisual;
 
 bool PluginBase::IsCloseWindowBindDown() {
 	return std::includes(_frameDownKeys.begin(), _frameDownKeys.end(), _closeWindowKeys.begin(), _closeWindowKeys.end());
@@ -118,7 +120,7 @@ void PluginBase::Init() {
 	optionWindow->SetMinSize(ImVec2(300, 300));
 	AddWindow(optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
-	KeyBindData* openOptions = new KeyBindData();
+	openOptions = new KeyBindData();
 	openOptions->plugin = MAIN_INFO;
 	openOptions->name = "OpenOptions";
 	openOptions->keys = Config::LoadKeyBinds(openOptions->plugin, openOptions->name, { VK_MENU,VK_SHIFT,'O' });
@@ -398,7 +400,7 @@ void PluginBase::Render()
 			plugin->RenderOptions();
 		}
 		if (ImGui::CollapsingHeader("Keybinds")) {
-			RenderKeyBinds();
+			RenderKeyBind(openOptions);
 		}
 		if (ImGui::CollapsingHeader("Addon Colors")) {
 			RenderColors("addon", AddonColor_COUNT, Addon::GetStyleColorName, Addon::Colors);
@@ -470,33 +472,14 @@ void PluginBase::RenderColors(const char* id,int size, std::function<const char*
 	ImGui::PopStyleVar(1);
 }
 
-void PluginBase::RenderKeyBinds()
+void PluginBase::RenderKeyBind(KeyBindData* keyBind)
 {
-	/*const char* lastPlugin = nullptr;
-	for (auto iterator = keyBinds.begin(), end = keyBinds.end(); iterator != end; ++iterator) {
-		KeyBindData* keyBind = *iterator;
-		if (!lastPlugin || lastPlugin != keyBind->plugin) {
-			if (lastPlugin) {
-				ImGui::Separator();
-			}
-			lastPlugin = keyBind->plugin;
-			ImGui::Text(lastPlugin);
-		}
-		ImGui::Text("%s", keyBind->name);
-		ImGui::SameLine(130);
-		if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
-			Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
-			Config::Save();
-		}
-	}*/
-	for (auto iterator = keyBinds.begin(), end = keyBinds.end(); iterator != end; ++iterator) {
-		KeyBindData* keyBind = *iterator;
-		ImGui::Text("%s", keyBind->name);
-		ImGui::SameLine(130);
-		if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
-			Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
-			Config::Save();
-		}
+	if (!keyBind) return;
+	ImGui::Text("%s", keyBind->name);
+	ImGui::SameLine(130);
+	if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
+		Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
+		Config::Save();
 	}
 }
 void PluginBase::ProcessTask(Task * task)
@@ -521,16 +504,15 @@ std::string PluginBase::GetPricesUrl()
 {
 	return configPricesUrl;
 }
-void PluginBase::ReadItemBase(ItemData* data, hl::ForeignClass pBase) {
+void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
 	uint id = pBase.get<uint>(0x28);
-	/*ItemData* savedData = ItemData::GetData(id);
+	ItemData* savedData = ItemData::GetData(id);
 	if (!savedData) {
 		savedData = new ItemData();
 		savedData->id = id;
 		ItemData::AddData(savedData);
-	}*/
-	//*data = savedData;
-	ItemData* savedData = data;
+	}
+	*data = savedData;
 	savedData->id = id;
 	savedData->pItemData = pBase;
 	savedData->level = pBase.get<int>(0x74);
@@ -547,41 +529,47 @@ void PluginBase::ReadItemBase(ItemData* data, hl::ForeignClass pBase) {
 		savedData->updateTaskActive = true;
 		PluginBase::GetInstance()->ProcessTask(new RequestTradingpostTask(savedData));
 	}
+	if (!savedData->name.empty()) return;
 	if (!GetCodedTextFromHashId || !DecodeText || !GetCodedItemName) return;
 	uint hashId = pBase.get<uint>(0x80);
 	if (hashId == 0) {
-		hl::ForeignClass hash = pBase.get<void*>(0xA8);
-		hashId = hash.get<uint>(0x58);
+		//hl::ForeignClass hash = pBase.get<void*>(0xA8);
+		//hashId = hash.get<uint>(0x58);
 		//uintptr_t* d = (uintptr_t*)GetCodedItemName(pBase.data(), skin,prefixname,suffixname,1,0,0)
 		uintptr_t* d = (uintptr_t*)GetCodedItemName(pBase.data(), (uintptr_t)0, 0/*savedData->prefixName*/, 0/*savedData->suffixName*/, 1, (uintptr_t)0, 0);
-		DecodeText(d, cbDecodeText, savedData->name);
+		DecodeText(d, cbDecodeText, &savedData->name);
 	//}else if (decodeIDs.find(hashId) == decodeIDs.end()) {
 	}else{
 		uintptr_t* d = (uintptr_t*)GetCodedTextFromHashId(hashId, 0);
-		DecodeText(d, cbDecodeText, savedData->name);
+		DecodeText(d, cbDecodeText, &savedData->name);
 	}
 }
 void PluginBase::ReadItemData(ItemStackData* data, hl::ForeignClass pBase) {
-	if (!pBase) return;
-	hl::ForeignClass itemPtr = pBase.call<void*>(0x20);
-	if (!itemPtr) return;
-	data->pItem = pBase;
-	data->count = pBase.call<int>(0x78);
-	data->accountBound = (pBase.get<int>(0x50) & 0x40);
-	data->tradingpostSellable = !(pBase.get<int>(0x50) & 0x08);
+	__try{
+		if (!pBase) return;
+		hl::ForeignClass itemPtr = pBase.call<void*>(0x20);
+		if (!itemPtr) return;
+		data->pItem = pBase;
+		data->count = pBase.call<int>(0x78);
+		data->accountBound = (pBase.get<int>(0x50) & 0x40);
+		data->tradingpostSellable = !(pBase.get<int>(0x50) & 0x08);
 
-	data->itemData.pSkin = pBase.call<void*>(0x70);
+		data->pSkin = pBase.call<void*>(0x70);
 
-	hl::ForeignClass prepost = pBase.call<void*>(0x210);
-	if (prepost) {
+		hl::ForeignClass prepost = pBase.call<void*>(0x210);
+		if (prepost) {
 
-		data->itemData.pPrefix = prepost.call<void*>(0x0);
-		hl::ForeignClass suffix = prepost.call<void*>(0x10, 1);
-		if (suffix) {
-			data->itemData.pSuffix = suffix.get<void*>(0x30);
+			data->pPrefix = prepost.call<void*>(0x0);
+			hl::ForeignClass suffix = prepost.call<void*>(0x10, 1);
+			if (suffix) {
+				data->pSuffix = suffix.get<void*>(0x30);
+			}
 		}
+		ReadItemBase(&data->itemData, itemPtr);
 	}
-	ReadItemBase(&data->itemData, itemPtr);
+	__except (ADDON_EXCEPTION("[hkGameThread] Exception in ReadItemData()")) {
+
+	}
 }
 void PluginBase::SetupMisc() {
 	currentPointers.elementParam = 0;
@@ -598,14 +586,14 @@ void PluginBase::SetupMisc() {
 	currentPointers.objOnElement = (uintptr_t)objOnElement.data();
 	if (!objOnElement) return;
 	hl::ForeignClass inventory = objOnElement.get<void*>(0xB8);
-	ItemData data;
+	ItemData* data;
 	ItemStackData stackData;
 	if (inventory && (uintptr_t)inventory.data() == currentPointers.inventory) {//its a normal slot in the inventory/shared/bank
 		currentPointers.LocationPtr = (uintptr_t)inventory.data();
 		hl::ForeignClass item = objOnElement.get<void*>(0xC8);
 		if (item) {
 			ReadItemData(&stackData, item);
-			currentPointers.itemPtr = (uintptr_t)stackData.itemData.pItemData.data();
+			currentPointers.itemPtr = (uintptr_t)stackData.itemData->pItemData.data();
 			SetHoveredItem(stackData.itemData);
 		}
 		return;
@@ -619,7 +607,7 @@ void PluginBase::SetupMisc() {
 			itemData = itemData.get<void*>(0x0);
 			if (itemData) {
 				ReadItemBase(&data, itemData);
-				currentPointers.itemPtr = (uintptr_t)data.pItemData.data();
+				currentPointers.itemPtr = (uintptr_t)data->pItemData.data();
 				SetHoveredItem(data);
 				return;
 			}
@@ -633,27 +621,32 @@ void PluginBase::SetupMisc() {
 		itemData = objOnElement.get<void*>(0x98);
 		if (itemData) {
 			ReadItemBase(&data, itemData);
-			currentPointers.itemPtr = (uintptr_t)data.pItemData.data();
+			currentPointers.itemPtr = (uintptr_t)data->pItemData.data();
 			SetHoveredItem(data);
 			return;
 		}
 	}
 }
 void PluginBase::SetupGuild() {
-	currentPointers.ctx = 0;
-	currentPointers.guildctx = 0;
-	currentPointers.guildInv = 0;
-	hl::ForeignClass ctx = pCtx;
-	currentPointers.ctx = (uintptr_t)ctx.data();
-	if (!ctx) return;
+	__try {
+		currentPointers.ctx = 0;
+		currentPointers.guildctx = 0;
+		currentPointers.guildInv = 0;
+		hl::ForeignClass ctx = pCtx;
+		currentPointers.ctx = (uintptr_t)ctx.data();
+		if (!ctx) return;
 
-	hl::ForeignClass guildctx = ctx.get<void*>(0x148);
-	currentPointers.guildctx = (uintptr_t)guildctx.data();
-	if (!guildctx) return;
+		hl::ForeignClass guildctx = ctx.get<void*>(0x148);
+		currentPointers.guildctx = (uintptr_t)guildctx.data();
+		if (!guildctx) return;
 
-	hl::ForeignClass guildInv = guildctx.get<void*>(0x68);
-	if (guildInv) {
-		currentPointers.guildInv = (uintptr_t)guildInv.data();
+		hl::ForeignClass guildInv = guildctx.get<void*>(0x68);
+		if (guildInv) {
+			currentPointers.guildInv = (uintptr_t)guildInv.data();
+		}
+	}
+	__except (ADDON_EXCEPTION("[hkGameThread] Exception in SetupGuild()")) {
+
 	}
 }
 void PluginBase::SetupPlayer() {
@@ -672,8 +665,9 @@ void PluginBase::SetupPlayer() {
 	hl::ForeignClass player = charctx.get<void*>(0x90);
 	currentPointers.player = (uintptr_t)player.data();
 	if (!player) {
-		if (inventory)
+		if (inventory) {
 			SetInventory(nullptr);
+		}
 		return;
 	}
 
@@ -698,9 +692,9 @@ void PluginBase::SetupPlayer() {
 		BagData* data = new BagData();
 		bagData[i] = data;
 		ReadItemData(data, itemStackPtr);
-		if (data->itemData.pExtendedType) {
-			data->bagSize = data->itemData.pExtendedType.get<int>(0x28);
-			data->noSellOrSort = data->itemData.pExtendedType.get<bool>(0x0);
+		if (data->itemData->pExtendedType) {
+			data->bagSize = data->itemData->pExtendedType.get<int>(0x28);
+			data->noSellOrSort = data->itemData->pExtendedType.get<bool>(0x0);
 		}
 		inventoryData->realSize += data->bagSize;
 		if (changed) continue;
@@ -733,7 +727,7 @@ void PluginBase::SetupPlayer() {
 				bagOffset += (inventoryData->slotsPerBag - bag->bagSize);
 				currentBagIndex = -1;
 			}
-			if (bag->pItem && data->itemData.sellable)  data->itemData.sellable = !bag->noSellOrSort;
+			if (data->itemData && bag->pItem && data->itemData->sellable)  data->sellable = !bag->noSellOrSort;
 		}
 		if (changed) continue;
 		ItemStackData* old = oldItemData[i];
@@ -742,8 +736,12 @@ void PluginBase::SetupPlayer() {
 		}
 	}
 	inventoryData->itemStackDatas = itemData;
-	if (changed)
+	if (changed) {
 		SetInventory(inventoryData);
+	}
+	else {
+		delete inventoryData;
+	}
 }
 void PluginBase::GameHook()
 {

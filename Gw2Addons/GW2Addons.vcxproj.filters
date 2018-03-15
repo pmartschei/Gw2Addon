@@ -148,9 +148,6 @@
     <ClCompile Include="TaskQueue.cpp">
       <Filter>Source Files\Threads</Filter>
     </ClCompile>
-    <ClCompile Include="SimpleLogTask.cpp">
-      <Filter>Source Files\Threads</Filter>
-    </ClCompile>
     <ClCompile Include="RequestTradingpostTask.cpp">
       <Filter>Source Files\FilterPlugin</Filter>
     </ClCompile>
@@ -177,6 +174,12 @@
     </ClCompile>
     <ClCompile Include="ItemStackData.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleLogTask.cpp">
+      <Filter>Source Files\FilterPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="TypeItemMultiFilter.cpp">
+      <Filter>Source Files\Filter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -389,6 +392,9 @@
     </ClInclude>
     <ClInclude Include="FilterPlugin.h">
       <Filter>Source Files\FilterPlugin</Filter>
+    </ClInclude>
+    <ClInclude Include="TypeItemMultiFilter.h">
+      <Filter>Source Files\Filter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,7 +17,7 @@ std::string RarityRangeItemFilter::GetName()
 	}
 	std::string displayMin = std::string(ItemRarities[minRarity]);
 	std::string displayMax = std::string(ItemRarities[maxRarity]);
-	return "Rarity Filter (Rarity: " + displayMin + (maxValue == minValue ? ")" : " to " + displayMax + ")");
+	return "Rarity Filter (" + displayMin + (maxValue == minValue ? ")" : " to " + displayMax + ")");
 }
 
 void RarityRangeItemFilter::RenderInput(ItemRarity & value, std::string s)

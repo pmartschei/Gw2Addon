@@ -8,7 +8,7 @@ TypeItemFilter::TypeItemFilter()
 }
 
 std::string TypeItemFilter::GetName() {
-	return "Type Filter (Type: " + std::string(ItemTypes[ItemTypeIndex[value]]) + ")";
+	return "Type Filter (" + std::string(ItemTypes[ItemTypeIndex[value]]) + ")";
 }
 
 void TypeItemFilter::RenderInput(ItemType & value)

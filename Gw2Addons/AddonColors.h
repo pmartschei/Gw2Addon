@@ -11,6 +11,14 @@ enum AddonColor
 	AddonColor_DisabledHeaderHovered,
 	AddonColor_FrameBgHighlighted,
 	AddonColor_TextHighlighted,
+	AddonColor_RarityJunk,
+	AddonColor_RarityBasic,
+	AddonColor_RarityFine,
+	AddonColor_RarityMasterwork,
+	AddonColor_RarityRare,
+	AddonColor_RarityExotic,
+	AddonColor_RarityAscended,
+	AddonColor_RarityLegendary,
 	AddonColor_COUNT
 };
 namespace Addon{

@@ -147,8 +147,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
-
 	ImGui_ImplDX9_WndProcHandler(hWnd, msg, wParam, lParam);
+
 	if (pluginBase->PushKeys(eventKeys)) return true;
 
 	if (pluginBase->HasFocusWindow() && pluginBase->IsCloseWindowBindDown() ) {

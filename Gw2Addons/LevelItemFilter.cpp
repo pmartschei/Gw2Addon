@@ -8,12 +8,15 @@ LevelItemFilter::LevelItemFilter() {
 
 std::string LevelItemFilter::GetName()
 {
-	return "Level Filter (Level: " + std::to_string(value) + ")";
+	return "Level Filter (" + std::to_string(value) + ")";
 }
 
 void LevelItemFilter::RenderInput(int & value)
 {
 	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##level", id), &value);
+	if (ImGui::IsItemHovered() && !ImGui::IsAnyItemActive()) {
+		value += ImGui::GetIO().MouseWheel;
+	}
 	value = CLAMP(value, 0, 80);
 }
 

@@ -102,14 +102,27 @@ void IFilter::Render()
 
 		int size = filteredItemDatas.size();
 		if (ImGui::IsItemHovered() && size > 0) {
+			filteredItemDatas.sort(ItemData::sortName);
+			filteredItemDatas.unique();
+			size = filteredItemDatas.size();
 			ImGui::BeginTooltip();
+			ImGui::Text("Use your mouse wheel to scroll");
+			ImGui::Text("");
+			ImGuiIO io = ImGui::GetIO();
+			filteredItemDatasStartY += io.MouseWheel;
+			if (filteredItemDatasStartY + 20 >= size) filteredItemDatasStartY = size - 20;
+			if (filteredItemDatasStartY < 0) filteredItemDatasStartY = 0;
+			int limit = min(size, 20);
 			ItemData** arr = new ItemData*[size];
 			std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
-			for (int i = 0; i < size; i++) {
-				const char* data = arr[i]->name;
-				ImGui::Text(data);
+			for (int i = filteredItemDatasStartY; i < filteredItemDatasStartY + limit; i++) {
+				ImGui::Text(arr[i]->name.c_str());
 			}
+			delete[] arr;
 			ImGui::EndTooltip();
+		}
+		else {
+			filteredItemDatasStartY = 0;
 		}
 	}
 

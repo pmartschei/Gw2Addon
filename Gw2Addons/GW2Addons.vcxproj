@@ -87,7 +87,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -152,6 +152,7 @@
     <ClCompile Include="tinyxml\tinyxml2.cpp" />
     <ClCompile Include="TradingPostValueFilter.cpp" />
     <ClCompile Include="TypeItemFilter.cpp" />
+    <ClCompile Include="TypeItemMultiFilter.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
@@ -224,6 +225,7 @@
     <ClInclude Include="TradingPostValueFilter.h" />
     <ClInclude Include="TypeItemFilter.h" />
     <ClInclude Include="SellableItemFilter.h" />
+    <ClInclude Include="TypeItemMultiFilter.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

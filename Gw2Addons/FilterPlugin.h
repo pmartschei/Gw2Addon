@@ -11,7 +11,6 @@ class FilterPlugin : public Plugin
 private:
 
 	RootGroupFilter* root;
-	RootGroupFilter* rootCopy;
 	RootGroupFilter* stdFilter;
 
 	Window* window;
@@ -44,6 +43,7 @@ private:
 
 	void HookVendorFunc();
 	void RenderMenu();
+	void UpdateFilter();
 	void AddHoveredItemToFilter();
 	void ReloadFilterFiles();
 	bool SaveFilterAs(RootGroupFilter* filter, const char* name);
@@ -57,6 +57,7 @@ public:
 	virtual void Init() override;
 	virtual void Render() override;
 	virtual void PluginMain() override;
+	virtual void RenderOptions() override;
 };
 struct firstParam {
 	int _;

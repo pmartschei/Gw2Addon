@@ -15,12 +15,15 @@ std::string LevelRangeItemFilter::GetName()
 		displayMin = maxValue;
 		displayMax = minValue;
 	}
-	return "Level Range Filter (Level: " + std::to_string(displayMin) + (maxValue == minValue ? ")" : " to " + std::to_string(displayMax) + ")");
+	return "Level Range Filter (" + std::to_string(displayMin) + (maxValue == minValue ? ")" : " to " + std::to_string(displayMax) + ")");
 }
 
 void LevelRangeItemFilter::RenderInput(int & value, std::string s)
 {
 	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##level" + s, id), &value, 1, 1000);
+	if (ImGui::IsItemHovered() && !ImGui::IsAnyItemActive()) {
+		value += ImGui::GetIO().MouseWheel;
+	}
 	value = CLAMP(value, 0, 80);
 }
 bool LevelRangeItemFilter::IsFiltered(FilterData data)

@@ -4,6 +4,7 @@
 #include <set>
 #include <string>
 #include <list>
+#include <mutex>
 #include "ItemStackData.h"
 #include "imgui.h"
 #include "tinyxml\tinyxml2.h"
@@ -18,8 +19,10 @@ typedef ItemStackData* FilterData;
 
 class IFilter{
 protected:
-	std::string name = "Unnamed Filter";
+	std::string name = "Unnamed Filter"; 
 	std::list<ItemData*> filteredItemDatas;
+	int filteredItemDatasStartY = 0;
+	std::recursive_mutex mutex;
 	bool nameCalculated = true;
 	bool markedForDelete = false;
 	bool gotUpdated = false;

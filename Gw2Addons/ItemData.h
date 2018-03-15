@@ -25,16 +25,13 @@ public:
 	ItemType itemtype;
 	std::string name;
 
-	hl::ForeignClass pSkin;
-	hl::ForeignClass pPrefix;
-	hl::ForeignClass pSuffix;
-
 	bool updateTaskActive = false;
 	bool validTradingPostData = false;
 	float lastTradingPostUpdate = 0;
 	float buyTradingPost;
 	float sellTradingPost;
 	uint vendorValue;
+	uint minTPValue;
 	static bool sortName(const ItemData* lhs, const ItemData* rhs) {
 		return lhs->name < rhs->name;
 	}

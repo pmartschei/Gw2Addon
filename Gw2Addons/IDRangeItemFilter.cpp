@@ -15,12 +15,15 @@ std::string IDRangeItemFilter::GetName()
 		displayMin = maxValue;
 		displayMax = minValue;
 	}
-	return "ID Range Filter (ID: " + std::to_string(displayMin) + (maxValue == minValue ? ")" : " to " + std::to_string(displayMax) + ")");
+	return "ID Range Filter (" + std::to_string(displayMin) + (maxValue == minValue ? ")" : " to " + std::to_string(displayMax) + ")");
 }
 
 void IDRangeItemFilter::RenderInput(int & value, std::string s)
 {
-	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##itemid"+s, id), &value);
+	gotUpdated |= ImGui::InputInt(UNIQUE_NO_DELIMITER("##itemid"+s, id), &value);	
+	if (ImGui::IsItemHovered() && !ImGui::IsAnyItemActive()) {
+		value += ImGui::GetIO().MouseWheel;
+	}
 	value = CLAMP(value, 0, 1000000);
 }
 
