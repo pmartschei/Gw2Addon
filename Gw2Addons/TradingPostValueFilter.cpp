@@ -1,4 +1,5 @@
 #include "TradingPostValueFilter.h"
+#include "PluginBase.h"
 
 TradingPostValueFilter::TradingPostValueFilter()
 {
@@ -46,6 +47,7 @@ std::string TradingPostValueFilter::GetName()
 
 bool TradingPostValueFilter::IsFiltered(FilterData data)
 {
+	if (!PluginBase::tpApiEnabled) return false;
 	if (onlyTradingPostSellable && !data->tradingpostSellable) return false;
 
 	float tpValue = data->itemData->buyTradingPost;
@@ -56,13 +58,13 @@ bool TradingPostValueFilter::IsFiltered(FilterData data)
 	if (tpValue == 0.0f) return false;
 
 	if (data->itemData->minTPValue > tpValue) {
-		return false;
+		return true;
 	}
 	if (tradingModus == TradingPostModus::Percent) {
 		if ((float)data->itemData->vendorValue * (value / 100.0f) > tpValue) {
 			return true;
 		}
-	}
+	} 
 	else if (tradingModus == TradingPostModus::Flat) {
 		if (data->itemData->vendorValue + value > tpValue) {
 			return true;
@@ -82,13 +84,15 @@ void TradingPostValueFilter::RenderInput(int & value)
 		min = 50;
 		max = 10000;
 	}
-	gotUpdated |= ImGui::SliderInt(UNIQUE_NO_DELIMITER("##value", id), &value,min,max,format);
+	int before = value;
+	bool sliderUpdate = ImGui::SliderInt(UNIQUE_NO_DELIMITER("##value", id), &value,min,max,format);
 	float wheel = ImGui::GetIO().MouseWheel;
 	if (wheel != 0.0f && ImGui::IsItemHovered() && !ImGui::IsAnyItemActive()) {
-		value += wheel;
-		value = CLAMP(value, min, max);
+		value += (int)wheel;
 		gotUpdated = true;
 	}
+	value = CLAMP(value, min, max);
+	if (sliderUpdate && value != before) gotUpdated = true;
 	/*ImVec2 c = ImGui::CalcTextSize("1g 3s 30c");
 	ImGui::SameLine(tabSpace +
 		(ImGui::GetContentRegionAvailWidth())/2-c.x);
@@ -134,7 +138,7 @@ void TradingPostValueFilter::RenderContent()
 	}
 	ImGui::PopItemWidth();
 
-	ImGui::Text("Value (Percent): ");
+	ImGui::Text("Value : ");
 	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	RenderInput(value);

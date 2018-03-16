@@ -17,6 +17,8 @@ typedef ItemStackData* FilterData;
 
 #define UNIQUE_NO_DELIMITER(t,id) ((std::string(t)+std::to_string(id)).c_str())
 
+#define DRAG_DROP_PAYLOAD_TYPE_FILTER "_PAYFILT"
+
 class IFilter{
 protected:
 	std::string name = "Unnamed Filter"; 
@@ -30,7 +32,6 @@ protected:
 	bool isOpened = true;
 	float tabSpace = 0.0f;
 	FilterFlags flags = FilterFlags::Null;
-	int filteredItems = 0;
 	int id;
 	virtual void RenderContent() = 0;
 	virtual void CustomMenu();
@@ -48,14 +49,18 @@ public:
 	virtual void Serialize(tinyxml2::XMLPrinter& printer);
 	virtual void Deserialize(tinyxml2::XMLElement* element);
 	virtual char* GetSerializeName() = 0;
-	virtual IFilter* CreateNew() = 0;
+	virtual IFilter* CreateNew() = 0;	
+	virtual void DragDropSource();
+	virtual void DragDropTarget() {}
+	virtual bool HasParent(IFilter* filter);
 
 	virtual void SetOpen(bool open);
 	virtual void SetActive(bool active);
 	bool IsActive();
 	bool IsMarkedForDeletion();
 	void SetName(std::string name);
-	int GetFilteredCount();
+
+	IFilter* parent;
 	static int ID;
 };
 #endif

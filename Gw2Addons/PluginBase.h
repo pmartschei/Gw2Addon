@@ -20,6 +20,14 @@ class Plugin;
 #define ADDON_EXCEPTION(msg) ExceptHandler(msg, GetExceptionCode(), GetExceptionInformation(), __FILE__, __FUNCTION__, __LINE__)
 #define IGNORE_EXCEPTION IgnoreExceptHandler()
 
+#define TP_UPDATE_INTERVAL "tpUpdateInterval"
+#define CHAINLOAD_DLL "chainloadDll"
+#define ENABLE_TP_API "enableTPApi"
+#define ENABLE_ESC_WINDOW_CLOSE "enableESCWindowClose"
+#define URL_ITEMS_INFO "urlItemsInfo"
+#define URL_LISTINGS_INFO "urlListingsInfo"
+#define REQUIRES_INTERACTION_KEYBIND "requiresInteractionKeybind"
+
 inline DWORD ExceptHandler(const char *msg, DWORD code, EXCEPTION_POINTERS *ep, const char *file, const char *func, int line) {
 	EXCEPTION_RECORD *er = ep->ExceptionRecord;
 	CONTEXT *ctx = ep->ContextRecord;
@@ -50,6 +58,7 @@ struct KeyBindData {
 	const char* plugin;
 	const char* name;
 	std::set<uint> keys;
+	std::set<uint> newKeys;
 	std::function<void()> func;
 	bool operator<(const KeyBindData& a) {
 		return (*this) < a;
@@ -76,17 +85,28 @@ private:
 
 	std::set<uint> _frameDownKeys;
 	std::set<uint> _downKeys;
+	std::set<uint> lastKeys;
 	std::set<uint> _closeWindowKeys = { VK_ESCAPE };
 	std::list<EventKey> eventKeys;
+	bool frameKeysOneUp;
 
 	InventoryData* inventory;
 	uint inventoryUpdateIndex = 0;
+	bool wasTPEnabled = false;
+	bool hasTPUpdates = false;
 	uint test = 0;
 	ItemData* hoveredItem;
-	KeyBindData* openOptions;
-	std::vector<KeyBindData*> keyBinds;
 
+	std::vector<KeyBindData*> keyBinds;
+	KeyBindData* interactionKeyBind;
+	bool requiresInteraction = false;
+
+	////SAVEDATA
+	KeyBindData* openOptions;
 	std::string chainLoad;
+	bool escCloseEnabled = true;
+
+
 	PluginBaseState pluginBaseState = PluginBaseState::CREATED;
 	ThreadTaskQueue* ttq;
 
@@ -150,8 +170,11 @@ public:
 
 	void CheckInitialize();
 
-	bool PushKeys(std::list<EventKey> eventKeys);
+	void PushKeys(std::list<EventKey> eventKeys);
+	bool InputKeyBind();
 	bool CheckKeyBinds();
+	bool CheckInteractionKeyBind();
+	bool NoKeyBindMode();
 
 	void Render();
 	//METHODS FOR PLUGINS
@@ -168,10 +191,17 @@ public:
 	void RegisterKeyBind(KeyBindData* keybind);
 	void UnregisterKeyBind(KeyBindData* keybind);
 
+	void TPUpdate() { hasTPUpdates = true; }
+
 	static bool KeybindText(std::string suffix, KeyBindData* data);
 	static void RenderKeyBind(KeyBindData* keybind);
 
 	const hl::IHook* GetAlertHook();
 	std::mutex* GetDataMutex();
+
+	static const int MAX_TP_INTERVAL = 60;
+	static const int MIN_TP_INTERVAL = 1;
+	static int tpUpdateInterval;
+	static bool tpApiEnabled;
 };
 #endif

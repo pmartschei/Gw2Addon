@@ -4,6 +4,7 @@
 
 LogLevel Logger::minLevel = LogLevel::Info;
 std::fstream Logger::file;
+std::mutex Logger::mutex;
 
 void Logger::LogTime()
 {
@@ -59,6 +60,7 @@ void Logger::Close()
 
 void Logger::LogString(LogLevel level, std::string info,std::string log)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	if (level < minLevel) return;
 	LogTime();
 	LogInfo(level);

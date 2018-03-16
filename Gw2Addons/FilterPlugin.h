@@ -5,6 +5,11 @@
 #include "RootGroupFilter.h"
 #include "Config.h"
 
+#define MAX_TOOLTIP_SIZE "maxToolTipSize"
+#define ENABLE_ADVANCED_OPTIONS "enableAdvancedOptions"
+#define ENABLE_ASCENDED_RARITY "enableAscendedRarity"
+#define MAX_SELL_RETRY "maxSellRetry"
+
 class Window;
 class FilterPlugin : public Plugin
 {
@@ -12,6 +17,7 @@ private:
 
 	RootGroupFilter* root;
 	RootGroupFilter* stdFilter;
+	RootGroupFilter* ascFilter;
 
 	Window* window;
 	uint lastUpdateIndex;
@@ -20,10 +26,17 @@ private:
 	std::set<FilterData> filteredCollection;
 	std::list<ItemData*> filteredItemDatas;
 	int filteredItemDatasStartY = 0;
-	std::mutex filterMutex;
+
+	////SAVEDATA
 	KeyBindData* copyItemKeyBind = new KeyBindData();
 	KeyBindData* openWindow = new KeyBindData();
+	bool advancedOptions = false;
+	bool ascendedRarity = false;
+	static const int MAX_RETRY = 200;
+	static const int MIN_RETRY = 10;
+	int maxRetry = 100;
 
+	////FILE IMPORT EXPORT
 	char fileName[64] = "Unnamed Filter";
 	bool extraMessageSave = false;
 	bool extraMessageLoad = false;
@@ -35,9 +48,9 @@ private:
 	int fileCount = 0;
 	bool appendLoad = false;
 
-	int lastItemsFilteredCount;
+	////SKIP IDS
 	int curRetry = 0;
-	int maxRetry = 100;
+	const int defaultRetry = 100;
 	int lastSlot = -1;
 	std::vector<int> skipUnsellableIds;
 
@@ -58,6 +71,11 @@ public:
 	virtual void Render() override;
 	virtual void PluginMain() override;
 	virtual void RenderOptions() override;
+
+	////SAVEDATA
+	static int maxTooltipSize;
+	static const int MAX_TOOLTIP = 50;
+	static const int MIN_TOOLTIP = 10;
 };
 struct firstParam {
 	int _;

@@ -15,12 +15,18 @@ void Window::SetOpen(bool open)
 	_opened = open;
 	Config::SaveBool("Windows", _name, _opened);
 	Config::Save();
-	if (!_opened) _focused = false;
+	if (!_opened) ReleaseFocus();
 }
 
 bool Window::IsOpen()
 {
 	return _opened;
+}
+void Window::ReleaseFocus() {
+	if (_focused) {
+		_focused = false;
+		ImGui::SetWindowFocus(NULL);
+	}
 }
 bool Window::IsFocus()
 {

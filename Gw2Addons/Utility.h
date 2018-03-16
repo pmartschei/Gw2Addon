@@ -4,6 +4,17 @@
 #include <vector>
 #include <windows.h>
 #include "main.h"
+#include <imgui.h>
+
+#define TEXTSPACE (150.0f)
+
+struct TooltipColor {
+	const char* tooltip;
+	ImVec4 color;
+public:
+	TooltipColor(const char* tooltip, ImVec4 color) :tooltip(tooltip), color(color) {}
+	TooltipColor(const char* tooltip) :tooltip(tooltip), color(ImGui::GetStyle().Colors[ImGuiCol_Text]) {}
+};
 
 std::wstring s2ws(const std::string & str);
 
@@ -38,4 +49,8 @@ void RenderReadonlyValue(const char* label, uintptr_t value);
 void RenderReadonlyValue(const char* label, std::string value);
 
 bool RenderInputText(const char* label, std::string& value, int size,float posX = 0.0f);
+bool RenderCheckbox(const char* label,bool* b, std::vector<TooltipColor> tooltips = std::vector<TooltipColor>());
+bool RenderInputInt(const char*label, int* value, int min = 0, int max = 0);
+bool RenderSliderInt(const char*label, int* value, int min = 0, int max = 0);
+void RenderTooltip(std::vector<TooltipColor> tooltips);
 #endif

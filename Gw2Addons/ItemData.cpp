@@ -1,4 +1,5 @@
 #include "ItemData.h"
+#include "PluginBase.h"
 
 std::map<uint, ItemData*> ItemData::datas = std::map<uint, ItemData*>();
 
@@ -25,5 +26,5 @@ ItemData * ItemData::GetData(uint id)
 
 bool ItemData::IsOldTradingPostData()
 {
-	return (GetCurrentTime() - lastTradingPostUpdate > 60000);
+	return (GetCurrentTime() - lastTradingPostUpdate > PluginBase::tpUpdateInterval * 60000);
 }

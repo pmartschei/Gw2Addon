@@ -2,6 +2,8 @@
 #include <iterator>
 #include <algorithm>
 #include "AddonColors.h"
+#include "FilterPlugin.h"
+#include "Utility.h"
 
 int IFilter::ID = 0;
 
@@ -39,7 +41,6 @@ std::set<FilterData> IFilter::Filter(std::set<FilterData> collection)
 		filteredSet = InvertSet(collection, filteredSet);
 	}
 	SaveFilteredItemDatas(filteredSet);
-	filteredItems = (int)filteredSet.size();
 	return filteredSet;
 }
 
@@ -48,9 +49,25 @@ bool IFilter::IsFiltered(FilterData data)
 	return false;
 }
 
+void IFilter::DragDropSource() {
+	if (ImGui::BeginDragDropSource()) {
+		IFilter* filter = this;
+		uintptr_t f = (uintptr_t)filter;
+		ImGui::SetDragDropPayload(DRAG_DROP_PAYLOAD_TYPE_FILTER, &f, sizeof(f), ImGuiCond_Once);
+		ImGui::Text("Filter");
+		ImGui::EndDragDropSource();
+	}
+}
+
+bool IFilter::HasParent(IFilter * filter)
+{
+	if (!parent) return false;
+	return parent == filter || parent->HasParent(filter);
+}
+
 void IFilter::Render()
 {
-	tabSpace = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + 140.0f;
+	tabSpace = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth() + TEXTSPACE;
 
 	if (!isActive) {
 		ImGui::PushStyleColor(ImGuiCol_Header, Addon::Colors[AddonColor_DisabledHeader]);
@@ -59,7 +76,8 @@ void IFilter::Render()
 	}
 	ImGui::SetNextTreeNodeOpen(isOpened);
 	isOpened = ImGui::CollapsingHeader(UNIQUE(name, id), ImGuiTreeNodeFlags_DefaultOpen);
-
+	DragDropSource();
+	DragDropTarget();
 	if (!isActive) {
 		ImGui::PopStyleColor(3);
 	}
@@ -96,27 +114,60 @@ void IFilter::Render()
 	float x = ImGui::GetWindowContentRegionWidth() - ImGui::GetContentRegionAvailWidth();
 	if ((ImGui::GetContentRegionMax().x - headerSize - 30.0f - x) > textSize) {
 		ImGui::SameLine(ImGui::GetContentRegionMax().x - textSize);
-		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
-		ImGui::Text(text, filteredItems);
-		ImGui::PopStyleColor();
 
 		int size = filteredItemDatas.size();
-		if (ImGui::IsItemHovered() && size > 0) {
+		if (size > 0) {
 			filteredItemDatas.sort(ItemData::sortName);
 			filteredItemDatas.unique();
 			size = filteredItemDatas.size();
+		}
+		ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
+		ImGui::Text(text, size);
+		ImGui::PopStyleColor();
+		if (ImGui::IsItemHovered() && size > 0) {
 			ImGui::BeginTooltip();
-			ImGui::Text("Use your mouse wheel to scroll");
-			ImGui::Text("");
+			int limit = min(size, FilterPlugin::maxTooltipSize);
+			if (size > limit) {
+				ImGui::Text("Use your mouse wheel to scroll");
+				ImGui::Text("");
+			}
 			ImGuiIO io = ImGui::GetIO();
-			filteredItemDatasStartY += io.MouseWheel;
-			if (filteredItemDatasStartY + 20 >= size) filteredItemDatasStartY = size - 20;
+			filteredItemDatasStartY -= io.MouseWheel;
+			if (filteredItemDatasStartY + FilterPlugin::maxTooltipSize >= size) filteredItemDatasStartY = size - FilterPlugin::maxTooltipSize;
 			if (filteredItemDatasStartY < 0) filteredItemDatasStartY = 0;
-			int limit = min(size, 20);
 			ItemData** arr = new ItemData*[size];
 			std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
 			for (int i = filteredItemDatasStartY; i < filteredItemDatasStartY + limit; i++) {
+				switch (arr[i]->rarity) {
+				case ItemRarity::Junk:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityJunk]);
+					break;
+				case ItemRarity::Basic:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityBasic]);
+					break;
+				case ItemRarity::Fine:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityFine]);
+					break;
+				case ItemRarity::Masterwork:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityMasterwork]);
+					break;
+				case ItemRarity::Rare:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityRare]);
+					break;
+				case ItemRarity::Exotic:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityExotic]);
+					break;
+				case ItemRarity::Ascended:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityAscended]);
+					break;
+				case ItemRarity::Legendary:
+					ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_RarityLegendary]);
+					break;
+				default:
+					ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
+				}
 				ImGui::Text(arr[i]->name.c_str());
+				ImGui::PopStyleColor();
 			}
 			delete[] arr;
 			ImGui::EndTooltip();
@@ -215,8 +266,4 @@ std::set<ItemStackData*> IFilter::InvertSet(std::set<ItemStackData*> fullData,st
 		return invers;
 	}
 	return selectedData;
-}
-
-int IFilter::GetFilteredCount() {
-	return filteredItems;
 }

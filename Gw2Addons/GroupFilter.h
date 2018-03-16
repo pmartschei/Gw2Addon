@@ -6,7 +6,9 @@
 
 class GroupFilter : public IFilter {
 protected:
-	std::vector<IFilter*> subFilters;
+	IFilter** subFilters = new IFilter*[1];
+	int filterSize = 1;
+	int filterIndex = 0;
 	// Geerbt über Filter
 	virtual void RenderContent() override;
 	virtual void RenderChildren();
@@ -17,7 +19,7 @@ public:
 	GroupFilter();
 	~GroupFilter();
 	void AddFilter(IFilter* filter);
-	std::vector<IFilter*>::iterator RemoveFilter(IFilter* filter);
+	void RemoveFilter(IFilter* filter);
 	void RemoveAndDeleteAll();
 
 	virtual void CheckForDeletion();
@@ -29,5 +31,6 @@ public:
 	virtual void ResetUpdateState() override;
 	virtual char* GetSerializeName() override;
 	virtual void SetOpen(bool open) override;
+	virtual void DragDropTarget() override;
 };
 #endif

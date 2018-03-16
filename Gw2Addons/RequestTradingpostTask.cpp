@@ -20,17 +20,19 @@ void RequestTradingpostTask::run()
 	data->updateTaskActive = false;
 	std::string idStr = std::to_string(data->id);
 	HttpDownloader downloader;
-	std::string jsonInfo = downloader.download(PluginBase::GetInstance()->GetItemInfoUrl() + idStr);
+	std::string url = PluginBase::GetInstance()->GetItemInfoUrl() + idStr;
+	std::string jsonInfo = downloader.download(url);
 	if (jsonInfo.empty()) {
-		Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not download ItemInfo for Item : " + idStr);
+		Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not download ItemInfo for item " + idStr + " url = " + url);
 		return;
 	}
-
+	jsonInfo.erase(std::remove(jsonInfo.begin(), jsonInfo.end(), '\n'), jsonInfo.end());
 	JSONValue* value = JSON::Parse(jsonInfo.c_str());
 	if (!value) return;
 	JSONObject root = value->AsObject();
 	if (root.find(L"vendor_value") == root.end()) {
 		delete value;
+		Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not find vendor_value for item " + idStr + " url = " + url);
 		return;
 	}
 
@@ -39,10 +41,10 @@ void RequestTradingpostTask::run()
 
 	delete value;
 	//can theoretically parse anything on api
-
-	jsonInfo = downloader.download(PluginBase::GetInstance()->GetPricesUrl() + idStr);
+	url = PluginBase::GetInstance()->GetPricesUrl() + idStr;
+	jsonInfo = downloader.download(url);
 	if (jsonInfo.empty()) {
-		Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not download Prices for Item : " + idStr);
+		Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not download Prices for item " + idStr+" url = " + url);
 		return;
 	}
 	jsonInfo.erase(std::remove(jsonInfo.begin(), jsonInfo.end(), '\n'), jsonInfo.end());
@@ -50,6 +52,12 @@ void RequestTradingpostTask::run()
 	if (!value) return;
 	root = value->AsObject();
 	if (root.find(L"buys") == root.end() || root.find(L"sells") == root.end()) {
+		if (root.find(L"text") != root.end()) {
+			Logger::LogString(LogLevel::Info, MAIN_INFO, "No buys and sells for item " + idStr);
+		}
+		else {
+			Logger::LogString(LogLevel::Error, MAIN_INFO, "Could not find buys and sells for item " + idStr + " url = " + url);
+		}
 		delete value;
 		return;
 	}
@@ -97,4 +105,5 @@ void RequestTradingpostTask::run()
 	
 	data->validTradingPostData = true;
 	delete value;
+	PluginBase::GetInstance()->TPUpdate();
 }

@@ -448,7 +448,7 @@ void PluginBase::Render()
 				Config::Save();
 			}
 			RenderKeyBind(openOptions);
-			if (RenderCheckbox("Enable ESC Closing", &escCloseEnabled, std::vector<TooltipColor> { TooltipColor("Test Tooltip"), TooltipColor("DO NOT", Addon::Colors[AddonColor_NegativeText])})) {
+			if (RenderCheckbox("Enable ESC Closing", &escCloseEnabled, std::vector<TooltipColor> { TooltipColor("Test Tooltip"),TooltipColor("\n\n"), TooltipColor("DO NOT", Addon::Colors[AddonColor_NegativeText])})) {
 				Config::SaveBool(MAIN_INFO, ENABLE_ESC_WINDOW_CLOSE, escCloseEnabled);
 				Config::Save();
 			}

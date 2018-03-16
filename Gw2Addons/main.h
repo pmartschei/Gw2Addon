@@ -34,3 +34,4 @@ template <typename T> T CLAMP(const T& value, const T& low, const T& high)
 #define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
 #endif
 #endif
+

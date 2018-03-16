@@ -214,6 +214,7 @@ void RenderTooltip(std::vector<TooltipColor> tooltips) {
 				ImGui::PushStyleColor(ImGuiCol_Text, tooltips[i].color);
 				ImGui::Text(tooltips[i].tooltip);
 				ImGui::PopStyleColor();
+				ImGui::SameLine();
 			}
 		}
 		ImGui::EndTooltip();

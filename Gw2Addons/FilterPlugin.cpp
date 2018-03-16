@@ -13,6 +13,8 @@
 uintptr_t* FilterPlugin::vendorSource = new uintptr_t(0);
 uintptr_t* FilterPlugin::lastCallPtr = new uintptr_t(0);
 
+int FilterPlugin::maxTooltipSize = 20;
+
 void FilterPlugin::Init() {
 	Plugin::Init();
 	LogString(LogLevel::Debug, "Creating window");
@@ -25,12 +27,19 @@ void FilterPlugin::Init() {
 	LogString(LogLevel::Debug, "Creating Filters");
 	root = new RootGroupFilter();
 	stdFilter = new RootGroupFilter();
-	GroupFilter* groupFilter = new GroupFilter();
+	ascFilter = new RootGroupFilter();
+	GroupFilter* safetyFilter = new GroupFilter();
+	GroupFilter* safetyFilterAscended = new GroupFilter();
 	RarityRangeItemFilter* rarityFilter = new RarityRangeItemFilter();
+	RarityRangeItemFilter* rarityFilterAscended = new RarityRangeItemFilter();
 	rarityFilter->SetValues(ItemRarity::Basic, ItemRarity::Ascended);
-	groupFilter->AddFilter(rarityFilter);
-	groupFilter->AddFilter(new SellableItemFilter());
-	stdFilter->AddFilter(groupFilter);
+	rarityFilterAscended->SetValues(ItemRarity::Basic, ItemRarity::Exotic);
+	safetyFilter->AddFilter(rarityFilter);
+	safetyFilter->AddFilter(new SellableItemFilter());
+	safetyFilterAscended->AddFilter(rarityFilterAscended);
+	safetyFilterAscended->AddFilter(new SellableItemFilter());
+	stdFilter->AddFilter(safetyFilter);
+	ascFilter->AddFilter(safetyFilterAscended);
 
 	LogString(LogLevel::Debug, "Filters successfully created");
 
@@ -48,6 +57,12 @@ void FilterPlugin::Init() {
 	openWindow->keys = Config::LoadKeyBinds(openWindow->plugin, openWindow->name, { VK_MENU,VK_SHIFT,'F' });
 	copyItemKeyBind->func = std::bind(&FilterPlugin::AddHoveredItemToFilter, this);
 	openWindow->func = std::bind(&Window::ChangeState, window);
+	maxTooltipSize = (int)Config::LoadLong(GetName(), MAX_TOOLTIP_SIZE, maxTooltipSize);
+	maxTooltipSize = CLAMP(maxTooltipSize, MIN_TOOLTIP, MAX_TOOLTIP);
+	advancedOptions = Config::LoadBool(GetName(), ENABLE_ADVANCED_OPTIONS, false);
+	maxRetry = (int)Config::LoadLong(GetName(), MAX_SELL_RETRY, maxRetry);
+	maxRetry = CLAMP(maxRetry, MIN_RETRY, MAX_RETRY);
+	ascendedRarity = Config::LoadBool(GetName(), ENABLE_ASCENDED_RARITY, ascendedRarity);
 	pluginBase->RegisterKeyBind(copyItemKeyBind);
 	pluginBase->RegisterKeyBind(openWindow);
 	LogString(LogLevel::Info, std::string(GetName())+ " initialization finished");
@@ -81,7 +96,10 @@ void FilterPlugin::PluginMain()
 		vendor.set<int>(0x50, data->slot);
 		vendorFunc(new firstParam{ 0x0,0x31,lastCallPtr }, new secondParam{ 0x0,0x2,0x3 });
 		curRetry++;
-		if (curRetry >= maxRetry) {
+		int max = defaultRetry;
+		if (advancedOptions)
+			max = maxRetry;
+		if (curRetry >= max) {
 			LogString(LogLevel::Info, std::string("Skipping unsellable ID : ").append(std::to_string(data->itemData->id)));
 			skipUnsellableIds.push_back(data->itemData->id);
 		}
@@ -94,8 +112,36 @@ void FilterPlugin::PluginMain()
 void FilterPlugin::RenderOptions()
 {
 	if (ImGui::CollapsingHeader(GetName())) {
+
+		if (RenderSliderInt("Max tooltip size", &maxTooltipSize,MIN_TOOLTIP,MAX_TOOLTIP)) {
+			Config::SaveLong(GetName(), MAX_TOOLTIP_SIZE, maxTooltipSize);
+			Config::Save();
+		}
 		PluginBase::RenderKeyBind(copyItemKeyBind);
 		PluginBase::RenderKeyBind(openWindow);
+		if (RenderCheckbox("Advanced opt.", &advancedOptions)) {
+			Config::SaveBool(GetName(), ENABLE_ADVANCED_OPTIONS, advancedOptions);
+			Config::Save();
+			lastUpdateIndex = 0; //force to reload
+		}
+		if (advancedOptions) {
+			ImGui::Separator();
+			if (RenderCheckbox("Enable ascended", &ascendedRarity)) {
+				Config::SaveBool(GetName(), ENABLE_ASCENDED_RARITY, ascendedRarity);
+				Config::Save();
+				lastUpdateIndex = 0; //force to reload
+			}
+			if (RenderSliderInt("Max sell retries", &maxRetry, MIN_RETRY, MAX_RETRY)) {
+				Config::SaveLong(GetName(), MAX_SELL_RETRY, maxRetry);
+				Config::Save();
+			}
+			ImGui::Text("Unsellable items : ");
+			ImGui::SameLine();
+			ImGui::Text(std::to_string(skipUnsellableIds.size()).c_str());
+			if (ImGui::Button("Clear unsellable items")) {
+				skipUnsellableIds.clear();
+			}
+		}
 	}
 }
 
@@ -114,7 +160,12 @@ void FilterPlugin::UpdateFilter() {
 	if (lastUpdateIndex != updateIndex || defaultFilterUpdated && inventory) {
 		lastUpdateIndex = updateIndex;
 		std::set<ItemStackData*> collection(inventory->itemStackDatas, inventory->itemStackDatas + inventory->realSize);
-		collection = stdFilter->Filter(collection);
+		if (!advancedOptions || !ascendedRarity) {
+			collection = ascFilter->Filter(collection);
+		}
+		else {
+			collection = stdFilter->Filter(collection);
+		}
 		filteredCollection = root->Filter(collection);
 		for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ) {
 			FilterData data = (*filteredCollection.begin());
@@ -125,7 +176,6 @@ void FilterPlugin::UpdateFilter() {
 				++it;
 			}
 		}
-		lastItemsFilteredCount = filteredCollection.size();
 		filteredItemDatas.clear();
 		for (auto it = filteredCollection.begin(); it != filteredCollection.end(); ++it) {
 			FilterData data = (*it);
@@ -240,7 +290,7 @@ void FilterPlugin::RenderMenu() {
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Edit")) {
+		if (ImGui::BeginMenu("Root Filter")) {
 			root->CustomMenu();
 			if (ImGui::Selectable("Expand all")) {
 				root->SetOpen(true);
@@ -250,30 +300,47 @@ void FilterPlugin::RenderMenu() {
 			}
 			ImGui::EndMenu();
 		}
-
+			if (ImGui::BeginDragDropTarget()) {
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DRAG_DROP_PAYLOAD_TYPE_FILTER)) {
+					uintptr_t* f = (uintptr_t*)payload->Data;
+					IFilter* filter = (IFilter*)*f;
+					if (filter && !root->HasParent(filter)) {
+						if (filter->parent) {
+							GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter->parent);
+							if (groupFilter) {
+								groupFilter->RemoveFilter(filter);
+							}
+						}
+						root->AddFilter(filter);
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
 		float textSize = ImGui::CalcTextSize("Total items : 125").x;
 		char* text = "Total items: %3u";
 		float c = ImGui::CalcItemWidth();
 		float a = ImGui::GetContentRegionAvailWidth();
 		if (a > textSize) {
 			ImGui::SameLine(0, a - textSize + ImGui::GetStyle().ColumnsMinSpacing * 2);
-			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
-			ImGui::Text(text, lastItemsFilteredCount);
-			ImGui::PopStyleColor();
 			int size = filteredItemDatas.size();
-			if (ImGui::IsItemHovered() && size > 0) {
+			if (size > 0) {
 				filteredItemDatas.sort(ItemData::sortName);
 				filteredItemDatas.unique();
-				size = filteredItemDatas.size();
+			}
+			size = filteredItemDatas.size();
+			ImGui::PushStyleColor(ImGuiCol_Text, Addon::Colors[AddonColor_PositiveText]);
+			ImGui::Text(text, size);
+			ImGui::PopStyleColor();
+			if (ImGui::IsItemHovered() && size > 0) {
 				ImGui::BeginTooltip();
-				int limit = min(size, 20);
+				int limit = min(size, maxTooltipSize);
 				if (size > limit) {
 					ImGui::Text("Use your mouse wheel to scroll");
 					ImGui::Text("");
 				}
 				ImGuiIO io = ImGui::GetIO();
 				filteredItemDatasStartY -= io.MouseWheel;
-				if (filteredItemDatasStartY + 20 >= size) filteredItemDatasStartY = size - 20;
+				if (filteredItemDatasStartY + maxTooltipSize >= size) filteredItemDatasStartY = size - maxTooltipSize;
 				if (filteredItemDatasStartY < 0) filteredItemDatasStartY = 0;
 				ItemData** arr = new ItemData*[size];
 				std::copy(filteredItemDatas.begin(), filteredItemDatas.end(), arr);
@@ -322,7 +389,6 @@ void FilterPlugin::RenderMenu() {
 
 }
 
-
 void FilterPlugin::ReloadFilterFiles() {
 	for (int i = 0; i < fileCount; i++) {
 		delete[] filesToLoad[i];
@@ -365,7 +431,6 @@ void FilterPlugin::AddHoveredItemToFilter()
 		root->AddFilter(groupFilter);
 	}
 }
-
 
 void FilterPlugin::HookVendorFunc() {
 	proxyVendorLocation = new uintptr_t((uintptr_t)vendorFunc);
@@ -440,8 +505,6 @@ bool FilterPlugin::LoadFilterFrom(RootGroupFilter* rootFilter, const char * name
 	LogString(LogLevel::Info, "Filter successfully loaded");
 	return true;
 }
-
-
 
 bool FilterPlugin::SaveFilterAs(RootGroupFilter* rootFilter, const char * name)
 {

@@ -8,7 +8,6 @@ protected:
 	virtual void SerializeContent(tinyxml2::XMLPrinter & printer) override;
 public:
 	RootGroupFilter();
-	RootGroupFilter(const RootGroupFilter& copy);
 	virtual void Render() override;
 	virtual void Serialize(tinyxml2::XMLPrinter& printer) override;
 	virtual void Deserialize(tinyxml2::XMLElement* element) override;

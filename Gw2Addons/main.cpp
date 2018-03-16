@@ -10,6 +10,9 @@
 	Tradingpost values
 	Filtered Items wegwerfen
 	s_styleData[..] 26 colors for ui etc size 20 
+
+
+	shift modifier eventuell option dafür
 */
 HWND GameWindow = 0;
 WNDPROC BaseWndProc;
@@ -52,7 +55,7 @@ IDirect3D9 *WINAPI Direct3DCreate9(UINT SDKVersion)
 Initializes the DLL 
 */
 void InitDLL() {
-	float f = GetTickCount();
+	ULONG f = GetTickCount();
 	Logger::LogString(LogLevel::Info, MAIN_INFO, std::to_string(f));
 	Logger::LogString(LogLevel::Info, MAIN_INFO, "Addon Started");
 	Logger::Init("IncQol.log");
@@ -97,7 +100,7 @@ bool WINAPI DllMain(HMODULE hModule, DWORD fdwReason, LPVOID lpReserved)
 /*
 Mouse/Keyboard Handler 
 */
-extern LRESULT ImGui_ImplDX9_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	std::list<EventKey> eventKeys;
@@ -115,14 +118,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			if (msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP)
+			/*if (msg == WM_SYSKEYDOWN || msg == WM_SYSKEYUP)
 			{
 				if (((lParam >> 29) & 1) == 1)
 					eventKeys.push_back({ VK_MENU, true });
 				else
 					eventKeys.push_back({ VK_MENU, false });
-			}
-			eventKeys.push_back({ VK_MENU, alt });
+			}*/
+			//eventKeys.push_back({ VK_MENU, alt });
 			eventKeys.push_back({ (uint)wParam, eventDown });
 			break;
 		case WM_LBUTTONDOWN:
@@ -147,9 +150,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 	}
-	ImGui_ImplDX9_WndProcHandler(hWnd, msg, wParam, lParam);
+	pluginBase->PushKeys(eventKeys);
 
-	if (pluginBase->PushKeys(eventKeys)) return true;
+	if (msg != WM_LBUTTONDOWN && msg != WM_LBUTTONUP &&  msg!=WM_MOUSEMOVE && pluginBase->InputKeyBind()) return true;
+	bool imguiInteraction = pluginBase->CheckInteractionKeyBind();
+	if (imguiInteraction)
+		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
 	if (pluginBase->HasFocusWindow() && pluginBase->IsCloseWindowBindDown() ) {
 		pluginBase->CloseFocusedWindow();
@@ -158,10 +164,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	if (pluginBase->CheckKeyBinds()) return true;
 	// Prevent game from receiving input if ImGui requests capture
 	const auto& io = ImGui::GetIO();
-	if (io.WantCaptureMouse) {
+	if (imguiInteraction && io.WantCaptureMouse) {
 		switch (msg) {
 		case WM_LBUTTONDBLCLK:
 		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONDBLCLK:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONDBLCLK:
 		case WM_MOUSEMOVE:
 		case WM_MOUSEWHEEL:
 			return true;
@@ -189,13 +199,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_SYSKEYDOWN:
 	case WM_SYSKEYUP:
 	case WM_CHAR:
-		if (io.WantTextInput)
+		if (io.WantTextInput) {
+			if (!imguiInteraction) {
+				ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+			}
 			return true;
+		}
 		break;
 	}
-
-
 	// Whatever's left should be sent to the game
+	switch (msg) {
+	case WM_LBUTTONDOWN:
+	case WM_MBUTTONDOWN:
+	case WM_RBUTTONDOWN:
+		ImGui::SetWindowFocus(NULL);
+	default:
+		break;
+	}
 	return CallWindowProc(BaseWndProc, hWnd, msg, wParam, lParam);
 }
 

@@ -21,7 +21,8 @@ public:
 
 	bool Begin();
 	void End();
+	void ReleaseFocus();
 	bool IsFocus();
-	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_ShowBorders;
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing;
 };
 #endif

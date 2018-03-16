@@ -3,6 +3,7 @@
 #include <time.h>
 #include <Shlobj.h>
 #include <fstream>
+#include <mutex>
 
 enum LogLevel {
 	Debug = 0,
@@ -11,9 +12,8 @@ enum LogLevel {
 	Critical = 3
 };
 class Logger {
-private:
-	Logger() {};
 protected:
+	static std::mutex mutex;
 	static std::fstream file;
 	static LogLevel minLevel;
 	static void LogTime();

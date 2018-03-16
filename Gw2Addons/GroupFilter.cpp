@@ -33,33 +33,35 @@ std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 	}
 	int activeCount = 0;
 	if (IsActive()) {
-		for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
-			bool filterActive = (*iter)->IsActive();
-			if (filterActive) {
-				activeCount++;
-			}
-			else {
-				continue;
-			}
-			std::set<FilterData> subFilteredSet = (*iter)->Filter(collection);
-			if (flags & FilterFlags::And) {
-				std::set<FilterData> intersection;
-				std::set_intersection(filteredSet.begin(), filteredSet.end(), subFilteredSet.begin(), subFilteredSet.end(), std::inserter(intersection, intersection.end()));
-				filteredSet = intersection;
-			}
-			else if (flags & FilterFlags::Or) {
-				filteredSet.insert(subFilteredSet.begin(), subFilteredSet.end());
+		for (int i = 0; i < filterIndex; i++) {
+			if (subFilters[i]) {
+				bool filterActive = subFilters[i]->IsActive();
+				if (filterActive) {
+					activeCount++;
+				}
+				else {
+					continue;
+				}
+				std::set<FilterData> subFilteredSet = subFilters[i]->Filter(collection);
+				if (flags & FilterFlags::And) {
+					std::set<FilterData> intersection;
+					std::set_intersection(filteredSet.begin(), filteredSet.end(), subFilteredSet.begin(), subFilteredSet.end(), std::inserter(intersection, intersection.end()));
+					filteredSet = intersection;
+				}
+				else if (flags & FilterFlags::Or) {
+					filteredSet.insert(subFilteredSet.begin(), subFilteredSet.end());
+				}
 			}
 		}
 	}
 
 	if (activeCount == 0) {
-		filteredItems = 0;
-		return std::set<FilterData>();
+		filteredSet = std::set<FilterData>();
+		SaveFilteredItemDatas(filteredSet);
+		return filteredSet;
 	}
 	filteredSet = InvertSet(collection, filteredSet);
 	SaveFilteredItemDatas(filteredSet);
-	filteredItems = (int)filteredSet.size();
 	return filteredSet;
 }
 
@@ -68,10 +70,10 @@ bool GroupFilter::Updated()
 	if (gotUpdated) return true;
 
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
-		if ((*iter)->Updated()) return true;
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i]) {
+			if (subFilters[i]->Updated()) return true;
+		}
 	}
 	return false;
 }
@@ -80,10 +82,10 @@ void GroupFilter::ResetUpdateState()
 {
 	IFilter::ResetUpdateState();
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter ) {
-		(*iter)->ResetUpdateState();
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i]) {
+			subFilters[i]->ResetUpdateState();
+		}
 	}
 }
 
@@ -96,10 +98,30 @@ void GroupFilter::SetOpen(bool open)
 {
 	IFilter::SetOpen(open);
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i]) {
+			subFilters[i]->SetOpen(open);
+		}
+	}
+}
 
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
-		(*iter)->SetOpen(open);
+void GroupFilter::DragDropTarget()
+{
+	if (ImGui::BeginDragDropTarget()) {
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DRAG_DROP_PAYLOAD_TYPE_FILTER)) {
+			uintptr_t* f = (uintptr_t*)payload->Data;
+			IFilter* filter = (IFilter*)*f;
+			if (filter && !this->HasParent(filter)) {
+				if (filter->parent) {
+					GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter->parent);
+					if (groupFilter) {
+						groupFilter->RemoveFilter(filter);
+					}
+				}
+				this->AddFilter(filter);
+			}
+		}
+		ImGui::EndDragDropTarget();
 	}
 }
 
@@ -156,37 +178,35 @@ void GroupFilter::CustomMenu()
 void GroupFilter::RemoveAndDeleteAll() {
 
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-
-	for (iter = subFilters.begin(); iter != subFilters.end(); ) {
-		IFilter* filter = *iter;
-		GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter);
-		if (groupFilter) groupFilter->RemoveAndDeleteAll();
-		iter = RemoveFilter(filter);
-		delete filter;
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i]) {
+			IFilter* filter = subFilters[i];
+			GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter);
+			if (groupFilter) groupFilter->RemoveAndDeleteAll();
+			delete filter;
+		}
 	}
 }
 
 void GroupFilter::CheckForDeletion()
 {
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-
-	for (iter = subFilters.begin(); iter != subFilters.end(); ) {
-		IFilter* filter = *iter;
-		GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter);
-		if (filter->IsMarkedForDeletion()) {
-			iter = RemoveFilter(filter);
-			if (groupFilter) {
-				groupFilter->RemoveAndDeleteAll();
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i]) {
+			IFilter* filter = subFilters[i];
+			GroupFilter* groupFilter = dynamic_cast<GroupFilter*>(filter);
+			if (filter->IsMarkedForDeletion()) {
+				if (groupFilter) {
+					groupFilter->RemoveAndDeleteAll();
+				}
+				this->RemoveFilter(filter);
+				delete filter;
 			}
-			delete filter;
-		}
-		else {
-			if (groupFilter) {
-				groupFilter->CheckForDeletion();
+			else {
+				if (groupFilter) {
+					groupFilter->CheckForDeletion();
+				}
 			}
-			++iter;
 		}
 	}
 }
@@ -220,32 +240,54 @@ void GroupFilter::RenderContent() {
 
 void GroupFilter::RenderChildren() {
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
-		(*iter)->Render();
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i])
+			subFilters[i]->Render();
 	}
 }
 
 void GroupFilter::AddFilter(IFilter* filter) {
-	subFilters.push_back(filter);
+	std::lock_guard<std::recursive_mutex> lock(mutex);
+
+	if (filterIndex == filterSize) {
+		filterSize *= 2;
+		IFilter** newFilters = new IFilter*[filterSize];
+		memcpy(newFilters, subFilters, filterIndex * sizeof(IFilter*));
+		delete[] subFilters;
+		subFilters = newFilters;
+	}
+	subFilters[filterIndex] = filter;
+	filter->parent = this;
+	filterIndex++;
 	gotUpdated = true;
 }
 
-std::vector<IFilter*>::iterator GroupFilter::RemoveFilter(IFilter* filter) {
+void GroupFilter::RemoveFilter(IFilter* filter) {
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator it = std::find(subFilters.begin(), subFilters.end(), filter);
+	int i = 0;
+	for (; i < filterIndex; i++) {
+		if (subFilters[i] == filter) {
+			break;
+		}
+	}
+	for (; i < filterIndex; i++) {
+		if (i < filterIndex - 1)
+			subFilters[i] = subFilters[i + 1];
+		else
+			subFilters[i] = nullptr;
+	}
+	filterIndex--;
 	gotUpdated = true;
-	return subFilters.erase(it);
 }
 
 
 void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 {
 	std::lock_guard<std::recursive_mutex> lock(mutex);
-	std::vector<IFilter*>::iterator iter;
-	for (iter = subFilters.begin(); iter != subFilters.end(); ++iter) {
-		(*iter)->Serialize(printer);
+
+	for (int i = 0; i < filterIndex; i++) {
+		if (subFilters[i])
+			subFilters[i]->Serialize(printer);
 	}
 }
 
