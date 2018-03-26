@@ -39,7 +39,7 @@ inline DWORD ExceptHandler(const char *msg, DWORD code, EXCEPTION_POINTERS *ep, 
 
 	//Logger::LogString(LogLevel::Critical, "Exception", "File : " + std::string(file));
 	Symbol((ULONG64)ep->ExceptionRecord->ExceptionAddress);
-	Logger::LogString(LogLevel::Critical, "Exception", "Code : " + ToHex(code));
+	Logger::LogString(LogLevel::Error, "Exception", "Code : " + ToHex(code));
 #else 
 	Logger::LogString(LogLevel::Critical, "Exception", msg);
 #endif

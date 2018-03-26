@@ -147,7 +147,7 @@ void TradingPostValueFilter::RenderContent()
 
 	ImGui::Text("Value : ");
 	RenderTooltip(std::vector<TooltipColor>{TooltipColor("Use Ctrl + Left Mouse for digit input"), TooltipColor("Or use Ctrl + Mouse Wheel for alternative input"),TooltipColor("\n"), TooltipColor("Only items are filtered when their vendor value modified by this value is higher than their buy/sell value.")
-		, TooltipColor("\n\n"), TooltipColor("As an example:"), TooltipColor("vendor value = 20c"), TooltipColor("filter value (Percentage) = 200%%"), TooltipColor("sell value = 30c"), TooltipColor("\n"), TooltipColor("Item will be filtered because 20 * 200%% >= 30")});
+		, TooltipColor("\n\n"), TooltipColor("As an example:"), TooltipColor("vendor value = 20"), TooltipColor("filter value (Percentage) = 200%%"), TooltipColor("sell value = 30"), TooltipColor("\n"), TooltipColor("Item will be filtered because 20 * 200%% >= 30")});
 	ImGui::SameLine(tabSpace);
 	ImGui::PushItemWidth(-1);
 	RenderInput(value);
