@@ -1,0 +1,424 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug-CustomFolder|x64">
+      <Configuration>Debug-CustomFolder</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release(Unoptimized)-CustomFolder|x64">
+      <Configuration>Release(Unoptimized)-CustomFolder</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release(Unoptimizied)|x64">
+      <Configuration>Release(Unoptimizied)</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release-CustomFolder|x64">
+      <Configuration>Release-CustomFolder</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\IncQol\AddonColors.cpp" />
+    <ClCompile Include="..\IncQol\Config.cpp" />
+    <ClCompile Include="..\IncQol\d3d9.cpp" />
+    <ClCompile Include="..\IncQol\FilterFactory.cpp" />
+    <ClCompile Include="..\IncQol\FilterPlugin.cpp" />
+    <ClCompile Include="..\IncQol\FilterPluginUtility.cpp" />
+    <ClCompile Include="..\IncQol\GroupFilter.cpp" />
+    <ClCompile Include="..\IncQol\hacklib\ExeFile.cpp" />
+    <ClCompile Include="..\IncQol\hacklib\ExeFile_WIN32.cpp" />
+    <ClCompile Include="..\IncQol\hacklib\Hooker.cpp" />
+    <ClCompile Include="..\IncQol\hacklib\Memory_WIN32.cpp" />
+    <ClCompile Include="..\IncQol\hacklib\PatternScanner.cpp" />
+    <ClCompile Include="..\IncQol\HttpDownloader.cpp" />
+    <ClCompile Include="..\IncQol\IDItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\IDRangeItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\IFilter.cpp" />
+    <ClCompile Include="..\IncQol\imgui\imgui.cpp" />
+    <ClCompile Include="..\IncQol\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\IncQol\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\IncQol\imgui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="..\IncQol\InventoryData.cpp" />
+    <ClCompile Include="..\IncQol\ItemData.cpp" />
+    <ClCompile Include="..\IncQol\ItemFilterFactory.cpp" />
+    <ClCompile Include="..\IncQol\ItemStackData.cpp" />
+    <ClCompile Include="..\IncQol\JSON\JSON.cpp" />
+    <ClCompile Include="..\IncQol\JSON\JSONValue.cpp" />
+    <ClCompile Include="..\IncQol\LevelItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\LevelRangeItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\Logger.cpp" />
+    <ClCompile Include="..\IncQol\main.cpp" />
+    <ClCompile Include="..\IncQol\Plugin.cpp" />
+    <ClCompile Include="..\IncQol\PluginBase.cpp" />
+    <ClCompile Include="..\IncQol\RarityItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\RarityRangeItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\RequestTradingpostTask.cpp" />
+    <ClCompile Include="..\IncQol\RootGroupFilter.cpp" />
+    <ClCompile Include="..\IncQol\SellableItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\SimpleLogTask.cpp" />
+    <ClCompile Include="..\IncQol\SingleFilter.cpp" />
+    <ClCompile Include="..\IncQol\Task.cpp" />
+    <ClCompile Include="..\IncQol\TaskQueue.cpp" />
+    <ClCompile Include="..\IncQol\ThreadTaskQueue.cpp" />
+    <ClCompile Include="..\IncQol\tinyxml\tinyxml2.cpp" />
+    <ClCompile Include="..\IncQol\TradingPostValueFilter.cpp" />
+    <ClCompile Include="..\IncQol\TypeItemFilter.cpp" />
+    <ClCompile Include="..\IncQol\TypeItemMultiFilter.cpp" />
+    <ClCompile Include="..\IncQol\Utility.cpp" />
+    <ClCompile Include="..\IncQol\Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\IncQol\AddonColors.h" />
+    <ClInclude Include="..\IncQol\BagData.h" />
+    <ClInclude Include="..\IncQol\Config.h" />
+    <ClInclude Include="..\IncQol\d3d9.h" />
+    <ClInclude Include="..\IncQol\FilterFactory.h" />
+    <ClInclude Include="..\IncQol\FilterFlags.h" />
+    <ClInclude Include="..\IncQol\FilterPlugin.h" />
+    <ClInclude Include="..\IncQol\FilterPluginUtility.h" />
+    <ClInclude Include="..\IncQol\ForeignFunction.h" />
+    <ClInclude Include="..\IncQol\GroupFilter.h" />
+    <ClInclude Include="..\IncQol\hacklib\ExeFile.h" />
+    <ClInclude Include="..\IncQol\hacklib\ForeignClass.h" />
+    <ClInclude Include="..\IncQol\hacklib\Handles.h" />
+    <ClInclude Include="..\IncQol\hacklib\Hooker.h" />
+    <ClInclude Include="..\IncQol\hacklib\Memory.h" />
+    <ClInclude Include="..\IncQol\hacklib\PageAllocator.h" />
+    <ClInclude Include="..\IncQol\hacklib\PatternScanner.h" />
+    <ClInclude Include="..\IncQol\HttpDownloader.h" />
+    <ClInclude Include="..\IncQol\IDItemFilter.h" />
+    <ClInclude Include="..\IncQol\IDRangeItemFilter.h" />
+    <ClInclude Include="..\IncQol\IFilter.h" />
+    <ClInclude Include="..\IncQol\imgui\imconfig.h" />
+    <ClInclude Include="..\IncQol\imgui\imgui.h" />
+    <ClInclude Include="..\IncQol\imgui\imgui_impl_dx9.h" />
+    <ClInclude Include="..\IncQol\imgui\imgui_internal.h" />
+    <ClInclude Include="..\IncQol\imgui\stb_rect_pack.h" />
+    <ClInclude Include="..\IncQol\imgui\stb_textedit.h" />
+    <ClInclude Include="..\IncQol\imgui\stb_truetype.h" />
+    <ClInclude Include="..\IncQol\InventoryData.h" />
+    <ClInclude Include="..\IncQol\ItemData.h" />
+    <ClInclude Include="..\IncQol\ItemFilterFactory.h" />
+    <ClInclude Include="..\IncQol\ItemRarity.h" />
+    <ClInclude Include="..\IncQol\ItemStackData.h" />
+    <ClInclude Include="..\IncQol\ItemType.h" />
+    <ClInclude Include="..\IncQol\JSON\JSON.h" />
+    <ClInclude Include="..\IncQol\JSON\JSONValue.h" />
+    <ClInclude Include="..\IncQol\LevelItemFilter.h" />
+    <ClInclude Include="..\IncQol\LevelRangeItemFilter.h" />
+    <ClInclude Include="..\IncQol\Logger.h" />
+    <ClInclude Include="..\IncQol\main.h" />
+    <ClInclude Include="..\IncQol\Plugin.h" />
+    <ClInclude Include="..\IncQol\PluginBase.h" />
+    <ClInclude Include="..\IncQol\PluginBaseState.h" />
+    <ClInclude Include="..\IncQol\RangeFilter.h" />
+    <ClInclude Include="..\IncQol\RarityItemFilter.h" />
+    <ClInclude Include="..\IncQol\RarityRangeItemFilter.h" />
+    <ClInclude Include="..\IncQol\RequestTradingpostTask.h" />
+    <ClInclude Include="..\IncQol\RootGroupFilter.h" />
+    <ClInclude Include="..\IncQol\SellableItemFilter.h" />
+    <ClInclude Include="..\IncQol\simpleini\SimpleIni.h" />
+    <ClInclude Include="..\IncQol\SimpleLogTask.h" />
+    <ClInclude Include="..\IncQol\SingleFilter.h" />
+    <ClInclude Include="..\IncQol\Singleton.h" />
+    <ClInclude Include="..\IncQol\Task.h" />
+    <ClInclude Include="..\IncQol\TaskQueue.h" />
+    <ClInclude Include="..\IncQol\ThreadTaskQueue.h" />
+    <ClInclude Include="..\IncQol\tinyxml\tinyxml2.h" />
+    <ClInclude Include="..\IncQol\TradingPostMode.h" />
+    <ClInclude Include="..\IncQol\TradingPostValueFilter.h" />
+    <ClInclude Include="..\IncQol\TypeItemFilter.h" />
+    <ClInclude Include="..\IncQol\TypeItemMultiFilter.h" />
+    <ClInclude Include="..\IncQol\Utility.h" />
+    <ClInclude Include="..\IncQol\Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\IncQol\main.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\IncQol\imgui_changes.txt" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{7EFE6DCC-544A-4116-9EF2-13C0431356E6}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>GW2Mounts</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+    <ProjectName>IncQol</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-CustomFolder|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-CustomFolder|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimizied)|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimized)-CustomFolder|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug-CustomFolder|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release-CustomFolder|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimizied)|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimized)-CustomFolder|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-CustomFolder|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-CustomFolder|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimizied)|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimized)-CustomFolder|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)imgui\;C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;_ERROR;_DEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
+    </PostBuildEvent>
+    <FxCompile>
+      <EntryPointName />
+      <ShaderModel />
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-CustomFolder|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>CURL_STATICLIB;_SCL_SECURE_NO_WARNINGS;_ERROR;_DEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)Dlls\d3d9-dbg.dll"</Command>
+    </PostBuildEvent>
+    <FxCompile>
+      <EntryPointName>
+      </EntryPointName>
+      <ShaderModel>
+      </ShaderModel>
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release-CustomFolder|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)Dlls\d3d9-opt.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimizied)|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_ERROR;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /Y "$(TargetDir)$(ProjectName).dll" "C:\Guild Wars 2\bin64\d3d9.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release(Unoptimized)-CustomFolder|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_ERROR;NDEBUG;GW2Mounts_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>imgui;tinyxml;F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\include</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ModuleDefinitionFile>main.def</ModuleDefinitionFile>
+      <AdditionalDependencies>libcurl_a.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>F:\Development\libcurl\builds\libcurl-vc-x64-release-static-ipv6-sspi-winssl\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)Dlls\d3d9.dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

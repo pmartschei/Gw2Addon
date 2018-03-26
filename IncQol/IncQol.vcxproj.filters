@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="tinyxml">
+      <UniqueIdentifier>{10113ace-974d-429d-a9ce-7a91a90fa457}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="simpleini">
+      <UniqueIdentifier>{7ca1eab3-9351-416f-bbc7-7d361e7b484c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JSON">
+      <UniqueIdentifier>{aff2d2f3-87ee-4b00-ac95-a06c71685d8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{6c5c5bf3-c60b-46d4-b856-c00677693c41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hacklib">
+      <UniqueIdentifier>{1f19fdbc-1c37-4619-8520-47dd40aaeb9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Addon">
+      <UniqueIdentifier>{3db9fbb4-9dfe-4736-bc25-5c445bea50bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Addon\Threads">
+      <UniqueIdentifier>{54d1e7c8-5242-4f91-a6c5-8f57b3d5b209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Addon\Filterplugin">
+      <UniqueIdentifier>{06365d16-a05c-4fbd-ab3e-028a738dd8a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Addon\Filterplugin\Filter">
+      <UniqueIdentifier>{86590ee9-8d19-49f6-801c-7999d6c03ed6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Addon\HTML">
+      <UniqueIdentifier>{025e3e93-b5af-4cc7-8665-133f98dd9773}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\IncQol\hacklib\Memory.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\PageAllocator.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\PatternScanner.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\ExeFile.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\ForeignClass.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\Handles.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\hacklib\Hooker.h">
+      <Filter>hacklib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\imgui_impl_dx9.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\stb_rect_pack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\stb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\stb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\JSON\JSONValue.h">
+      <Filter>JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\JSON\JSON.h">
+      <Filter>JSON</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\simpleini\SimpleIni.h">
+      <Filter>simpleini</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\tinyxml\tinyxml2.h">
+      <Filter>tinyxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\AddonColors.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\BagData.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Config.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\d3d9.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ForeignFunction.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\InventoryData.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ItemData.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ItemRarity.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ItemStackData.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ItemType.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Logger.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\main.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Plugin.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\PluginBase.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\PluginBaseState.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Singleton.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Utility.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Window.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\FilterFactory.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\FilterFlags.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\FilterPlugin.h">
+      <Filter>Addon\Filterplugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\FilterPluginUtility.h">
+      <Filter>Addon\Filterplugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\GroupFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\HttpDownloader.h">
+      <Filter>Addon\HTML</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\IDItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\IDRangeItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\Task.h">
+      <Filter>Addon\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\TaskQueue.h">
+      <Filter>Addon\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ThreadTaskQueue.h">
+      <Filter>Addon\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\RequestTradingpostTask.h">
+      <Filter>Addon\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\ItemFilterFactory.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\LevelItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\LevelRangeItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\RarityItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\RarityRangeItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\RootGroupFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\SellableItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\SingleFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\TradingPostValueFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\TradingPostMode.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\TypeItemMultiFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\TypeItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\IFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\SimpleLogTask.h">
+      <Filter>Addon\Threads</Filter>
+    </ClInclude>
+    <ClInclude Include="..\IncQol\RangeFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\IncQol\hacklib\Memory_WIN32.cpp">
+      <Filter>hacklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\hacklib\PatternScanner.cpp">
+      <Filter>hacklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\hacklib\ExeFile.cpp">
+      <Filter>hacklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\hacklib\ExeFile_WIN32.cpp">
+      <Filter>hacklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\hacklib\Hooker.cpp">
+      <Filter>hacklib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\imgui\imgui_impl_dx9.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\JSON\JSONValue.cpp">
+      <Filter>JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\JSON\JSON.cpp">
+      <Filter>JSON</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\tinyxml\tinyxml2.cpp">
+      <Filter>tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\AddonColors.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Config.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\d3d9.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\InventoryData.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\ItemData.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\ItemStackData.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Logger.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\main.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Plugin.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\PluginBase.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Utility.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Window.cpp">
+      <Filter>Addon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\RequestTradingpostTask.cpp">
+      <Filter>Addon\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\FilterFactory.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\FilterPlugin.cpp">
+      <Filter>Addon\Filterplugin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\FilterPluginUtility.cpp">
+      <Filter>Addon\Filterplugin</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\GroupFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\HttpDownloader.cpp">
+      <Filter>Addon\HTML</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\IDItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\IDRangeItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\IFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\Task.cpp">
+      <Filter>Addon\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\TaskQueue.cpp">
+      <Filter>Addon\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\ThreadTaskQueue.cpp">
+      <Filter>Addon\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\ItemFilterFactory.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\LevelItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\LevelRangeItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\RarityItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\RarityRangeItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\RootGroupFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\SellableItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\SingleFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\TradingPostValueFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\TypeItemMultiFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\TypeItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\IncQol\SimpleLogTask.cpp">
+      <Filter>Addon\Threads</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\IncQol\main.def">
+      <Filter>Addon</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\IncQol\imgui_changes.txt">
+      <Filter>Addon</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
