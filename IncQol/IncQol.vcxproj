@@ -140,6 +140,7 @@
     <ClInclude Include="..\IncQol\TypeItemMultiFilter.h" />
     <ClInclude Include="..\IncQol\Utility.h" />
     <ClInclude Include="..\IncQol\Window.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\IncQol\main.def" />
