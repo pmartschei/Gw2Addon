@@ -210,6 +210,9 @@ void FilterPlugin::UpdateFilter() {
 void FilterPlugin::Render() {
 	if (window->Begin()) {
 		RenderMenu();
+		if (!vendorSuccessful) {
+			ImGui::TextColored(Addon::Colors[AddonColor::AddonColor_NegativeText], "Selling items does not work!");
+		}
 		root->Render();
 		root->CheckForDeletion();
 		window->End();
@@ -217,6 +220,9 @@ void FilterPlugin::Render() {
 	if (infoWindow->Begin()) {
 		char* text = "Total items: %3u";
 		RenderItemsFiltered(text);
+		if (!vendorSuccessful) {
+			ImGui::TextColored(Addon::Colors[AddonColor::AddonColor_NegativeText], "Selling items does not work!");
+		}
 		infoWindow->End();
 	}
 }
@@ -465,12 +471,13 @@ void FilterPlugin::AddHoveredItemToFilter()
 
 void FilterPlugin::HookVendorFunc() {
 	proxyVendorLocation = new uintptr_t((uintptr_t)vendorFunc);
-	uintptr_t vendorHookBasePtr = hl::FindPattern("C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? e8 ?? ?? ?? ?? 0F B6 9C 24 ?? ?? ?? ?? 4C 8D 25 ?? ?? ?? ??");
+	uintptr_t vendorHookBasePtr = hl::FindPattern("E8 ?? ?? ?? ?? EB ?? BA ?? ?? ?? ?? 41 8B ?? E8 ?? ?? ?? ?? 0F B6 9C 24 ?? ?? ?? ?? 4C 8D ?? ?? ?? ?? ?? 0F B6 BC 24 ?? ?? ?? ??");
+	// "C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? C7 44 24 ?? ?? ?? ?? ?? e8 ?? ?? ?? ?? 0F B6 9C 24 ?? ?? ?? ?? 4C 8D 25 ?? ?? ?? ??");
 	if (!vendorHookBasePtr) {
 		LogString(LogLevel::Error, "Pattern for VendorFunc is invalid");
 		return;
 	}
-	vendorHookBasePtr = hl::FollowRelativeAddress(vendorHookBasePtr + 0x28);
+	vendorHookBasePtr = hl::FollowRelativeAddress(vendorHookBasePtr + 0x1F);
 	if (!vendorHookBasePtr) {
 		LogString(LogLevel::Error, "Follow for VendorFunc is invalid");
 		return;

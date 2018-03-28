@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\IncQol\imgui_changes.txt" />
+    <Text Include="CodeForInventory.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

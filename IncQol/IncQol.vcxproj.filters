@@ -378,5 +378,8 @@
     <Text Include="..\IncQol\imgui_changes.txt">
       <Filter>Addon</Filter>
     </Text>
+    <Text Include="CodeForInventory.txt">
+      <Filter>Addon\Filterplugin</Filter>
+    </Text>
   </ItemGroup>
 </Project>

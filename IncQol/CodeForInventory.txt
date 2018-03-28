@@ -1,0 +1,89 @@
+Gw2-64.exe+BAAC50 - 48 89 5C 24 10        - mov [rsp+10],rbx
+Gw2-64.exe+BAAC55 - 48 89 4C 24 08        - mov [rsp+08],rcx
+Gw2-64.exe+BAAC5A - 55                    - push rbp
+Gw2-64.exe+BAAC5B - 56                    - push rsi
+Gw2-64.exe+BAAC5C - 57                    - push rdi
+Gw2-64.exe+BAAC5D - 41 54                 - push r12
+Gw2-64.exe+BAAC5F - 41 55                 - push r13
+Gw2-64.exe+BAAC61 - 41 56                 - push r14
+Gw2-64.exe+BAAC63 - 41 57                 - push r15
+Gw2-64.exe+BAAC65 - 48 81 EC 80000000     - sub rsp,00000080 { 128 }
+Gw2-64.exe+BAAC6C - 48 8B E9              - mov rbp,rcx
+Gw2-64.exe+BAAC6F - E8 2C2DA4FF           - call Gw2-64.exe+5ED9A0
+Gw2-64.exe+BAAC74 - 48 8B C8              - mov rcx,rax
+Gw2-64.exe+BAAC77 - 48 8B 10              - mov rdx,[rax]
+Gw2-64.exe+BAAC7A - FF 52 20              - call qword ptr [rdx+20]
+Gw2-64.exe+BAAC7D - 48 89 44 24 40        - mov [rsp+40],rax
+Gw2-64.exe+BAAC82 - 48 8B F0              - mov rsi,rax
+Gw2-64.exe+BAAC85 - 48 85 C0              - test rax,rax
+Gw2-64.exe+BAAC88 - 75 19                 - jne Gw2-64.exe+BAACA3
+Gw2-64.exe+BAAC8A - 41 B8 DB000000        - mov r8d,000000DB { 219 }
+Gw2-64.exe+BAAC90 - 48 8D 15 E974A700     - lea rdx,[Gw2-64.exe+1622180] { ["..\..\..\Game\Ui\Widgets\VendorDialog\VendorDialog.cpp"] }
+Gw2-64.exe+BAAC97 - 48 8D 0D 1A75A700     - lea rcx,[Gw2-64.exe+16221B8] { ["vendorInstance"] }
+Gw2-64.exe+BAAC9E - E8 ED8A61FF           - call Gw2-64.exe+1C3790
+Gw2-64.exe+BAACA3 - 48 89 75 58           - mov [rbp+58],rsi
+Gw2-64.exe+BAACA7 - 48 8D 55 48           - lea rdx,[rbp+48]
+Gw2-64.exe+BAACAB - 4C 8B 06              - mov r8,[rsi]
+Gw2-64.exe+BAACAE - 48 8B CE              - mov rcx,rsi
+Gw2-64.exe+BAACB1 - 41 FF 90 D8000000     - call qword ptr [r8+000000D8]
+Gw2-64.exe+BAACB8 - E8 E32CA4FF           - call Gw2-64.exe+5ED9A0
+Gw2-64.exe+BAACBD - 48 8D 55 40           - lea rdx,[rbp+40]
+Gw2-64.exe+BAACC1 - 48 8B C8              - mov rcx,rax
+Gw2-64.exe+BAACC4 - 4C 8B 00              - mov r8,[rax]
+Gw2-64.exe+BAACC7 - 41 FF 50 30           - call qword ptr [r8+30]
+Gw2-64.exe+BAACCB - 8B 4D 08              - mov ecx,[rbp+08]
+Gw2-64.exe+BAACCE - E8 3DFA3E00           - call Gw2-64.exe+F9A710
+Gw2-64.exe+BAACD3 - 89 84 24 D0000000     - mov [rsp+000000D0],eax
+Gw2-64.exe+BAACDA - 44 8B F0              - mov r14d,eax
+Gw2-64.exe+BAACDD - 85 C0                 - test eax,eax
+Gw2-64.exe+BAACDF - 75 19                 - jne Gw2-64.exe+BAACFA
+Gw2-64.exe+BAACE1 - 41 B8 E3000000        - mov r8d,000000E3 { 227 }
+Gw2-64.exe+BAACE7 - 48 8D 15 9274A700     - lea rdx,[Gw2-64.exe+1622180] { ["..\..\..\Game\Ui\Widgets\VendorDialog\VendorDialog.cpp"] }
+Gw2-64.exe+BAACEE - 48 8D 0D D374A700     - lea rcx,[Gw2-64.exe+16221C8] { ["dialogFrameId != 0u"] }
+Gw2-64.exe+BAACF5 - E8 968A61FF           - call Gw2-64.exe+1C3790
+Gw2-64.exe+BAACFA - 48 8B 16              - mov rdx,[rsi]
+Gw2-64.exe+BAACFD - 48 8B CE              - mov rcx,rsi
+Gw2-64.exe+BAAD00 - FF 12                 - call qword ptr [rdx]
+Gw2-64.exe+BAAD02 - 41 B8 B2000000        - mov r8d,000000B2 { 178 }
+Gw2-64.exe+BAAD08 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD0B - 48 8B D0              - mov rdx,rax
+Gw2-64.exe+BAAD0E - E8 8DA3AAFF           - call Gw2-64.exe+6550A0
+Gw2-64.exe+BAAD13 - BA 26000000           - mov edx,00000026 { 38 }
+Gw2-64.exe+BAAD18 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD1B - E8 30A0AAFF           - call Gw2-64.exe+654D50
+Gw2-64.exe+BAAD20 - 33 D2                 - xor edx,edx
+Gw2-64.exe+BAAD22 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD25 - E8 96A0AAFF           - call Gw2-64.exe+654DC0
+Gw2-64.exe+BAAD2A - 33 D2                 - xor edx,edx
+Gw2-64.exe+BAAD2C - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD2F - E8 FCA0AAFF           - call Gw2-64.exe+654E30
+Gw2-64.exe+BAAD34 - 48 8D 54 24 48        - lea rdx,[rsp+48]
+Gw2-64.exe+BAAD39 - C7 44 24 54 00007041  - mov [rsp+54],41700000 { 15.00 }
+Gw2-64.exe+BAAD41 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD44 - C7 44 24 50 00007041  - mov [rsp+50],41700000 { 15.00 }
+Gw2-64.exe+BAAD4C - C7 44 24 4C 00007041  - mov [rsp+4C],41700000 { 15.00 }
+Gw2-64.exe+BAAD54 - C7 44 24 48 00007041  - mov [rsp+48],41700000 { 15.00 }
+Gw2-64.exe+BAAD5C - E8 EFA2AAFF           - call Gw2-64.exe+655050
+Gw2-64.exe+BAAD61 - 48 8B 06              - mov rax,[rsi]
+Gw2-64.exe+BAAD64 - 48 8B CE              - mov rcx,rsi
+Gw2-64.exe+BAAD67 - FF 50 18              - call qword ptr [rax+18]
+Gw2-64.exe+BAAD6A - 48 8B D8              - mov rbx,rax
+Gw2-64.exe+BAAD6D - 48 85 C0              - test rax,rax
+Gw2-64.exe+BAAD70 - 74 19                 - je Gw2-64.exe+BAAD8B
+Gw2-64.exe+BAAD72 - 48 8B C8              - mov rcx,rax
+Gw2-64.exe+BAAD75 - E8 D6E65FFF           - call Gw2-64.exe+1A9450
+Gw2-64.exe+BAAD7A - 85 C0                 - test eax,eax
+Gw2-64.exe+BAAD7C - 74 0D                 - je Gw2-64.exe+BAAD8B
+Gw2-64.exe+BAAD7E - 48 8B D3              - mov rdx,rbx
+Gw2-64.exe+BAAD81 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD84 - E8 C7A1AAFF           - call Gw2-64.exe+654F50
+Gw2-64.exe+BAAD89 - EB 0D                 - jmp Gw2-64.exe+BAAD98
+Gw2-64.exe+BAAD8B - BA 1B000000           - mov edx,0000001B { 27 }
+Gw2-64.exe+BAAD90 - 41 8B CE              - mov ecx,r14d
+Gw2-64.exe+BAAD93 - E8 C8A1AAFF           - call Gw2-64.exe+654F60
+Gw2-64.exe+BAAD98 - 0FB6 9C 24 C0000000   - movzx ebx,byte ptr [rsp+000000C0]
+Gw2-64.exe+BAADA0 - 4C 8D 3D A972A700     - lea r15,[Gw2-64.exe+1622050] { [00000000] } /////// HERE
+Gw2-64.exe+BAADA7 - 0FB6 BC 24 C0000000   - movzx edi,byte ptr [rsp+000000C0]
+Gw2-64.exe+BAADAF - 45 33 ED              - xor r13d,r13d
+Gw2-64.exe+BAADB2 - 48 C7 44 24 48 06000000 - mov [rsp+48],00000006 { 6 }
+Gw2-64.exe+BAADBB - 0F1F 44 00 00         - nop [rax+rax+00]

@@ -78,10 +78,10 @@ inline void Symbol(ULONG64 dwAddr)
 		if (SymName(GetCurrentProcess(), dwAddr, &dwDisplacement, pSym))
 		{
 			if (SymLine(GetCurrentProcess(), dwAddr, &dwDisplacement, &pLine)) {
-				Logger::LogString(LogLevel::Critical, "Exception", "Func: " + std::string(pSym->Name) + " Line: " + std::to_string(pLine.LineNumber));
+				Logger::LogString(LogLevel::Error, "Exception", "Func: " + std::string(pSym->Name) + " Line: " + std::to_string(pLine.LineNumber));
 				return;
 			}
-			Logger::LogString(LogLevel::Critical, "Exception", "Func: " + std::string(pSym->Name));
+			Logger::LogString(LogLevel::Error, "Exception", "Func: " + std::string(pSym->Name));
 		}
 	}
 }
@@ -726,7 +726,7 @@ void PluginBase::ReadItemData(ItemStackData* data, hl::ForeignClass pBase) {
 		data->pPrefix = prepost.call<void*>(0x0);
 		hl::ForeignClass suffix = prepost.call<void*>(0x10, 1);
 		if (suffix) {
-			data->pSuffix = suffix.get<void*>(0x30);
+			//data->pSuffix = suffix.get<void*>(0x30);
 		}
 	}
 	ReadItemBase(&data->itemData, itemPtr);
@@ -743,8 +743,8 @@ void PluginBase::SetupMisc() {
 	if (!element) return;
 	currentPointers.elementParam = element.get<uint>(0x68);
 	hl::ForeignClass objOnElement = element.get<void*>(0x228);
-	currentPointers.objOnElement = (uintptr_t)objOnElement.data();
 	if (!objOnElement) return;
+	currentPointers.objOnElement = (uintptr_t)objOnElement.data();
 	hl::ForeignClass inventory = objOnElement.get<void*>(0xB8);
 	ItemData* data;
 	ItemStackData stackData;
