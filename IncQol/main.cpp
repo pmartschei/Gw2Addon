@@ -236,13 +236,13 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	BaseWndProc = (WNDPROC)GetWindowLongPtr(hFocusWindow, GWLP_WNDPROC);
 	SetWindowLongPtr(hFocusWindow, GWLP_WNDPROC, (LONG_PTR)&WndProc);
 
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins");
 	plugin->Init();
 	pluginBase->AddPlugin(plugin);
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins completed");
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins completed");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins");
 	plugin->PreCreateDevice();
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins completed");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins completed");
 
 	// Create and initialize device
 	IDirect3DDevice9* temp_device = nullptr;
@@ -270,9 +270,9 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	GameWidth = pPresentationParameters->BackBufferWidth;
 	GameHeight = pPresentationParameters->BackBufferHeight;
 
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "PostCreateDevice() plugins");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PostCreateDevice() plugins");
 	plugin->PostCreateDevice();
-	Logger::LogString(LogLevel::Info, MAIN_INFO, "PostCreateDevice() plugins completed");
+	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PostCreateDevice() plugins completed");
 
 
 	return hr;
