@@ -4,6 +4,7 @@
 #include "ItemType.h"
 #include "ItemRarity.h"
 #include "main.h"
+#include "ItemFlags.h"
 #include <map>
 
 class ItemData {
@@ -24,6 +25,7 @@ public:
 	ItemRarity rarity;
 	ItemType itemtype;
 	std::string name;
+	ItemFlags flags;
 
 	bool updateTaskActive = false;
 	bool validTradingPostData = false;
@@ -32,6 +34,9 @@ public:
 	float sellTradingPost;
 	uint vendorValue;
 	uint minTPValue;
+	ItemFlags GetFlags();
+	void SetFlags(ItemFlags flags);
+	bool HasFlags(ItemFlags flags);
 	static bool sortName(const ItemData* lhs, const ItemData* rhs) {
 		return lhs->name < rhs->name;
 	}

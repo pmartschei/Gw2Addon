@@ -5,6 +5,7 @@
 #include "Utility.h"
 #include "FilterPlugin.h"
 #include "PluginBase.h"
+#include "NoDeleteWarningPlugin.h"
 /*
 	TODO: 
 	Tradingpost values
@@ -22,6 +23,7 @@ IDirect3DDevice9* RealDevice = nullptr;
 // Rendering
 
 Plugin* plugin= (Plugin*)new FilterPlugin();
+Plugin* pluginNoDeleteWarning = (Plugin*)new NoDeleteWarningPlugin();
 
 PluginBase* pluginBase;
 
@@ -237,11 +239,13 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	SetWindowLongPtr(hFocusWindow, GWLP_WNDPROC, (LONG_PTR)&WndProc);
 
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins");
-	plugin->Init();
+	plugin->Init(); 
+	pluginNoDeleteWarning->Init();
 	pluginBase->AddPlugin(plugin);
+	//pluginBase->AddPlugin(pluginNoDeleteWarning);
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins completed");
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins");
-	plugin->PreCreateDevice();
+	plugin->PreCreateDevice(); 
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "PreCreateDevice() plugins completed");
 
 	// Create and initialize device

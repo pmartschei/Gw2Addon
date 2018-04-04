@@ -28,3 +28,21 @@ bool ItemData::IsOldTradingPostData()
 {
 	return (GetCurrentTime() - lastTradingPostUpdate > (uint)(PluginBase::tpUpdateInterval * 60000));
 }
+
+ItemFlags ItemData::GetFlags()
+{
+	return flags;
+}
+
+void ItemData::SetFlags(ItemFlags flags)
+{
+	pItemData.set<ItemFlags>(0x38, flags);
+	this->flags = flags;
+}
+
+bool ItemData::HasFlags(ItemFlags flags)
+{
+	return (this->flags & flags);
+}
+
+

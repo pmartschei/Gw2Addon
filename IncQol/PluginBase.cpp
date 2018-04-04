@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "windows.h"
 #include "psapi.h"
+#include "ItemFlags.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
 void __fastcall cbDecodeText(std::string* ctx, wchar_t* decodedText);
@@ -500,6 +501,7 @@ void PluginBase::Render()
 			RenderReadonlyValue("ItemType", currentPointers.hoveredItemData->itemtype);
 			RenderReadonlyValue("Rarity", currentPointers.hoveredItemData->rarity);
 			RenderReadonlyValue("Level", currentPointers.hoveredItemData->level);
+			RenderReadonlyValue("Flags", currentPointers.hoveredItemData->flags);
 			RenderReadonlyValue("Sellable?", currentPointers.hoveredItemData->sellable);
 			RenderReadonlyValue("lastUpd", std::to_string(currentPointers.hoveredItemData->lastTradingPostUpdate));
 			RenderReadonlyValue("Vendor", std::to_string(currentPointers.hoveredItemData->vendorValue));
@@ -680,7 +682,8 @@ void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
 	savedData->pItemData = pBase;
 	savedData->level = pBase.get<int>(0x74);
 	savedData->rarity = (ItemRarity)pBase.get<int>(0x60);
-	savedData->sellable = !(pBase.get<byte>(0x39) & 0x40);
+	savedData->flags = pBase.get<ItemFlags>(0x38);
+	savedData->sellable = !(savedData->flags & ItemFlags::NoSell);
 	savedData->pExtendedType = pBase.get<void*>(0x30);
 	if (savedData->sellable) {
 		savedData->sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);

@@ -75,6 +75,7 @@
     <ClCompile Include="..\IncQol\TypeItemMultiFilter.cpp" />
     <ClCompile Include="..\IncQol\Utility.cpp" />
     <ClCompile Include="..\IncQol\Window.cpp" />
+    <ClCompile Include="NoDeleteWarningPlugin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IncQol\AddonColors.h" />
@@ -140,6 +141,8 @@
     <ClInclude Include="..\IncQol\TypeItemMultiFilter.h" />
     <ClInclude Include="..\IncQol\Utility.h" />
     <ClInclude Include="..\IncQol\Window.h" />
+    <ClInclude Include="ItemFlags.h" />
+    <ClInclude Include="NoDeleteWarningPlugin.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\IncQol\main.def" />

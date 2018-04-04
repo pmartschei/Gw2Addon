@@ -22,7 +22,7 @@ typedef unsigned __int64 mstime;
 #define POINTER_SIZE (8)
 #define MAIN_INFO ("Main")
 
-#define VERSION ("1.0.0")
+#define VERSION ("1.0.2")
 
 template <typename T> T CLAMP(const T& value, const T& low, const T& high)
 {

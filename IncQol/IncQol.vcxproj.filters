@@ -31,6 +31,9 @@
     <Filter Include="Addon\HTML">
       <UniqueIdentifier>{025e3e93-b5af-4cc7-8665-133f98dd9773}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Addon\NoDeleteWarningPlugin">
+      <UniqueIdentifier>{c7dd1ce6-3bd8-45db-a528-87a540bab538}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IncQol\hacklib\Memory.h">
@@ -222,6 +225,12 @@
     <ClInclude Include="..\IncQol\RangeFilter.h">
       <Filter>Addon\Filterplugin\Filter</Filter>
     </ClInclude>
+    <ClInclude Include="ItemFlags.h">
+      <Filter>Addon</Filter>
+    </ClInclude>
+    <ClInclude Include="NoDeleteWarningPlugin.h">
+      <Filter>Addon\NoDeleteWarningPlugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\IncQol\hacklib\Memory_WIN32.cpp">
@@ -367,6 +376,9 @@
     </ClCompile>
     <ClCompile Include="..\IncQol\SimpleLogTask.cpp">
       <Filter>Addon\Threads</Filter>
+    </ClCompile>
+    <ClCompile Include="NoDeleteWarningPlugin.cpp">
+      <Filter>Addon\NoDeleteWarningPlugin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
