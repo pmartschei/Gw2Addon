@@ -1,0 +1,32 @@
+#Story Time
+
+Since a long time, I always wanted to have something changed when vendoring items (especially sigils and runes). Because ANet didn't deliver, I thought that it must be possible to sell specific items from your inventory via an addon. 
+
+&nbsp;
+
+My first idea came like 1.5 years ago, where I had an early prototype that worked, but I didn't like my implementation(no .dll), so I stopped working on it. Then time passed, and 4 to 5 months ago I started working on my addon again. I started from 0 and took another approach to compile my addon as a .dll. 
+
+I was convinced to release my addon some day, so I made the addon usable for everyone. Since the beginning of march, the addon is fully finished. After that I played with my addon for over a month before I decided to ask if the addon would be allowed. The addon 
+
+#Release
+
+Before you download the .dll you should read [README.md](https://github.com/Qouve/IncQol/blob/master/README.md) in the github where you can find all informations about the addon.
+
+Here you can find the [latest release](https://github.com/Qouve/IncQol/releases)
+
+##What does this addon do?
+
+- Filter items from your inventory
+- Sell filtered items when pressing "Sell Junk" in any vendor tab
+
+&nbsp;
+
+Even if it's not that much, it's nice and comfortable
+
+If you have ideas for more quality of life improvements, just tell me and I will look at it.
+
+If you need help with something then just message me on reddit / ingame (Qeve.5743)
+
+#DISCLAIMER
+
+I am **NOT** responsible if items are deleted / sold by mistake or wrong configuration. Use at your own risk.

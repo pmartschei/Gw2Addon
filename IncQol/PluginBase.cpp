@@ -854,6 +854,7 @@ void PluginBase::SetupPlayer() {
 			hl::ForeignClass itemStackPtr = inventoryC.call<void*>(0x108, i);
 			BagData* data = new BagData();
 			bagData[i] = data;
+			if (!itemStackPtr) continue;
 			ReadItemData(data, itemStackPtr);
 			if (data->itemData->pExtendedType) {
 				data->bagSize = data->itemData->pExtendedType.get<int>(0x28);
