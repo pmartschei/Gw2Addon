@@ -132,7 +132,7 @@ void FilterPlugin::RenderOptions()
 			Config::Save();
 			lastCallPtr = new uintptr_t(0);
 		}
-		if (RenderSliderInt("Max tooltip size", &maxTooltipSize, MIN_TOOLTIP, MAX_TOOLTIP, std::vector<TooltipColor>{TooltipColor("Changes how many items will be displayed when hovering over filter count"})) {
+		if (RenderSliderInt("Max tooltip size", &maxTooltipSize, MIN_TOOLTIP, MAX_TOOLTIP, std::vector<TooltipColor>{TooltipColor("Changes how many items will be displayed when hovering over filter count")})) {
 			Config::SaveLong(GetName(), MAX_TOOLTIP_SIZE, maxTooltipSize);
 			Config::Save();
 		}
