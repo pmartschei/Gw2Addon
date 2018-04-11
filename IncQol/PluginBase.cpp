@@ -230,15 +230,17 @@ void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
 	openOptions = new KeyBindData();
 	openOptions->plugin = MAIN_INFO;
-	openOptions->name = "OpenOptions";
-	openOptions->keys = Config::LoadKeyBinds(openOptions->plugin, openOptions->name, { VK_MENU,VK_SHIFT,'1' });
+	openOptions->name = "Open options";
+	openOptions->savename = "OpenOptions";
+	openOptions->keys = Config::LoadKeyBinds(openOptions->plugin, openOptions->savename, { VK_MENU,VK_SHIFT,'1' });
 	openOptions->func = std::bind(&Window::ChangeState, optionWindow);
 	RegisterKeyBind(openOptions);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Registering keybind for option window");
 	interactionKeyBind = new KeyBindData();
 	interactionKeyBind->plugin = MAIN_INFO;
-	interactionKeyBind->name = "InteractWithGUI";
-	interactionKeyBind->keys = Config::LoadKeyBinds(interactionKeyBind->plugin, interactionKeyBind->name, { VK_MENU,VK_SHIFT });
+	interactionKeyBind->name = "Interact with GUI";
+	interactionKeyBind->savename = "InteractWithGUI";
+	interactionKeyBind->keys = Config::LoadKeyBinds(interactionKeyBind->plugin, interactionKeyBind->savename, { VK_MENU,VK_SHIFT });
 	requiresInteraction = Config::LoadBool(MAIN_INFO, REQUIRES_INTERACTION_KEYBIND, false);
 
 	chainLoad = Config::LoadText(MAIN_INFO, CHAINLOAD_DLL, "d3d9_incqol_chain.dll");
@@ -537,7 +539,7 @@ void PluginBase::Render()
 				Config::SaveBool(MAIN_INFO, REQUIRES_INTERACTION_KEYBIND, requiresInteraction);
 				Config::Save();
 			}
-			RenderKeyBind(interactionKeyBind, std::vector<TooltipColor> { TooltipColor("Keybind for interaction with the GUI (if enabled).")});
+			RenderKeyBind(interactionKeyBind, std::vector<TooltipColor> { TooltipColor("Keybind required to interact with the GUI (if enabled).")});
 			if (RenderCheckbox("Enable TP api", &tpApiEnabled, std::vector<TooltipColor> { TooltipColor("Enables the Trading Post API used to generate buy and sell values per item.")})) {
 				Config::SaveBool(MAIN_INFO, ENABLE_TP_API, tpApiEnabled);
 				Config::Save();
@@ -643,7 +645,7 @@ void PluginBase::RenderKeyBind(KeyBindData* keyBind,std::vector<TooltipColor> to
 	if (!keyBind) return;
 	RenderTextPre(keyBind->name, tooltips);
 	if (KeybindText("##" + std::string(keyBind->plugin) + std::string(keyBind->name), keyBind)) {
-		Config::SaveKeyBinds(keyBind->plugin, keyBind->name, keyBind->keys);
+		Config::SaveKeyBinds(keyBind->plugin, keyBind->savename, keyBind->keys);
 		Config::Save();
 	}
 }

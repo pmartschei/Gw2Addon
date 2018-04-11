@@ -61,6 +61,7 @@ struct KeyBindData {
 	bool finished = false;
 	const char* plugin;
 	const char* name;
+	const char* savename;
 	std::set<uint> keys;
 	std::set<uint> newKeys;
 	std::function<void()> func;

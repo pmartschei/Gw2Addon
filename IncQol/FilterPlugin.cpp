@@ -58,12 +58,15 @@ void FilterPlugin::Init() {
 	copyItemKeyBind->plugin = GetName();
 	openWindow->plugin = GetName();
 	openInfoWindow->plugin = GetName();
-	copyItemKeyBind->name = "CopyHoveredItem";
-	openWindow->name = "OpenFilter";
-	openInfoWindow->name = "OpenFilteredInfo";
-	copyItemKeyBind->keys = Config::LoadKeyBinds(copyItemKeyBind->plugin, copyItemKeyBind->name, { VK_MENU,VK_SHIFT,'4' });
-	openWindow->keys = Config::LoadKeyBinds(openWindow->plugin, openWindow->name, { VK_MENU,VK_SHIFT,'2' });
-	openInfoWindow->keys = Config::LoadKeyBinds(openInfoWindow->plugin, openInfoWindow->name, { VK_MENU,VK_SHIFT,'3' });
+	copyItemKeyBind->name = "Copy hovered item";
+	copyItemKeyBind->savename = "CopyHoveredItem";
+	openWindow->name = "Open filter";
+	openWindow->savename = "OpenFilter";
+	openInfoWindow->name = "Open filtered info";
+	openInfoWindow->savename = "OpenFilteredInfo";
+	copyItemKeyBind->keys = Config::LoadKeyBinds(copyItemKeyBind->plugin, copyItemKeyBind->savename, { VK_MENU,VK_SHIFT,'4' });
+	openWindow->keys = Config::LoadKeyBinds(openWindow->plugin, openWindow->savename, { VK_MENU,VK_SHIFT,'2' });
+	openInfoWindow->keys = Config::LoadKeyBinds(openInfoWindow->plugin, openInfoWindow->savename, { VK_MENU,VK_SHIFT,'3' });
 	copyItemKeyBind->func = std::bind(&FilterPlugin::AddHoveredItemToFilter, this);
 	openWindow->func = std::bind(&Window::ChangeState, window);
 	openInfoWindow->func = std::bind(&Window::ChangeState, infoWindow);
@@ -129,7 +132,7 @@ void FilterPlugin::RenderOptions()
 			Config::Save();
 			lastCallPtr = new uintptr_t(0);
 		}
-		if (RenderSliderInt("Max tooltip size", &maxTooltipSize,MIN_TOOLTIP,MAX_TOOLTIP)) {
+		if (RenderSliderInt("Max tooltip size", &maxTooltipSize, MIN_TOOLTIP, MAX_TOOLTIP, std::vector<TooltipColor>{TooltipColor("Changes how many items will be displayed when hovering over filter count"})) {
 			Config::SaveLong(GetName(), MAX_TOOLTIP_SIZE, maxTooltipSize);
 			Config::Save();
 		}
@@ -137,7 +140,7 @@ void FilterPlugin::RenderOptions()
 		PluginBase::RenderKeyBind(openInfoWindow, std::vector<TooltipColor> { TooltipColor("Shows / Hides the small info window.")});
 		PluginBase::RenderKeyBind(copyItemKeyBind, std::vector<TooltipColor> { TooltipColor("Copies the item under the mouse and creates a filter."), TooltipColor("\n"),
 			TooltipColor("Does work:"), TooltipColor("Inventory"), TooltipColor("Material storage"), TooltipColor("Guild Inventory")});
-		if (RenderCheckbox("Advanced opt.", &advancedOptions, std::vector<TooltipColor> { TooltipColor("Enables the advanced options.")})) {
+		if (RenderCheckbox("Advanced opt.", &advancedOptions)) {
 			Config::SaveBool(GetName(), ENABLE_ADVANCED_OPTIONS, advancedOptions);
 			Config::Save();
 			lastUpdateIndex = 0; //force to reload

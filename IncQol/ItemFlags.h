@@ -18,10 +18,12 @@ enum ItemFlags {
 	UnknownFlag2000 = 0x2000,
 	NoSell = 0x4000, 
 	NotUpgradeable = 0x8000,
-	UnknownFlag10000 = 0x1000,
+	UnknownFlag10000 = 0x10000,
 	SoulboundOnUse = 0x20000,
 	Unique = 0x40000,
 	UnknownFlag80000 = 0x80000,
+	UnknownFlag100000 = 0x100000,
+	SAB = 0x200000,
 };
 
 inline ItemFlags operator^(ItemFlags lhs, ItemFlags rhs) {
