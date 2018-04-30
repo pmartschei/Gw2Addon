@@ -37,8 +37,9 @@ void RarityItemFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("value", value);
 }
 
-void RarityItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool RarityItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	value = (ItemRarity)CLAMP(element->IntAttribute("value", 0),0,ItemRarity::RarityCount - 1);
 	name = GetName();
+	return true;
 }

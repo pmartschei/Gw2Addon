@@ -240,7 +240,7 @@ HRESULT f_iD3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins");
 	plugin->Init(); 
-	pluginNoDeleteWarning->Init();
+	//pluginNoDeleteWarning->Init();
 	pluginBase->AddPlugin(plugin);
 	//pluginBase->AddPlugin(pluginNoDeleteWarning);
 	//Logger::LogString(LogLevel::Info, MAIN_INFO, "Initializing plugins completed");

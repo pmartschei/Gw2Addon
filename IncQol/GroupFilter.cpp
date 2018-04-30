@@ -25,6 +25,9 @@ GroupFilter::~GroupFilter() {
 }
 std::set<FilterData> GroupFilter::Filter(std::set<FilterData> collection)
 {
+	if (filterIndex == 0) {
+		return IFilter::Filter(collection);
+	}
 	std::lock_guard<std::recursive_mutex> lock(mutex);
 	std::set<FilterData> filteredSet;
 	std::vector<IFilter*>::iterator iter;
@@ -108,7 +111,7 @@ void GroupFilter::SetOpen(bool open)
 
 void GroupFilter::DragDropTarget()
 {
-	if (ImGui::BeginDragDropTarget()) {
+	if (supportDrop &&	ImGui::BeginDragDropTarget()) {
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(DRAG_DROP_PAYLOAD_TYPE_FILTER)) {
 			uintptr_t* f = (uintptr_t*)payload->Data;
 			IFilter* filter = (IFilter*)*f;
@@ -215,16 +218,18 @@ void GroupFilter::CheckForDeletion()
 }
 
 void GroupFilter::RenderContent() {
-	char *cpy = new char[64];
-	strcpy_s(cpy,64, name.c_str());
+	if (showNameInput) {
+		char *cpy = new char[64];
+		strcpy_s(cpy, 64, name.c_str());
 
-	ImGui::Text("Name : ");
-	ImGui::SameLine(tabSpace);
-	ImGui::PushItemWidth(-1);
-	gotUpdated |= ImGui::InputText(UNIQUE_NO_DELIMITER("##nameinput", id), cpy, 64);
-	ImGui::PopItemWidth();
-
-	name = std::string(cpy);
+		ImGui::Text("Name : ");
+		ImGui::SameLine(tabSpace);
+		ImGui::PushItemWidth(-1);
+		gotUpdated |= ImGui::InputText(UNIQUE_NO_DELIMITER("##nameinput", id), cpy, 64);
+		ImGui::PopItemWidth();
+		name = std::string(cpy);
+		delete[] cpy;
+	}
 	ImGui::Text("Operation : ");
 	ImVec4 colorAnd = flags & FilterFlags::And ? Addon::Colors[AddonColor_PositiveText] : ImGui::GetStyle().Colors[ImGuiCol_Text];
 	ImVec4 colorOr = flags & FilterFlags::Or ? Addon::Colors[AddonColor_PositiveText] : ImGui::GetStyle().Colors[ImGuiCol_Text];
@@ -250,9 +255,16 @@ void GroupFilter::RenderContent() {
 
 void GroupFilter::RenderChildren() {
 	std::lock_guard<std::recursive_mutex> lock(mutex);
+	int oldActive = activeChildFilters;
+	activeChildFilters = 0;
 	for (int i = 0; i < filterIndex; i++) {
-		if (subFilters[i])
+		if (subFilters[i]) {
+			if (subFilters[i]->IsActive()) activeChildFilters++;
 			subFilters[i]->Render();
+		}
+	}
+	if (activeChildFilters != oldActive) {
+		name = GetName();
 	}
 }
 
@@ -270,6 +282,7 @@ void GroupFilter::AddFilter(IFilter* filter) {
 	filter->parent = this;
 	filterIndex++;
 	gotUpdated = true;
+	activeChildFilters++;
 }
 
 void GroupFilter::RemoveFilter(IFilter* filter) {
@@ -280,6 +293,7 @@ void GroupFilter::RemoveFilter(IFilter* filter) {
 			break;
 		}
 	}
+	if (filter->IsActive()) activeChildFilters--;
 	for (; i < filterIndex; i++) {
 		if (i < filterIndex - 1)
 			subFilters[i] = subFilters[i + 1];
@@ -301,9 +315,8 @@ void GroupFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	}
 }
 
-void GroupFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool GroupFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
-
 	tinyxml2::XMLElement* child = element->FirstChildElement();
 	tinyxml2::XMLElement* currentChild;
 	while (child) {
@@ -315,8 +328,13 @@ void GroupFilter::DeserializeContent(tinyxml2::XMLElement * element)
 		IFilter* filter = iff.get(type);
 		if (!filter) continue;
 		filter = filter->CreateNew();
-		filter->Deserialize(currentChild);
-		AddFilter(filter);
+		if (filter->Deserialize(currentChild)) {
+			AddFilter(filter);
+		}
+		else {
+			delete filter;
+		}
 	}
+	return true;
 }
 

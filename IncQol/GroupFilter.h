@@ -9,17 +9,20 @@ protected:
 	IFilter** subFilters = new IFilter*[1];
 	int filterSize = 1;
 	int filterIndex = 0;
+	int activeChildFilters = 0;
+	bool showNameInput = true;
+	bool supportDrop = true;
 	// Geerbt über Filter
 	virtual void RenderContent() override;
 	virtual void RenderChildren();
 	virtual void SerializeContent(tinyxml2::XMLPrinter & printer) override;
-	virtual void DeserializeContent(tinyxml2::XMLElement * element) override;
+	virtual bool DeserializeContent(tinyxml2::XMLElement * element) override;
 	virtual IFilter* CreateNew() override;
 public:
 	GroupFilter();
 	~GroupFilter();
-	void AddFilter(IFilter* filter);
-	void RemoveFilter(IFilter* filter);
+	virtual void AddFilter(IFilter* filter);
+	virtual void RemoveFilter(IFilter* filter);
 	void RemoveAndDeleteAll();
 
 	virtual void CheckForDeletion();

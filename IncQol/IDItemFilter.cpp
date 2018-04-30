@@ -40,8 +40,9 @@ void IDItemFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("value", value);
 }
 
-void IDItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool IDItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	value = CLAMP(element->IntAttribute("value", 0), 0, 1000000); 
 	name = GetName();
+	return true;
 }

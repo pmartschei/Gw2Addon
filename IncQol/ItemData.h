@@ -5,6 +5,7 @@
 #include "ItemRarity.h"
 #include "main.h"
 #include "ItemFlags.h"
+#include "ExtendedItemType.h"
 #include <map>
 
 class ItemData {
@@ -17,6 +18,7 @@ public:
 	static ItemData* GetData(uint id);
 
 	bool IsOldTradingPostData();
+
 	hl::ForeignClass pItemData;
 	hl::ForeignClass pExtendedType;
 	uint id = 0;
@@ -26,6 +28,7 @@ public:
 	ItemType itemtype;
 	std::string name;
 	ItemFlags flags;
+	ExtendedItemType* extendedItemType = nullptr;
 
 	bool updateTaskActive = false;
 	bool validTradingPostData = false;

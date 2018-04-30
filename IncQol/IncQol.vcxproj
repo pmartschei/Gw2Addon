@@ -30,7 +30,6 @@
     <ClCompile Include="..\IncQol\AddonColors.cpp" />
     <ClCompile Include="..\IncQol\Config.cpp" />
     <ClCompile Include="..\IncQol\d3d9.cpp" />
-    <ClCompile Include="..\IncQol\FilterFactory.cpp" />
     <ClCompile Include="..\IncQol\FilterPlugin.cpp" />
     <ClCompile Include="..\IncQol\FilterPluginUtility.cpp" />
     <ClCompile Include="..\IncQol\GroupFilter.cpp" />
@@ -65,7 +64,6 @@
     <ClCompile Include="..\IncQol\RootGroupFilter.cpp" />
     <ClCompile Include="..\IncQol\SellableItemFilter.cpp" />
     <ClCompile Include="..\IncQol\SimpleLogTask.cpp" />
-    <ClCompile Include="..\IncQol\SingleFilter.cpp" />
     <ClCompile Include="..\IncQol\Task.cpp" />
     <ClCompile Include="..\IncQol\TaskQueue.cpp" />
     <ClCompile Include="..\IncQol\ThreadTaskQueue.cpp" />
@@ -76,6 +74,8 @@
     <ClCompile Include="..\IncQol\Utility.cpp" />
     <ClCompile Include="..\IncQol\Window.cpp" />
     <ClCompile Include="NoDeleteWarningPlugin.cpp" />
+    <ClCompile Include="SubTypeItemFilter.cpp" />
+    <ClCompile Include="UpgradeComponentType.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IncQol\AddonColors.h" />
@@ -141,8 +141,11 @@
     <ClInclude Include="..\IncQol\TypeItemMultiFilter.h" />
     <ClInclude Include="..\IncQol\Utility.h" />
     <ClInclude Include="..\IncQol\Window.h" />
+    <ClInclude Include="ExtendedItemType.h" />
     <ClInclude Include="ItemFlags.h" />
     <ClInclude Include="NoDeleteWarningPlugin.h" />
+    <ClInclude Include="SubTypeItemFilter.h" />
+    <ClInclude Include="UpgradeComponentType.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\IncQol\main.def" />

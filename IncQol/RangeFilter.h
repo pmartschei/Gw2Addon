@@ -5,7 +5,6 @@
 template<class T>
 class RangeFilter : public IFilter {
 protected:
-	virtual std::string GetName() = 0;
 	T minValue;
 	T maxValue;
 public:

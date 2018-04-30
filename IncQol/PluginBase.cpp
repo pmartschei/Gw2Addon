@@ -10,6 +10,7 @@
 #include "windows.h"
 #include "psapi.h"
 #include "ItemFlags.h"
+#include "UpgradeComponentType.h"
 
 void __fastcall hkGameThread(uintptr_t, int, int);
 void __fastcall cbDecodeText(std::string* ctx, wchar_t* decodedText);
@@ -224,7 +225,7 @@ void PluginBase::Init() {
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating option window");
 	char* buf = new char[128];
 	sprintf(buf, "Options - IncQol %s ###Options", VERSION);
-	optionWindow = new Window(buf);
+	optionWindow = new Window(buf,true,"Options");
 	optionWindow->SetMinSize(ImVec2(300, 300));
 	AddWindow(optionWindow);
 	Logger::LogString(LogLevel::Debug, MAIN_INFO, "Creating keybind for option window");
@@ -671,6 +672,18 @@ std::string PluginBase::GetPricesUrl()
 {
 	return configPricesUrl;
 }
+void PluginBase::ReadItemExtendedType(ItemData** data, hl::ForeignClass pType) {
+
+	ItemData* realData = *data;
+	if (realData->itemtype == ItemType::UpgradeComponent) {
+		UpgradeComponentType* uct = new UpgradeComponentType();
+		uct->type = pType.get<int>(0x24);
+		if (realData->extendedItemType) {
+			delete realData->extendedItemType;
+		}
+		realData->extendedItemType = uct;
+	}
+}
 void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
 	uint id = pBase.get<uint>(0x28);
 	ItemData* savedData = ItemData::GetData(id);
@@ -691,6 +704,8 @@ void PluginBase::ReadItemBase(ItemData** data, hl::ForeignClass pBase) {
 		savedData->sellable = (pBase.get<byte>(0x88) > 0x0 || pBase.get<byte>(0x4c) > 0x0);
 	}
 	savedData->itemtype = (ItemType)pBase.get<int>(0x2C);
+	ReadItemExtendedType(&savedData, savedData->pExtendedType);
+	
 	if (tpApiEnabled && !savedData->updateTaskActive && savedData->IsOldTradingPostData()) {
 		test++;
 		savedData->updateTaskActive = true;

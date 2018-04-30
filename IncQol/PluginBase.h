@@ -153,6 +153,7 @@ private:
 	void SetupGuild();
 	void ReadItemData(ItemStackData* data, hl::ForeignClass pBase);
 	void ReadItemBase(ItemData** data, hl::ForeignClass pBase);
+	void ReadItemExtendedType(ItemData** data, hl::ForeignClass pType);
 	bool KeysDown(std::set<uint> keys);
 	void SetInventory(InventoryData* data);
 	void SetHoveredItem(ItemData* data);

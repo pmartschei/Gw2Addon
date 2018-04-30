@@ -52,9 +52,10 @@ void LevelRangeItemFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("maxValue", maxValue);
 }
 
-void LevelRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool LevelRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	minValue = CLAMP(element->IntAttribute("minValue", 0), 0, 80);
 	maxValue = CLAMP(element->IntAttribute("maxValue", 0), 0, 80);
 	name = GetName();
+	return true;
 }

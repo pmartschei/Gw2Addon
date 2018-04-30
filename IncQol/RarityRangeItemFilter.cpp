@@ -52,9 +52,10 @@ void RarityRangeItemFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("maxValue", maxValue);
 }
 
-void RarityRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool RarityRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	minValue = (ItemRarity)CLAMP(element->IntAttribute("minValue", 0), 0, ItemRarity::RarityCount - 1);
 	maxValue = (ItemRarity)CLAMP(element->IntAttribute("maxValue", 0), 0, ItemRarity::RarityCount - 1);
 	name = GetName();
+	return true;
 }

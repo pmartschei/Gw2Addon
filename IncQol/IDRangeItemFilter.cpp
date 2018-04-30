@@ -53,9 +53,10 @@ void IDRangeItemFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("maxValue", maxValue);
 }
 
-void IDRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool IDRangeItemFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	minValue = CLAMP(element->IntAttribute("minValue", 0), 0, 1000000);
 	maxValue = CLAMP(element->IntAttribute("maxValue", 0), 0, 1000000);
 	name = GetName();
+	return true;
 }

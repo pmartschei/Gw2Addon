@@ -34,6 +34,9 @@
     <Filter Include="Addon\NoDeleteWarningPlugin">
       <UniqueIdentifier>{c7dd1ce6-3bd8-45db-a528-87a540bab538}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Addon\ExtendedItemTypes">
+      <UniqueIdentifier>{7b8d88c2-da23-400e-bbc9-7c59db10ae25}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\IncQol\hacklib\Memory.h">
@@ -231,6 +234,15 @@
     <ClInclude Include="NoDeleteWarningPlugin.h">
       <Filter>Addon\NoDeleteWarningPlugin</Filter>
     </ClInclude>
+    <ClInclude Include="ExtendedItemType.h">
+      <Filter>Addon\ExtendedItemTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="UpgradeComponentType.h">
+      <Filter>Addon\ExtendedItemTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="SubTypeItemFilter.h">
+      <Filter>Addon\Filterplugin\Filter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\IncQol\hacklib\Memory_WIN32.cpp">
@@ -308,9 +320,6 @@
     <ClCompile Include="..\IncQol\RequestTradingpostTask.cpp">
       <Filter>Addon\Threads</Filter>
     </ClCompile>
-    <ClCompile Include="..\IncQol\FilterFactory.cpp">
-      <Filter>Addon\Filterplugin\Filter</Filter>
-    </ClCompile>
     <ClCompile Include="..\IncQol\FilterPlugin.cpp">
       <Filter>Addon\Filterplugin</Filter>
     </ClCompile>
@@ -362,9 +371,6 @@
     <ClCompile Include="..\IncQol\SellableItemFilter.cpp">
       <Filter>Addon\Filterplugin\Filter</Filter>
     </ClCompile>
-    <ClCompile Include="..\IncQol\SingleFilter.cpp">
-      <Filter>Addon\Filterplugin\Filter</Filter>
-    </ClCompile>
     <ClCompile Include="..\IncQol\TradingPostValueFilter.cpp">
       <Filter>Addon\Filterplugin\Filter</Filter>
     </ClCompile>
@@ -379,6 +385,12 @@
     </ClCompile>
     <ClCompile Include="NoDeleteWarningPlugin.cpp">
       <Filter>Addon\NoDeleteWarningPlugin</Filter>
+    </ClCompile>
+    <ClCompile Include="UpgradeComponentType.cpp">
+      <Filter>Addon\ExtendedItemTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="SubTypeItemFilter.cpp">
+      <Filter>Addon\Filterplugin\Filter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

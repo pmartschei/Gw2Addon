@@ -5,7 +5,6 @@ SellableItemFilter::SellableItemFilter() {
 	name = GetName();
 }
 
-
 std::string SellableItemFilter::GetName()
 {
 	return "Sellable Filter (" + std::to_string(value) + ")";

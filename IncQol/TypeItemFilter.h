@@ -9,7 +9,7 @@ protected:
 	// Geerbt über Filter
 	virtual IFilter* CreateNew() override;
 	virtual void SerializeContent(tinyxml2::XMLPrinter &printer) override;
-	virtual void DeserializeContent(tinyxml2::XMLElement* element) override;
+	virtual bool DeserializeContent(tinyxml2::XMLElement* element) override;
 public:
 	TypeItemFilter();
 
@@ -18,6 +18,11 @@ public:
 	virtual bool IsFiltered(FilterData data) override;
 	// Geerbt über Filter
 	virtual char* GetSerializeName() override;
+
+	virtual void CustomMenu() override;
+
+	virtual void AddFilter(IFilter* filter) override;
+	virtual void RemoveFilter(IFilter* filter) override;
 
 };
 #endif

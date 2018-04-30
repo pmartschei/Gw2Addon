@@ -26,7 +26,7 @@ void TradingPostValueFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("sellable", onlyTradingPostSellable);
 }
 
-void TradingPostValueFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool TradingPostValueFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	tradingModus = (TradingPostMode)element->IntAttribute("tradingMode", TradingPostMode::Percent);
 	tradingModus = (TradingPostMode)CLAMP(tradingModus, TradingPostMode::Percent, (TradingPostMode)(TradingPostMode::ModesCount - 1));
@@ -41,6 +41,7 @@ void TradingPostValueFilter::DeserializeContent(tinyxml2::XMLElement * element)
 	value = CLAMP(element->IntAttribute("value", min), min, max);
 	onlyTradingPostSellable = element->BoolAttribute("sellable", false);
 	name = GetName();
+	return true;
 }
 
 std::string TradingPostValueFilter::GetName()

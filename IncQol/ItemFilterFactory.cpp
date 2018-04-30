@@ -9,6 +9,7 @@
 #include "GroupFilter.h"
 #include "TradingPostValueFilter.h"
 #include "TypeItemMultiFilter.h"
+#include "SubTypeItemFilter.h"
 #include <vector>
 
 ItemFilterFactory::ItemFilterFactory()
@@ -24,6 +25,7 @@ ItemFilterFactory::ItemFilterFactory()
 		new GroupFilter(),
 		new TradingPostValueFilter(),
 		new TypeItemMultiFilter(),
+		new SubTypeItemFilter(ItemType::None),
 	};
 	for (int i = 0; i < filters.size(); i++) {
 		IFilter* filter = filters[i];

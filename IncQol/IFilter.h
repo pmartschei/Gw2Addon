@@ -30,6 +30,7 @@ protected:
 	bool gotUpdated = false;
 	bool isActive = true;
 	bool isOpened = true;
+	bool supportDrag = true;
 	float tabSpace = 0.0f;
 	FilterFlags flags = FilterFlags::Null;
 	int id;
@@ -37,7 +38,8 @@ protected:
 	virtual void CustomMenu();
 	virtual void SaveFilteredItemDatas(std::set<FilterData> filteredSet);
 	virtual void SerializeContent(tinyxml2::XMLPrinter& printer);
-	virtual void DeserializeContent(tinyxml2::XMLElement* element);
+	virtual bool DeserializeContent(tinyxml2::XMLElement* element);
+	virtual std::string GetName() { return name; }
 	std::set<FilterData> InvertSet(std::set<FilterData> fullData,std::set<FilterData> selectedData);
 public:
 	IFilter();
@@ -47,7 +49,7 @@ public:
 	virtual bool Updated();
 	virtual void ResetUpdateState();
 	virtual void Serialize(tinyxml2::XMLPrinter& printer);
-	virtual void Deserialize(tinyxml2::XMLElement* element);
+	virtual bool Deserialize(tinyxml2::XMLElement* element);
 	virtual char* GetSerializeName() = 0;
 	virtual IFilter* CreateNew() = 0;	
 	virtual void DragDropSource();

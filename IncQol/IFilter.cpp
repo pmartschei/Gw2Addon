@@ -50,7 +50,7 @@ bool IFilter::IsFiltered(FilterData data)
 }
 
 void IFilter::DragDropSource() {
-	if (ImGui::BeginDragDropSource()) {
+	if (supportDrag && ImGui::BeginDragDropSource()) {
 		IFilter* filter = this;
 		uintptr_t f = (uintptr_t)filter;
 		ImGui::SetDragDropPayload(DRAG_DROP_PAYLOAD_TYPE_FILTER, &f, sizeof(f), ImGuiCond_Once);
@@ -252,7 +252,7 @@ void IFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 }
 
 
-void IFilter::Deserialize(tinyxml2::XMLElement * element)
+bool IFilter::Deserialize(tinyxml2::XMLElement * element)
 {
 	const char* c = element->Attribute("name");
 	isActive = element->BoolAttribute("isActive", true);
@@ -261,11 +261,12 @@ void IFilter::Deserialize(tinyxml2::XMLElement * element)
 		name = std::string(c);
 		name = name.substr(0, min(name.size(), 63));
 	}
-	DeserializeContent(element);
+	return DeserializeContent(element);
 }
 
-void IFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool IFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
+	return true;
 }
 
 std::set<ItemStackData*> IFilter::InvertSet(std::set<ItemStackData*> fullData,std::set<ItemStackData*> selectedData)

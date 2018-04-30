@@ -1,9 +1,9 @@
 #include "Window.h"
 #include "Config.h"
 
-Window::Window(char * name,bool defaultOpened) : _name(name)
+Window::Window(char * name,bool defaultOpened,char* saveName) : _name(name), saveName(saveName)
 {
-	_opened = Config::LoadBool("Windows", _name, defaultOpened);
+	_opened = Config::LoadBool("Windows", saveName==""? _name : saveName, defaultOpened);
 }
 
 Window::~Window()
@@ -13,7 +13,7 @@ Window::~Window()
 void Window::SetOpen(bool open)
 {
 	_opened = open;
-	Config::SaveBool("Windows", _name, _opened);
+	Config::SaveBool("Windows", saveName == "" ? _name : saveName, _opened);
 	Config::Save();
 	if (!_opened) ReleaseFocus();
 }

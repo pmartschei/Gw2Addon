@@ -25,9 +25,9 @@ void RootGroupFilter::Serialize(tinyxml2::XMLPrinter & printer)
 	printer.CloseElement();
 }
 
-void RootGroupFilter::Deserialize(tinyxml2::XMLElement * element)
+bool RootGroupFilter::Deserialize(tinyxml2::XMLElement * element)
 {
-	DeserializeContent(element);
+	return DeserializeContent(element);
 }
 
 

@@ -10,6 +10,6 @@ public:
 	RootGroupFilter();
 	virtual void Render() override;
 	virtual void Serialize(tinyxml2::XMLPrinter& printer) override;
-	virtual void Deserialize(tinyxml2::XMLElement* element) override;
+	virtual bool Deserialize(tinyxml2::XMLElement* element) override;
 };
 #endif

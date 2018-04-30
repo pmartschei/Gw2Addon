@@ -1,6 +1,7 @@
 #ifndef ITEM_TYPE_H
 #define ITEM_TYPE_H
 #include <map>
+#include "UpgradeComponentType.h"
 
 enum ItemType {
 	None = -1,
@@ -26,6 +27,7 @@ static std::map<ItemType, int> ItemTypeIndex = {
 	{ Trinket,12 },{ Trophy,13 },{ UpgradeComponent,14 },{ Weapon,15 } };
 static std::map<int, ItemType> ItemTypeEnum = { { 0,None },{ 1,Armor },{ 2,Back },{ 3,Bag },{ 4,Consumable },{ 5,Container },{ 6,CraftingMaterial },{ 7,Gathering },{ 8,Gizmo },
 { 9,Minipet },{ 10,Tool },{ 11,Trait },{ 12,Trinket },{ 13,Trophy },{ 14,UpgradeComponent },{ 15,Weapon } };
+static std::map<ItemType, ExtendedItemType*> ItemTypeSubTypes = { {UpgradeComponent,new UpgradeComponentType()} };
 static const char * ItemTypes[] = { "None", "Armor", "Back", "Bag", "Consumable", "Container", "CraftingMaterial", "Gathering","Gizmo","Minipet"
 ,"Tool" ,"Trait" ,"Trinket" ,"Trophy" ,"UpgradeComponent" ,"Weapon" };
 #endif

@@ -5,7 +5,7 @@
 class IDItemFilter : public SingleFilter<int> {
 protected:
 	virtual void SerializeContent(tinyxml2::XMLPrinter &printer) override;
-	virtual void DeserializeContent(tinyxml2::XMLElement* element) override;
+	virtual bool DeserializeContent(tinyxml2::XMLElement* element) override;
 	virtual IFilter* CreateNew() override;
 public:
 	IDItemFilter();

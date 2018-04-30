@@ -15,8 +15,9 @@ protected:
 	ImVec2 firstSize = ImVec2(400, 300);
 	ImVec2 position = ImVec2(0.0f,0.0f);
 	char* _name;
+	char* saveName;
 public:
-	Window(char* name,bool defaultOpened = true);
+	Window(char* name,bool defaultOpened = true,char* saveName = "");
 	~Window();
 	void SetOpen(bool open);
 	bool IsOpen();

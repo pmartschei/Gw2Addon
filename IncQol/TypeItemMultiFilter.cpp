@@ -60,7 +60,7 @@ void TypeItemMultiFilter::SerializeContent(tinyxml2::XMLPrinter & printer)
 	printer.PushAttribute("values", values.c_str());
 }
 
-void TypeItemMultiFilter::DeserializeContent(tinyxml2::XMLElement * element)
+bool TypeItemMultiFilter::DeserializeContent(tinyxml2::XMLElement * element)
 {
 	std::string values = element->Attribute("values", 0);
 	std::string delimiter = ",";
@@ -91,4 +91,5 @@ void TypeItemMultiFilter::DeserializeContent(tinyxml2::XMLElement * element)
 		if (value[i]) typeCount++;
 	}
 	name = GetName();
+	return true;
 }
